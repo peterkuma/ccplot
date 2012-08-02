@@ -602,7 +602,7 @@ def parse_options():
                     if len(subparts) != 2: raise ValueError
                     for j, subpart in enumerate(subparts):
                         # Match absolute time in format hour:min[:sec].
-                        r1 = re.compile(r"^(\d?\d):(\d\d)(?::(\d\d):)?$")                    
+                        r1 = re.compile(r"^(\d?\d):(\d\d)(?::(\d\d))?$")                    
                         # Match relative time in format +/-[hour:]min:sec.
                         r2 = re.compile(r"^(\+|-)(?:(\d+):)?(\d?\d):(\d\d)$")
 
@@ -643,7 +643,7 @@ def parse_options():
                     opt,s,val = p.partition("=")
                     plot_opts.setopt(opt, val)
         except (ValueError, KeyError), err:
-            fail("Invalid argument passed to %s: %s" % (o, err))
+            fail("Invalid argument passed to %s" % o)
 
     if print_info_only:
         if len(args) != 1: usage()
@@ -1067,9 +1067,9 @@ def plot_grid(what, fname, niofile, fig, axes, extent=(0,-1,0,-1),
 
         e1, e2, e3, e4 = extent 
         if type(e1) in (dt.time, dt.timedelta):
-            e1 = time2ray(e1, time, time2dt)
+            e1 = time2ray(e1, time[:,0] if time.rank == 2 else time, time2dt)
         if type(e2) in (dt.time, dt.timedelta):
-            e2 = time2ray(e2, time, time2dt)
+            e2 = time2ray(e2, time[:,0] if time.rank == 2 else time, time2dt)
 
         e1 = norm_index(e1, 0, nray)
         e2 = norm_index(e2, 0, nray)

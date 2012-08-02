@@ -5,7 +5,7 @@ module1 = Extension('cctk',
                     sources=['cctkmodule.c'])
 
 setup(name='ccplot',
-      version='1.3',
+      version='1.3.1',
       description='CloudSat/CALIPSO data processing helper routines',
       author='Peter Kuma',
       author_email='peterkuma@waveland.org',
