@@ -1,6 +1,3 @@
-Overview of ccplot
-==================
-
 ccplot is an open source command-line application for producing
 two-dimensinal plots of profile, layer and earth view data
 from CloudSat, CALIPSO and Aqua satellites.
