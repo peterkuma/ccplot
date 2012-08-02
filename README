@@ -1,0 +1,24 @@
+Overview of ccplot
+==================
+
+ccplot is a python program that reads CloudSat, CALISO and Aqua MODIS HDF
+and HDF-EOS data files, and produces plots of profile, layer and swath
+products.
+
+The following products are supported:
+
+	CloudSat Reflectivity Factor
+	CALIPSO L1B Total Attenuated Backscatter 532nm
+ 	CALIPSO L1B Perpendicular Attenuated Backscatter 532nm
+	CALIPSO L1B Attenuated Backscatter 1064nm
+	CALIPSO L1B Attenuated Color Ratio 1064nm/532nm
+	CALIPSO L1B Depolarization Ratio
+	CALIPSO L2 Integrated Attenuated Backscatter 532nm
+	CALIPSO L2 Integrated Attenuated Backscatter 1064nm
+	CALIPSO L2 Integrated Attenuated Total Color Ratio 1064nm/532nm
+	CALIPSO L2 Integrated Volume Depolarization Ratio
+	CALIPSO L2 Midlayer Temperature
+	CloudSat trajectory
+	CALIPSO trajectory
+	Aqua MODIS radiance and reflectance bands (except band 26)
+

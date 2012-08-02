@@ -1,0 +1,13 @@
+Metadata-Version: 1.1
+Name: ccplot
+Version: 1.0
+Summary: CloudSat/CALIPSO data processing helper routines
+Home-page: UNKNOWN
+Author: Peter Kuma
+Author-email: peterkuma@waveland.org
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Requires: matplotlib
+Requires: PyNIO
+Requires: basemap

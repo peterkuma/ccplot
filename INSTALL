@@ -1,0 +1,71 @@
+Installation instructions
+=========================
+
+ccplot is indended to be installed on unix-like operation systems.
+
+
+1. REQUIREMENTS
+
+(a) List of required programs
+
+The following programs are required by ccplot:
+
+	Python 2.6 (or later)
+	PyNIO 1.3.0b1 (or later)
+	numpy 1.1 (or later)
+	libpng 1.1 (or later)
+	freetype 1.4 (or later)
+	matplotlib 0.98.6 (or later)
+	basemap and libraries shipped with basemap
+
+(b) Installing Python
+
+Python 2.6 is likely to be a part of your OS distribution,
+or in the OS packaging system. If it is not, you can download it at
+http://www.python.org/.
+
+(c) Installing PyNIO
+
+PyNIO is the most cumbersome dependency. It can be downloaded
+from the EOS (Earth System Grid) web site; however, you will
+need have an account first (anyone is free to create one, though).
+Please follow the instructions at http://www.pyngl.ucar.edu/Download/.
+
+(d) Installing numpy
+
+If numpy is not distrubuted with your OS, you can download it at
+http://numpy.scipy.org/. numpy 1.1 is fairly common amongst stable
+linux distrubutions.
+
+(e) Installing libpng and freetype
+
+These are very likely to be in your OS distrubution. libpng can be
+downloaded at http://www.libpng.org/pub/png/libpng.html, and FreeType can be
+downloaded at http://www.freetype.org/.
+
+(f) Installing matplotlib, basemap and dependent libraries
+
+ccplot requires a recent version of matplotlib and basemap (>= 0.98.6).
+You can download both of them at
+http://sourceforge.net/projects/matplotlib/files/.
+
+For more information about installing matplotlib and dependent libraries, go to
+http://matplotlib.sourceforge.net/users/installing.html.
+
+For more information about installing basemap and dependent libraries, go to
+http://matplotlib.sourceforge.net/basemap/doc/html/users/installing.html.
+
+
+2. INSTALLING CCPLOT
+
+Once you installed required libraries you can build and install ccplot
+and its cctk extension module by the following commands:
+
+    $ python setup.py build
+    # python setup.py install   (as root)
+
+
+3. ADDITIONAL INFORMATION
+
+You can find usage information and examples in the manual page ccplot(1).
+

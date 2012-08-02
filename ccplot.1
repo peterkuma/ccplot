@@ -1,0 +1,322 @@
+.\" Copyright (c) 2009 Peter Kuma
+.Dd August 1, 2009
+.Dt CCPLOT 1
+.Os
+.Sh NAME
+.Nm ccplot
+.Nd CloudSat and CALIPSO data plotting tool
+.Sh SYNOPSIS
+.Nm ccplot
+.Op Fl a Ar ratio
+.Op Fl c Ar cmapfile
+.Op Fl d Ar dpi
+.Op Fl m Ar band
+.Op Fl o Ar outfile
+.Op Fl p Ar projection
+.Op Fl r Ar radius
+.Op Fl v Ar extent
+.Op Fl x Ar extent
+.Op Fl z Ar options
+.Ar type
+.Ar
+.Nm
+.Fl i Ar file
+.Nm
+.Fl h
+.Sh DESCRIPTION
+.Nm
+is a tool that produces 2D plots of data stored in CloudSat, CALIPSO
+and MODIS HDF files.
+.Pp
+The plot
+.Ar type
+can be one of:
+.Pp
+.Bl -tag -offset 4n -width "calipso-temperature-layer" -compact
+.It Cm cloudsat-reflec
+CloudSat Reflectivity Factor
+.It Cm calipso532
+CALIPSO L1B Total Attenuated Backscatter 532nm
+.It Cm calipso532p
+CALIPSO L1B Perpendicular Attenuated Backscatter 532nm
+.It Cm calipso1064
+CALIPSO L1B Attenuated Backscatter 1064nm
+.It Cm calipso-cratio
+CALIPSO L1B Attenuated Color Ratio 1064nm/532nm
+.It Cm calipso-dratio
+CALIPSO L1B Depolarization Ratio
+.It Cm calipso532-layer
+CALIPSO L2 Integrated Attenuated Backscatter 532nm
+.It Cm calipso1064-layer
+CALIPSO L2 Integrated Attenuated Backscatter 1064nm
+.It Cm calipso-cratio-layer
+CALIPSO L2 Integrated Attenuated Total Color Ratio 1064nm/532nm
+.It Cm calipso-dratio-layer
+CALIPSO L2 Integrated Volume Depolarization Ratio
+.It Cm calipso-temperature-layer
+CALIPSO L2 Midlayer Temperature
+.It Cm orbit
+map projection of CALIPSO and CloudSat trajectory, and Aqua MODIS radiance
+or reflectance swath depending on files supplied
+.It Cm orbit-clipped
+MODIS-region-clipped map projection of CALIPSO and CloudSat trajectory,
+and Aqua MODIS radiance or reflectance swath depending on files supplied
+.El
+.Pp
+The options are as follows:
+.Bl -tag
+.It Fl a Ar ratio
+Aspect ratio of profile products in seconds per km. Defaults to 2.
+.It Fl c Ar cmapfile
+Path to a cmap file defining colormap
+.Em boundaries ,
+colorbar
+.Em ticks
+and
+.Em colors .
+See the example cmap files that are distrubuted with
+.Nm
+for information about the format.
+.It Fl d Ar dpi
+DPI of
+.Ar outfile
+if a raster image is to be output.
+.It Fl m Ar band
+MODIS band specifier in format r# for reflective bands and x# for radiation
+bands, where # is the band number.
+.It Fl o Ar outfile
+Output file. Format is determined by extension Supported formats are
+.Tn SVG
+(.svg),
+.Tn PNG
+(.png),
+.Tn PDF
+(.pdf),
+.Tn EPS
+(.eps)
+and
+.Tn PS
+(.ps).
+.It Fl p Ar projection
+For MODIS
+.Cm orbit-clipped
+plots specifies the projection type. Default projection type is
+.Cm cyl .
+Supported projection types are:
+.Pp
+.Bl -tag -offset 4n -width "npstere" -compact
+.It Cm aeqd
+Azimuthal Equidistant
+.It Cm poly
+Polyconic
+.It Cm gnom
+Gnomonic
+.It Cm moll
+Mollweide
+.It Cm tmerc
+Transverse Mercator
+.It Cm nplaea
+North-Polar Lambert Azimuthal
+.It Cm gall
+Gall Stereographic Cylindrical
+.It Cm mill
+Miller Cylindrical
+.It Cm merc
+Mercator
+.It Cm stere
+Stereographic
+.It Cm npstere
+North-Polar Stereographic
+.It Cm geos
+Geostationary
+.It Cm vandg
+van der Grinten
+.It Cm laea
+Lambert Azimuthal Equal Area
+.It Cm mbtfpq
+McBryde-Thomas Flat-Polar Quartic
+.It Cm sinu
+Sinusoidal
+.It Cm spstere
+South-Polar Stereographic
+.It Cm lcc
+Lambert Conformal
+.It Cm npaeqd
+North-Polar Azimuthal Equidistant
+.It Cm eqdc
+Equidistant Conic
+.It Cm cyl
+Cylindrical Equidistant
+.It Cm omerc
+Oblique Mercator
+.It Cm aea
+Albers Equal Area
+.It Cm spaeqd
+South-Polar Azimuthal Equidistant
+.It Cm ortho
+Orthographic
+.It Cm cass
+Cassini-Soldner
+.It Cm splaea
+South-Polar Lambert Azimuthal
+.It Cm robin
+Robinson
+.El
+.It Fl r Ar radius
+Interpolation radius in pixels. In profile products radius specifies
+vertical extent which a data point is mapped onto. If such vertical
+regions of two data points overlap value is determined by averaging
+with a weight coefficient of 1 over distance squared.
+The same holds for swath products, but here radius specifies a square.
+If radius is too low with respect to
+.Cm dpi
+data will be sparsely distributed on the image.
+.It Fl v Ar extent
+Vertical extent of CloudSat and CALIPSO profiles in m in the format
+.Em from:to .
+.It Fl x Ar extent
+For CloudSat and CALIPSO profiles
+.Ar extent
+specifies region to be plotted in rays.
+For MODIS swath
+.Ar extent
+specifies horizontal extent in bins in the along-track
+direction and across-track direction.
+The format of
+.Ar extent
+qis
+.Em from:to
+or
+.Em from:to,from:to
+(respectively).
+.It Fl z Ar options
+Miscellaneous options that modifiy plot formatting.
+.Ar options
+is a list of comma separeted key=value pairs with no spaces in between.
+Supported general options are:
+.Pp
+.Bl -tag -offset 4n -width "cbfontsize" -compact
+.It Cm cbfontsize
+color bar font size (defaults to 8)
+.It Cm fontsize
+font size (defaults to 10)
+.El
+.Pp
+Supported options for orbit plots are:
+.Pp
+.Bl -tag -offset 4n -width "majormeridianscolor" -compact
+.It Cm coastlinescolor
+coastlines color (defaults to #46396D)
+.It Cm coastlineslw
+coastlines line width (defaults to 0.4)
+.It Cm countriescolor
+countries outlines color (defaults to #46396D)
+.It Cm countrieslw
+countries outlines line width (defaults to 0.2)
+.It Cm drawcoastlines
+draw coastlines (defaults to 1)
+.It Cm drawcountries
+draw countries outlines (defaults to 1)
+.It Cm drawlakes
+draw lakes (defaults to 1)
+.It Cm drawlsmask
+draw land-sea mask (defaults to 1)
+.It Cm drawmeridians
+draw meridians (defaults to 1)
+.It Cm drawminormeridians
+draw meridians (defaults to 1)
+.It Cm drawminorparallels
+draw minor parallels (defaults to 1)
+.It Cm drawparallels
+draw parallels (defaults to 1)
+.It Cm landcolor
+land color (defaults to #E9E4F7)
+.It Cm majormeridianscolor
+major meridians color (defaults to #000000)
+.It Cm majormeridianslw
+major meridians line width (defaults to 0.3)
+.It Cm majorparallelscolor
+major parallels line color (defaults to #000000)
+.It Cm majorparallelslw
+major parallels line width (defaults to 0.3)
+.It Cm mapres
+map resolution: c (crude), l (low), i (intermediate), h (high), f (full); (defaults to i)
+.It Cm minormeridianscolor
+minor meridians color (defaults to #000000)
+.It Cm minormeridianslw
+minor meridians line width (defaults to 0.1)
+.It Cm minorparallelscolor
+minor parallels color (defaults to #000000)
+.It Cm minorparallelslw
+minor parallels line width (defaults to 0.1)
+.It Cm trajcolors
+list of trajectory colors (defaults to #FF0000:#0000FF:#00FF00)
+.It Cm trajlws
+list of trajectory line widths (defaults to 0.5)
+.It Cm watercolor
+water color (defaults to #FFFFFF)
+.El
+.Pp
+Options that accept a list of values are specified in the form
+key=value1:value2[:value...].
+.El
+.\" .Sh ENVIRONMENT
+.\" .Sh FILES
+.Sh EXAMPLES
+Plot the first 1000 rays of CloudSat reflectivity profile from
+2006224184641_01550_CS_2B-GEOPROF_GRANULE_P_R03_E01.hdf
+using cloudsat-reflec.cmap colormap,
+and save it as cloudsat-reflec.png:
+.Bd -literal -offset 4n
+$ ccplot -x :1000 -c cloudsat-reflec.cmap
+-o cloudsat-reflec.png cloudsat-reflec
+2006224184641_01550_CS_2B-GEOPROF_GRANULE_P_R03_E01.hdf
+.Ed
+.Pp
+Plot CALIPSO backscatter profile from 0 to 20km from ray 5000 to 10000 from
+CAL_LID_L1-Prov-V2-01.2006-07-06T19-50-51ZN.hdf
+using calipso-backscatter.cmap colormap,
+and save it as calipso532.png:
+.Bd -literal -offset 4n
+$ ccplot -v 0:20000 -x 5000:10000 -c calipso-backscatter.cmap
+-o calipso532.png calipso532
+CAL_LID_L1-Prov-V2-01.2006-07-06T19-50-51ZN.hdf
+.Ed
+.Pp
+Plot map projection of CALIPSO trajectory superimposed on Aqua MODIS
+band 31 radiance using modis-temperature.cmap colormap,
+and save it as orbit-calipso.png:
+.Bd -literal -offset 4n
+$ ccplot -m x31 -c modis-temperature.cmap -p tmerc
+-o orbit-calipso.png orbit-clipped
+MYD021KM.A2006224.1945.005.2007140113559.hdf
+CAL_LID_L1-Prov-V2-01.2006-07-06T19-50-51ZN.hdf
+.Ed
+.\" .Sh DIAGNOSTICS
+.Sh SEE ALSO
+.Pp
+.Rs
+.%B CloudSat Standard Data Products Handbook
+.%D April 25th, 2008
+.Re
+.Pp
+.Rs
+.%B CALIPSO Data Products Catalog Release 2.4
+.%D December 2007
+.Re
+.Pp
+.Rs
+.%B MODIS Level 1B Product User's Guide
+.%D December 1, 2005
+.Re
+.\" .Xr foobar 1
+.\" .Sh STANDARDS
+.\" .Sh HISTORY
+.Sh AUTHORS
+.An -nosplit
+.Nm ccplot
+was written by
+.An Peter Kuma.
+.Sh CAVEATS
+Plot size is limited to 32767 pixels.
+.\" .Sh BUGS

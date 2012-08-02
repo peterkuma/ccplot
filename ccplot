@@ -1,0 +1,1654 @@
+#!/usr/bin/env python2.5
+#
+# ccplot - CloudSat and CALIPSO data plotting tool
+# Copyright (c) 2009 Peter Kuma
+#
+
+#
+# Includes.
+#
+
+# Core python includes.
+import os
+import sys
+from sys import argv, stdin, stdout, stderr
+from math import *
+import getopt
+import datetime as dt
+import gc
+import re
+import signal
+
+# Other includes.
+import Nio
+import numpy as np
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+from mpl_toolkits import basemap
+
+# CCTK is a helper module that performs various calculations.
+import cctk
+
+
+#
+# Constants.
+#
+
+planck_c1 = 1.191E-16
+planck_c2 = 1.439E-2
+
+supported_projections = ("aeqd","poly","gnom","moll","tmerc","nplaea","gall",
+"mill","merc","stere","npstere","geos","vandg","laea","mbtfpq","sinu","spstere",
+"lcc","npaeqd","eqdc","cyl","omerc","aea","spaeqd","ortho","cass","splaea",
+"robin")
+
+# WORKAROUND: This array should be constant throughout CALIPSO data files.
+# We list it inline here, because the field is stored in a VData structure
+# that is not supported by PyNIO.
+calipso_height = np.array((39.855106, 39.555317, 39.25553, 38.95574, 38.655952,
+38.356167, 38.056377, 37.756588, 37.4568, 37.157013, 36.857224, 36.557434,
+36.25765, 35.95786, 35.65807, 35.35828, 35.058495, 34.758705, 34.458916,
+34.15913, 33.85934, 33.55955, 33.25976, 32.959976, 32.660187, 32.360397,
+32.06061, 31.760822, 31.461033, 31.161245, 30.861456, 30.561668, 30.261879,
+30.022049, 29.842176, 29.662304, 29.48243, 29.302557, 29.122684, 28.94281,
+28.762938, 28.583065, 28.403193, 28.223318, 28.043446, 27.863573, 27.6837,
+27.503826, 27.323954, 27.144081, 26.964209, 26.784334, 26.604462, 26.42459,
+26.244717, 26.064842, 25.88497, 25.705097, 25.525225, 25.34535, 25.165478,
+24.985605, 24.805733, 24.625858, 24.445986, 24.266113, 24.086239, 23.906366,
+23.726494, 23.546621, 23.366747, 23.186874, 23.007002, 22.82713, 22.647255,
+22.467382, 22.28751, 22.107637, 21.927763, 21.74789, 21.568018, 21.388145,
+21.208271, 21.028399, 20.848526, 20.668653, 20.48878, 20.308907, 20.188992,
+20.129034, 20.069077, 20.009119, 19.94916, 19.889202, 19.829245, 19.769287,
+19.70933, 19.649372, 19.589415, 19.529457, 19.4695, 19.409542, 19.349585,
+19.289627, 19.229668, 19.16971, 19.109753, 19.049795, 18.989838, 18.92988,
+18.869923, 18.809965, 18.750008, 18.69005, 18.630093, 18.570133, 18.510176,
+18.450218, 18.39026, 18.330303, 18.270346, 18.210388, 18.15043, 18.090473,
+18.030516, 17.970558, 17.9106, 17.850641, 17.790684, 17.730726, 17.670769,
+17.610811, 17.550854, 17.490896, 17.430939, 17.370981, 17.311024, 17.251066,
+17.191107, 17.13115, 17.071192, 17.011234, 16.951277, 16.89132, 16.831362,
+16.771404, 16.711447, 16.65149, 16.591532, 16.531574, 16.471615, 16.411657,
+16.3517, 16.291742, 16.231785, 16.171827, 16.11187, 16.051912, 15.991955,
+15.931996, 15.872039, 15.812081, 15.752124, 15.692166, 15.632208, 15.57225,
+15.512293, 15.452335, 15.392378, 15.33242, 15.272462, 15.212504, 15.152547,
+15.092589, 15.032632, 14.972674, 14.912716, 14.852758, 14.792801, 14.732843,
+14.672886, 14.612928, 14.55297, 14.493012, 14.433055, 14.373097, 14.31314,
+14.253181, 14.193224, 14.133266, 14.073309, 14.013351, 13.953394, 13.8934355,
+13.833478, 13.77352, 13.713563, 13.653605, 13.593648, 13.5336895, 13.473732,
+13.4137745, 13.353817, 13.2938595, 13.233902, 13.1739435, 13.113986, 13.0540285,
+12.994071, 12.9341135, 12.874156, 12.814198, 12.75424, 12.694283, 12.634325,
+12.574368, 12.514409, 12.454452, 12.394494, 12.334537, 12.274579, 12.214622,
+12.154663, 12.094706, 12.034748, 11.974791, 11.914833, 11.854876, 11.794917,
+11.73496, 11.675002, 11.615045, 11.555087, 11.49513, 11.435171, 11.375214,
+11.315256, 11.255299, 11.195341, 11.135383, 11.075425, 11.015468, 10.95551,
+10.895553, 10.835595, 10.775637, 10.715679, 10.655722, 10.595764, 10.535807,
+10.475849, 10.415891, 10.355933, 10.295976, 10.236018, 10.176061, 10.116103,
+10.056145, 9.996187, 9.93623, 9.876272, 9.816315, 9.756356, 9.696399, 9.636441,
+9.576484, 9.516526, 9.456569, 9.39661, 9.336653, 9.276695, 9.216738, 9.15678,
+9.096823, 9.036864, 8.976907, 8.916949, 8.856992, 8.797034, 8.737077, 8.677118,
+8.617161, 8.557203, 8.497246, 8.437288, 8.37733, 8.317372, 8.257415, 8.212447,
+8.182467, 8.152489, 8.12251, 8.092531, 8.062552, 8.032574, 8.002595, 7.972616,
+7.942637, 7.912658, 7.8826795, 7.8527007, 7.822722, 7.792743, 7.762764,
+7.732785, 7.7028065, 7.6728277, 7.642849, 7.61287, 7.582891, 7.552912,
+7.5229335, 7.4929547, 7.462976, 7.432997, 7.403018, 7.3730392, 7.3430605,
+7.3130817, 7.283103, 7.2531238, 7.223145, 7.1931663, 7.1631875, 7.1332088,
+7.10323, 7.073251, 7.043272, 7.0132933, 6.9833145, 6.953336, 6.923357,
+6.893378, 6.863399, 6.8334203, 6.8034415, 6.773463, 6.743484, 6.713505,
+6.683526, 6.6535473, 6.6235685, 6.59359, 6.5636106, 6.533632, 6.503653,
+6.4736743, 6.4436955, 6.413717, 6.3837376, 6.353759, 6.32378, 6.2938013,
+6.2638226, 6.233844, 6.2038646, 6.173886, 6.143907, 6.1139283, 6.0839496,
+6.053971, 6.0239916, 5.994013, 5.964034, 5.9340553, 5.9040766, 5.874098,
+5.8441186, 5.81414, 5.784161, 5.7541823, 5.7242036, 5.6942244, 5.6642456,
+5.634267, 5.604288, 5.5743093, 5.5443306, 5.5143514, 5.4843726, 5.454394,
+5.424415, 5.3944364, 5.3644576, 5.3344784, 5.3044996, 5.274521, 5.244542,
+5.2145634, 5.1845846, 5.1546054, 5.1246266, 5.094648, 5.064669, 5.0346904,
+5.004711, 4.9747324, 4.9447536, 4.914775, 4.884796, 4.8548174, 4.824838,
+4.7948594, 4.7648807, 4.734902, 4.704923, 4.6749444, 4.644965, 4.6149864,
+4.5850077, 4.555029, 4.52505, 4.4950714, 4.465092, 4.4351134, 4.4051347,
+4.375156, 4.345177, 4.315198, 4.285219, 4.2552404, 4.2252617, 4.195283,
+4.165304, 4.135325, 4.105346, 4.0753675, 4.0453887, 4.01541, 3.985431,
+3.9554522, 3.9254732, 3.8954945, 3.8655157, 3.8355367, 3.805558, 3.7755792,
+3.7456002, 3.7156215, 3.6856427, 3.6556637, 3.625685, 3.5957062, 3.5657272,
+3.5357485, 3.5057697, 3.4757907, 3.445812, 3.4158332, 3.3858542, 3.3558755,
+3.3258967, 3.2959177, 3.265939, 3.23596, 3.2059813, 3.1760025, 3.1460235,
+3.1160448, 3.086066, 3.056087, 3.0261083, 2.9961295, 2.9661505, 2.9361718,
+2.906193, 2.876214, 2.8462353, 2.8162565, 2.7862775, 2.7562988, 2.72632,
+2.696341, 2.6663623, 2.6363835, 2.6064045, 2.5764258, 2.546447, 2.516468,
+2.4864893, 2.4565103, 2.4265316, 2.3965528, 2.3665738, 2.336595, 2.3066163,
+2.2766373, 2.2466586, 2.2166798, 2.1867008, 2.156722, 2.1267433, 2.0967643,
+2.0667856, 2.0368068, 2.0068278, 1.9768491, 1.9468702, 1.9168913, 1.8869126,
+1.8569337, 1.8269548, 1.7969761, 1.7669972, 1.7370183, 1.7070396, 1.6770607,
+1.6470819, 1.6171031, 1.5871242, 1.5571454, 1.5271665, 1.4971877, 1.4672089,
+1.43723, 1.4072512, 1.3772724, 1.3472935, 1.3173147, 1.2873359, 1.257357,
+1.2273781, 1.1973994, 1.1674205, 1.1374416, 1.1074629, 1.077484, 1.0475051,
+1.0175264, 0.9875475, 0.95756865, 0.92758983, 0.897611, 0.86763215, 0.83765334,
+0.8076745, 0.77769566, 0.74771684, 0.717738, 0.68775916, 0.65778035, 0.6278015,
+0.59782267, 0.5678438, 0.537865, 0.5078862, 0.47790733, 0.4479285, 0.41794965,
+0.3879708, 0.35799196, 0.32801315, 0.2980343, 0.26805547, 0.23807664, 0.2080978,
+0.17811897, 0.14814013, 0.1181613, 0.088182464, 0.058203626, 0.028224792,
+-0.001754042, -0.031732876, -0.06171171, -0.09169055, -0.12166938, -0.15164822,
+-0.18162705, -0.21160589, -0.24158472, -0.27156356, -0.3015424, -0.3315212,
+-0.36150005, -0.3914789, -0.42145774, -0.45143658, -0.61632013, -0.9161085,
+-1.2158968, -1.5156852, -1.8154736), dtype=np.float32)
+calipso_height = calipso_height[::-1]*1000 # meters
+
+calipso_backscat_bounds = np.concatenate((np.arange(0.0001, 0.001, 0.0001),
+                                          np.arange(0.0010, 0.0085, 0.0005),
+                                          np.arange(0.0100, 0.110, 0.01)))
+
+wavelengths = np.zeros(37)
+
+# TODO: Wavelenghts for 13lo, 13hi, 14lo and 14hi may not be correct.
+wavelengths[1:37] = (645,858.500,469,555,1240,1640,2130,412.5,443,488,531,551,
+667,678,748,869.500,905,936,940,
+3660,3929,3929,4020,4433,4482,1360,6535,7175,8400,9580,10780,11770,13185,13485,
+13785,14085)
+
+
+#
+# Classes.
+#
+
+class ModisParams(object):
+    lon = None
+    lat = None
+    data = None
+    band = 1
+    band_index = 0
+    refrad = "x"
+    extent = ((0, -1), (0, -1))
+    lonlat_extent = ((-180, 180), (-90, 90))
+    si_scale = 1.0
+    si_offset = 0.0
+    lon_scale = 1.0
+    lon_offset = 0.0
+    lat_scale = 1.0
+    lat_offset = 0.0
+
+
+class PlotOpts(object):
+    cbfontsize = 8
+    coastlinescolor = "#46396D"
+    coastlineslw = 0.4
+    countriescolor = "#46396D"
+    countrieslw = 0.2
+    drawcoastlines = True
+    drawcountries = True
+    drawlakes = True
+    drawlsmask = True
+    drawmeridians = True
+    drawminormeridians = True
+    drawminorparallels = True
+    drawparallels = True
+    fontsize = 10
+    landcolor = "#E9E4F7"
+    majormeridianscolor = "#000000"
+    majormeridianslw = 0.3
+    majorparallelscolor = "#000000"
+    majorparallelslw = 0.3
+    mapres = "i"
+    minormeridianscolor = "#000000"
+    minormeridianslw = 0.1
+    minorparallelscolor = "#000000"
+    minorparallelslw = 0.1
+    trajcolors = ("#FF0000", "#0000FF", "#00FF00")
+    trajlws = (0.5,)
+    watercolor = "#FFFFFF"
+
+    def setint(self, o, v, a, b):
+        i = int(v)
+        if i < a or i > b:
+            raise ValueError("%s expected between %d and %d" % (o, a, b))
+        return i
+
+    def setfloat(self, o, v, a, b):
+        f = float(v)
+        if f < a or f > b:
+            raise ValueError("%s expected between %f and %f" % (o, a, b))
+        return f
+
+    def setcolor(self, o, v):
+        if re.match("^#[0-9A-Z]{6}$", v, re.IGNORECASE) == None:
+            raise ValueError("%s is not a valid color" % v)
+        return v
+
+    def settuple(self, o, v, func, *args, **kwargs):
+        parts = v.split(":")
+        return [func(o, p, *args, **kwargs) for p in parts]
+
+    def setenum(self, o, v, vals):
+        if v not in vals: ValueError("%s must be one of: %s" % (v,vals))
+        return v
+
+    def setbool(self, o, v):
+        if o == "1": setattr(self, o, True)
+        elif o == "0": setattr(self, o, False)
+        else: ValueError("%s must be 1 or 0" % o)
+        return v
+
+    def setopt(self, o, v):
+        if not hasattr(self, o): raise ValueError
+        
+        if   o == "cbfontsize": q = self.setfloat(o, v, 0, 50)
+        elif o == "coastlinecolor": q = self.setcolor(o, v)
+        elif o == "coastlinelw": q = self.setfloat(o, v, 0, 10)
+        elif o == "countriescolor": q = self.setcolor(o, v)
+        elif o == "countrieslw": q = self.setfloat(o, v, 0, 10)
+        elif o == "drawcoastlines": q = self.setbool(o, v)
+        elif o == "drawcountries": q = self.setbool(o, v)
+        elif o == "drawlakes": q = self.setbool(o, v)
+        elif o == "drawlsmask": q = self.setbool(o, v)
+        elif o == "drawmeridians": q = self.setbool(o, v)
+        elif o == "drawminormeridians": q = self.setbool(o, v)
+        elif o == "drawminorparallels": q = self.setbool(o, v)
+        elif o == "fontsize": q = self.setfloat(o, v, 0, 50)
+        elif o == "landcolor": q = self.setcolor(o, v)
+        elif o == "linewidth": q = self.setfloat(o, v, 0, 10)
+        elif o == "majormeridianscolor": q = self.setcolor(o, v)
+        elif o == "majormeridianslw": q = self.setfloat(o, v, 0, 10)
+        elif o == "majorparallelscolor": q = self.setcolor(o, v)
+        elif o == "majorparallelslw": q = self.setfloat(o, v, 0, 10)
+        elif o == "mapres": q = self.setenum(o, v, ("c","l","i","h","f"))
+        elif o == "minormeridianscolor": q = self.setcolor(o, v)
+        elif o == "minormeridianslw": q = self.setfloat(o, v, 0, 10)
+        elif o == "trajcolors": q = self.settuple(o, v, self.setcolor)
+        elif o == "trajlws": q = self.settuple(o, v, self.setfloat, 0, 10)
+        elif o == "watercolor": q = self.setcolor(o, v)
+        setattr(self, o, q)
+        
+
+class TimeLocator(mpl.ticker.Locator):
+    def __init__(self, n, time, time2dt, \
+                 steps=     [1, 10, 30, 60, 300, 600, 900],
+                 minorsteps=[0.2,2,  5, 10,  60, 120, 300]):
+        self.n = int(n)
+        self.time = time
+        self.time2dt = time2dt
+        self.steps = np.array(steps, np.float)
+        self.minorsteps = np.array(minorsteps, np.float)
+        self.minorlocs = []
+
+    def __call__(self):
+        vmin, vmax = self.axis.get_view_interval()
+        dmin, dmax = self.axis.get_data_interval()
+        vmin, vmax = int(vmin), int(vmax)
+        if len(self.time) == 0 or self.n <= 0: return []
+        if vmin < 0: vmin = 0
+        if vmax >= len(self.time): vmax = len(self.time) - 1
+        if vmax < vmin: vmax = vmin = 0
+        td = self.time2dt(self.time[vmax]) - self.time2dt(self.time[vmin])
+        # Time difference in seconds.
+        nseconds = td.days*86400 + td.seconds + td.microseconds*0.000001
+        if nseconds == 0: return []
+        ratio = 1.0 * (vmax-vmin)/nseconds
+        time0 = self.time2dt(self.time[vmin])
+        # Adjust to the nearest minute. We introduce a correction of 200ms
+        # (1 ray is about 49ms), so that we don't get min:59.
+        offset = -ratio * (time0.microsecond * 0.000001 + \
+                           time0.second + \
+                           time0.minute * 60 - 0.2)
+        stepdiffs = self.steps - nseconds/self.n
+        np.place(stepdiffs, stepdiffs < 0, float("infinity"))
+        i = stepdiffs.argmin()
+        base = ratio * self.steps[i]
+        minorbase = ratio * self.minorsteps[i]
+        offset = offset % base
+        self.minorlocs = np.arange(vmin + offset, vmax + offset, minorbase)
+        return np.arange(vmin + offset, vmax + offset, base)
+
+
+class TimeMinorLocator(mpl.ticker.Locator):
+    def __call__(self):
+        locator = self.axis.get_major_locator()
+        if isinstance(locator, TimeLocator):
+            return locator.minorlocs
+        else:
+            return []
+
+        
+class TimeFormatter(mpl.ticker.Formatter):
+    def __init__(self, time, time2dt):
+        self.time = time
+        self.time2dt = time2dt
+
+    def __call__(self, x, pos=None):
+        i = int(x)
+        if i >= len(self.time) or i < 0: return "undef"
+        return self.time2dt(self.time[i]).strftime("%H:%M:%S")
+
+
+class CopyLocator(mpl.ticker.Locator):
+    def __init__(self, axis):
+        self.model_axis = axis
+    
+    def __call__(self):
+        return self.model_axis.get_majorticklocs()
+
+
+class SciFormatter(mpl.ticker.Formatter):
+    def __call__(self, x, pos=None):
+        if x == 0.0: return "0.0"
+        y = log(abs(x), 10)
+        n = int(floor(y))
+        if n < -1 or n > 2: return "%.1fx10$^{%d}$" % (x/10**n, n)
+        else: return "%.1f" % (x,)
+
+
+#
+# Default command-line options.
+#
+
+extent = np.array((0, -1, 0, -1), dtype=np.int)
+fnames = []
+vextent = np.array((float("-infinity"), float("infinity")), dtype=np.float)
+resolution = None
+aspect = 2.0
+dpi = 300
+outfname = None
+plot_type = None
+print_info_only = False
+cmapfname = None
+modis_band = 1
+modis_refrad = "x"
+projection = "cyl"
+radius = None
+plot_opts = PlotOpts()
+
+
+#
+# Functions.
+#
+
+def report_memory():
+    pid = os.getpid()
+    a2 = os.popen("ps -p %d -o rss,vsz,%%mem" % pid).readlines()
+    print "MEMORY:", a2[1],
+    return int(a2[1].split()[1])
+
+
+def fail(s):
+    global program_name
+    print >> stderr, "%s: %s" % (program_name, s)
+    sys.exit(1)
+
+
+def warn(s):
+    global program_name
+    print >> stderr, "%s: Warning: %s" % (program_name, s)    
+
+
+def norm_index(x, a, b):
+    if x > b: return b
+    if x < a: x += b
+    if x < a: return a
+    return x
+
+
+def radiance2temp(L, lamb):
+    """Converts radiace to temperature by inverse Planck's law.
+    
+    Arguments:
+        L       -- radiance in W m^-2 m^-1
+        lamb    -- wavelength in m
+
+    Returns:
+        temerature in K
+    """
+    global planck_c1, planck_c2
+    return planck_c2 / (lamb * np.log(planck_c1 / (lamb**5 * L * 1E6) + 1))
+
+
+def usage():
+    """Prints usage information and exits the program with return value of 1."""
+    global program_name
+    print >> stderr, "Usage: %s [OPTION]... TYPE FILE..." % program_name
+    print >> stderr, "       %s -i FILE" % program_name
+    print >> stderr, "Try `%s -h' for more information." % program_name
+    sys.exit(1)
+
+
+def help():
+    global program_name
+
+    print >> stderr, "\
+%s: [OPTION]... TYPE FILE...\n\
+%s: -i FILE\n\
+\n\
+Plot data from CloudSat, CALIPSO and Aqua MODIS product files.\n\
+Example: %s -c calipso.cmap -x 11000:13000 -v :25000 -o out.png calipso532 \
+CAL_LID_L1-Prov-V2-01.2006-08-12T19-15-34ZD.hdf\n\
+\n\
+Where OPTION is one of:\n\
+  -a RATIO                      aspect ratio of profile products in s per km\n\
+  -c FILE                       colormap file\n\
+  -d DPI                        DPI of the output file\n\
+  -h                            print help information and exit\n\
+  -i FILE                       print information about FILE\n\
+  -m BAND                       MODIS band (e.g. r1 for reflectance band 1,\n\
+                                x31 for radiance band 31)\n\
+  -o OUTFILE                    output file, type is determined by extension\n\
+  -p PROJECTION                 projection type\n\
+  -r RADIUS                     interpolation radius\n\
+  -v FROM:TO                    vertical extent in meters\n\
+  -x FROM:TO[,FROM:TO]          horizontal extent in bins\n\
+  -z OPTION=VAL[,OPTION=VAL]    list of option-value pairs\n\
+\n\
+OPTION is one of:\n\
+  coastlinescolor\n\
+  coastlineslw\n\
+  countriescolor\n\
+  countrieslw\n\
+  drawcoastlines\n\
+  drawcountries\n\
+  drawlakes\n\
+  drawlsmask\n\
+  drawmeridians\n\
+  drawminormeridians\n\
+  drawminorparallels\n\
+  drawparallels\n\
+  fontsize\n\
+  landcolor\n\
+  majormeridianscolor\n\
+  majormeridianslw\n\
+  majorparallelscolor\n\
+  majorparallelslw\n\
+  mapres\n\
+  minormeridianscolor\n\
+  minormeridianslw\n\
+  minorparallelscolor\n\
+  minorparallelslw\n\
+  trajcolors\n\
+  trajlws\n\
+  watercolor\n\
+\n\
+PROJECTION is one of:\n\
+  aeqd 		Azimuthal Equidistant\n\
+  poly 		Polyconic\n\
+  gnom 		Gnomonic\n\
+  moll 		Mollweide\n\
+  tmerc 	Transverse Mercator\n\
+  nplaea 	North-Polar Lambert Azimuthal\n\
+  gall 		Gall Stereographic Cylindrical\n\
+  mill 		Miller Cylindrical\n\
+  merc 		Mercator\n\
+  stere 	Stereographic\n\
+  npstere 	North-Polar Stereographic\n\
+  geos 		Geostationary\n\
+  vandg 	van der Grinten\n\
+  laea 		Lambert Azimuthal Equal Area\n\
+  mbtfpq 	McBryde-Thomas Flat-Polar Quartic\n\
+  sinu 		Sinusoidal\n\
+  spstere 	South-Polar Stereographic\n\
+  lcc 		Lambert Conformal\n\
+  npaeqd 	North-Polar Azimuthal Equidistant\n\
+  eqdc 		Equidistant Conic\n\
+  cyl 		Cylindrical Equidistant\n\
+  omerc 	Oblique Mercator\n\
+  aea 		Albers Equal Area\n\
+  spaeqd 	South-Polar Azimuthal Equidistant\n\
+  ortho 	Orthographic\n\
+  cass 		Cassini-Soldner\n\
+  splaea 	South-Polar Lambert Azimuthal\n\
+  robin 	Robinson\n\
+\n\
+TYPE is one of:\n\
+  cloudsat-reflec\n\
+  calipso532\n\
+  calipso532p\n\
+  calipso1064\n\
+  calipso-cratio\n\
+  calipso-dratio\n\
+  calipso532-layer\n\
+  calipso1064-layer\n\
+  calipso-cratio-layer\n\
+  calipso-dratio-layer\n\
+  calipso-temperature-layer\n\
+  orbit\n\
+  orbit-clipped\n\
+\n\
+FILE is a CloudSat or Aqua MODIS HDF-EOS file, or a CALIPSO HDF4 file.\n\
+\n\
+Report bugs to <peterkuma@waveland.org>." % \
+    (program_name, program_name, program_name)
+
+#
+# Parses command-line options.
+#
+def parse_options():
+    global extent, vextent, fnames, aspect, dpi, outfname, plot_type, \
+           print_info_only, cmapfname, modis_band, modis_refrad, modis_hilo, \
+           projection, supported_projections, plot_opts, radius
+
+    try:
+        opts, args = getopt.getopt(argv[1:], "a:c:d:him:o:p:r:t:v:x:z:")
+    except getopt.error, err: usage()
+    for o, a in opts:
+        try:
+            if o == "-a":
+                aspect = float(a)
+                if aspect <= 0.0: raise ValueError
+            elif o == "-c": cmapfname = a
+            elif o == "-d":
+                dpi = int(a)
+                if dpi <= 0: raise ValueError
+            elif o == "-h":
+                help()
+                sys.exit()
+            elif o == "-i": print_info_only = True
+            elif o == "-m":
+                modis_refrad = a[0]
+                if a[-2:] == "hi":
+                    modis_band = int(a[1:-2]) + 0.5
+                elif a[-2:] == "lo":
+                    modis_band = int(a[1:-2])
+                else:
+                    modis_band = int(a[1:])
+            elif o == "-o": outfname = a
+            elif o == "-p":
+                projection = a
+                if projection not in supported_projections:
+                    raise ValueError
+            elif o == "r":
+                radius = int(a)
+                if radius < 0: raise ValueError
+            elif o == "-v":
+                parts = a.partition(":")
+                if parts[0] != "": vextent[0] = int(parts[0])
+                if parts[2] != "": vextent[1] = int(parts[2])
+            elif o == "-x":
+                r = re.compile(r"^(-?\d+)?:(-?\d+)?(?:,(-?\d+)?:(-?\d+)?)?$")
+                m = r.match(a)
+                if m == None: raise ValueError
+                gs = m.groups()
+                for i in range(4):
+                    g, e = gs[i], extent[i]
+                    extent[i] = int(g) if g != None else e
+            elif o == "-z":
+                parts = a.split(",")
+                for p in parts:
+                    opt,s,val = p.partition("=")
+                    plot_opts.setopt(opt, val)
+        except (ValueError, KeyError), err:
+            fail("Invalid argument passed to %s: %s" % (o, err))
+
+    if print_info_only:
+        if len(args) != 1: usage()
+        fnames = args
+    else:
+        if len(args) < 2: usage()
+        plot_type = args[0]
+        fnames = args[1:]
+
+
+def loadcolormap(filename, name):
+    """"Returns a tuple of matplotlib colormap, matplotlib norm,
+    and a list of ticks loaded from the file filename in format:
+    
+    BOUNDS
+    from1 to1 step1
+    from2 to2 step2
+    ...
+    
+    TICKS
+    from1 to1 step1
+    from2 to2 step2
+    
+    COLORS
+    r1 g1 b1
+    r2 g2 b2
+    ...
+    
+    UNDER_OVER_BAD_COLORS
+    ro go bo
+    ru gu bu
+    rb gb bb
+    
+    Where fromn, ton, stepn are floating point numbers as would be supplied
+    to numpy.arange, and rn, gn, bn are the color components the n-th color
+    stripe. Components are expected to be in base10 format (0-255).
+    UNDER_OVER_BAD_COLORS section specifies colors to be used for
+    over, under and bad (masked) values in that order.
+
+    Arguments:
+        filename    -- name of the colormap file
+        name        -- name for the matplotlib colormap object
+
+    Returns:
+        (instance of ListedColormap, instance of BoundaryNorm, ticks)
+    """
+    bounds = []
+    ticks = []
+    rgbarray = []
+    specials = []
+    mode = "COLORS"
+    try:
+        fp = open(filename, "r")
+        lines = fp.readlines()
+        for n, s in enumerate(lines):
+            s = s.strip()
+            if len(s) == 0: continue
+            if s in ("BOUNDS", "TICKS", "COLORS", "UNDER_OVER_BAD_COLORS"):
+                mode = s
+                continue
+
+            a = s.split()
+            if len(a) not in (3, 4):
+                raise ValueError("Invalid number of fields")
+
+            if mode == "BOUNDS":
+                bounds += list(np.arange(float(a[0]), float(a[1]), float(a[2])))
+            elif mode == "TICKS":
+                ticks += list(np.arange(float(a[0]), float(a[1]), float(a[2])))
+            elif mode == "COLORS":
+                rgba = [int(c)/256.0 for c in a]
+                if len(rgba) == 3: rgba.append(1)
+                rgbarray.append(rgba)
+            elif mode == "UNDER_OVER_BAD_COLORS":
+                rgba = [int(c)/256.0 for c in a]
+                if len(rgba) == 3: rgba.append(1)
+                specials.append(rgba)
+
+    except IOError, err:
+        fail(err)
+    except ValueError, err:
+        fail("Error reading `%s' on line %d: %s" % (filename, n+1, err))
+   
+    if (len(rgbarray) > 0):
+        colormap = mpl.colors.ListedColormap(rgbarray, name)
+        try:
+            colormap.set_under(specials[0][:3], specials[0][3])
+            colormap.set_over(specials[1][:3], specials[1][3])
+            colormap.set_bad(specials[2][:3], specials[2][3])
+        except IndexError: pass
+    else:
+        colormap = None
+        
+    if len(bounds) == 0:
+        norm = None
+    else:
+        norm = mpl.colors.BoundaryNorm(bounds, colormap.N)
+    if len(ticks) == 0: ticks = None
+    return (colormap, norm, ticks)
+
+
+def print_info(niofile):
+    """Prints information about the file.
+       
+    Arguments:
+        niofile -- NIO module file to read the information from.
+    """
+    ftype = None
+    try: # Try CALIPSO names.
+        time = niofile.variables["Profile_UTC_Time"][:,0]
+        start_time = None
+        time2dt = calipso_time2dt
+        height = calipso_height
+        backscat532 = niofile.variables["Total_Attenuated_Backscatter_532"]
+        lat  = niofile.variables["Latitude"][:,0]
+        lon  = niofile.variables["Longitude"][:,0]
+        nbin = backscat532.shape[1]
+        nray = len(time)
+        ftype = "CALIPSO"
+    except (KeyError, IndexError): pass
+    try: # Try CloudSat names.
+        time = niofile.variables["Profile_time_2B_GEOPROF"]
+        lat = niofile.variables["Latitude_2B_GEOPROF"]
+        lon = niofile.variables["Longitude_2B_GEOPROF"]
+        height = niofile.variables["Height_2B_GEOPROF"][0]
+        time2dt = cloudsat_time2dt
+        st = niofile.attributes["start_time_2B_GEOPROF"]
+        start_time = dt.datetime.strptime(st, "%Y%m%d%H%M%S")
+        del st
+        nbin = niofile.dimensions["nbin_2B_GEOPROF"]
+        nray = len(time)
+        ftype = "CloudSat"
+    except (KeyError, IndexError): pass
+    try: # Try MODIS names.
+        lon = niofile.variables["Longitude_MODIS_SWATH_Type_L1B"][:,0]
+        lat = niofile.variables["Latitude_MODIS_SWATH_Type_L1B"][:,0]
+        ftype = "MODIS"
+    except (KeyError, IndexError): pass
+
+    if ftype == None: fail("Unsupported file format")
+
+    if ftype == "MODIS":
+        print "Type: %s" % ftype
+        print "Longitude: %f %f" % (lon[0], lon[-1])
+        print "Latitude: %f %f" % (lat[0], lat[-1])
+    else:
+        time1 = time2dt(time[0], start_time).strftime("%Y-%m-%d %H:%M:%S")
+        time2 = time2dt(time[-1], start_time).strftime("%Y-%m-%d %H:%M:%S")
+        print "Type: %s" % ftype
+        print "Time: %s %s" % (time1, time2)
+        print "Height: %d %d" % (height[0], height[-1])
+        print "nray: %d" % nray
+        print "nbin: %d" % nbin
+        print "Longitude: %f %f" % (lon[0], lon[-1])
+        print "Latitude: %f %f" % (lat[0], lat[-1])
+
+
+def calipso_time2dt(time, start_time=None):
+    """Converts a float in format yymmdd.ffffffff to a instance of python
+    datetime class.
+    
+    Arguments:
+        time        -- float in format yymmdd.ffffffff
+        start_time  -- ignored 
+    
+    Returns:
+        instance of datetime
+    """
+    d = int(time % 100)
+    m = int((time-d) % 10000)
+    y = int(time-m-d)
+    return dt.datetime(2000 + y/10000, m/100, d) + dt.timedelta(time % 1)
+
+
+def cloudsat_time2dt(time, start_time):
+    """Converts time in seconds to a instance of python datetime class.
+    
+    Arguments:
+        time        -- seconds from start_time
+        start_time  -- python datetime
+    
+    Returns:
+        instance of datetime
+    """
+    return start_time + dt.timedelta(0, float(time))
+    
+
+def get_axes_size_inches(fig, axes):
+    """Returns size of axes in iches."""
+    x, y, w, h = axes.get_position().bounds
+    w_in = fig.get_size_inches()[0] * w
+    h_in = fig.get_size_inches()[1] * h
+    return np.array((w_in, h_in))
+
+    
+def fit_colorbar(fig, axes, aspect=0.03, shrink=1.0, space_in=0.4):
+    """Creates new axes for a colorbar at the expense of main axes.
+    
+    Arguments:
+        axes    -- main axes
+        aspect  -- colorbar axes aspect ratio
+        shrink  -- ratio by which to shrink height of the colorbar axes
+                   relative to the the height of the main axes
+    
+    Returns:
+        an instance of matplotlib axes
+    """
+    (x, y, width, height) = axes.get_position().bounds
+    width_in = fig.get_size_inches()[0] * width
+    height_in = fig.get_size_inches()[1] * height
+
+    cbaxes = fig.add_axes((x+width*(1.0-height_in*aspect/width_in), \
+                           y+height*(1.0-shrink)/2, \
+                           width*height_in*aspect/width_in, \
+                           height*shrink))
+    # Shrink main axes.
+    axes.set_position((x, y,
+                       width*(1.0-(height_in*aspect+space_in)/width_in),
+                       height))
+
+    figw, figh = fig.get_size_inches()
+    fig.set_size_inches(figw + width*height_in*aspect, figh)
+    return cbaxes
+    
+
+def stripstr(s1, s2):
+    i = s1.rfind(s2)
+    if i == -1: return s1
+    else: return s1[:i]
+
+
+def lon2str(lonf):
+    if lonf >= 0.0: return "%.2f$\degree$E" % (lonf,)
+    else: return "%.2f$\degree$W" % (-lonf,)
+
+
+def lat2str(latf):
+    if latf >= 0.0: return "%.2f$\degree$N" % (latf,)
+    else: return "%.2f$\degree$S" % (-latf,)
+
+
+def setup_lonlat_axes(fig, axes, lon, lat):
+    @mpl.ticker.FuncFormatter
+    def lonlat_formatter(x, pos=None):
+        i = long(x)
+        if x < 0 or x >= len(lon): return ""
+        return "%s\n%s" % (lon2str(lon[i]), lat2str(lat[i]))
+
+    llaxes = fig.add_axes(axes.get_position())
+    llaxes.yaxis.set_visible(False)
+    llaxes.axesPatch.set_alpha(0.0)
+    llaxes.set_xlim(axes.get_xlim())
+    llaxes.set_ylim(axes.get_ylim())
+    llaxes.set_aspect(axes.get_aspect())
+    llaxes.xaxis.set_major_locator(CopyLocator(axes.xaxis))
+
+    for tick in llaxes.xaxis.get_major_ticks():
+        tick.tick1On = tick.label1On = False
+        tick.tick2On = tick.label2On = True
+
+    for line in llaxes.xaxis.get_ticklines():
+        line.set_marker(mpl.lines.TICKUP)
+
+    for label in llaxes.xaxis.get_ticklabels():
+        label.set_y(label.get_position()[1] + 0.01)
+
+    llaxes.xaxis.set_major_formatter(lonlat_formatter)
+
+
+def expand_figure(fig, axes, aspect):
+    """Exands figure, so that axes have a given aspect ratio. However,
+    it does not care about any other elements in the figure,
+    whose aspect ratio would be changed too.
+    
+    Arguments:
+        fig     -- figure to expand
+        axes    -- axes
+        aspect  -- aspect ratio
+    
+    Returns:
+        a pair of new figure width and figure height in inches
+    """
+    figw, figh = fig.get_size_inches()
+    x, y, w, h = axes.get_position().bounds
+    w_in, h_in = w*figw, h*figh
+    figw = figh/aspect * w/h
+    fig.set_size_inches(figw, figh)
+    axes.set_aspect("auto")
+    axes.apply_aspect()
+    return figw, figh
+
+
+def plot_grid(what, fname, niofile, fig, axes, extent=((0,-1),(0,-1)),
+                 vextent=np.array((float("-infinity"), float("infinity"))),
+                 aspect=2.0, colormap=None, norm=None, ticks=None, radius=None,
+                 opts=PlotOpts()):
+    """Draws a plot of a profile product identified by argument what.
+
+    Arguments:
+        what            -- product type string
+        fname           -- file name
+        niofile         -- NIO module file to read data from
+        fig             -- matplotlib Figure instance to draw onto
+        axes            -- matplotlib Axes instance to draw onto
+        vextent         -- vertical extent, a pair of low and high boundary
+                           in meters
+        extent          -- a list of two pairs defining horizontal (first pair)
+                           and vertical (second pair) extent in bins
+        aspect          -- aspect ratio in s per km
+        colormap        -- matplotlib Colormap instance
+        norm            -- matplotlib Normalize instance
+        ticks           -- a list of ticks to be drawn on colorbar
+    """
+    global calipso_height
+
+    #
+    # Data retrieval.
+    #
+    try: # Try CloudSat names.
+        time = niofile.variables["Profile_time_2B_GEOPROF"]
+        lat = niofile.variables["Latitude_2B_GEOPROF"]
+        lon = niofile.variables["Longitude_2B_GEOPROF"]
+        reflec = niofile.variables["Radar_Reflectivity_2B_GEOPROF"]
+        height = niofile.variables["Height_2B_GEOPROF"]
+        start_time = niofile.attributes["start_time_2B_GEOPROF"]
+        nbin = niofile.dimensions["nbin_2B_GEOPROF"]
+        nray = len(time)
+    except KeyError: pass
+    try: # Try common CALIPSO profile/layer names.
+        time = niofile.variables["Profile_UTC_Time"]
+        lat  = niofile.variables["Latitude"]
+        lon  = niofile.variables["Longitude"]
+        nray = len(time)
+    except KeyError: pass
+    try: # Try CALIPSO profile names.
+        backscat532 = niofile.variables["Total_Attenuated_Backscatter_532"]
+        backscat532p = niofile.variables["Perpendicular_Attenuated_Backscatter_532"]
+        backscat1064 = niofile.variables["Attenuated_Backscatter_1064"]
+        # CALIPSO doesn't call them rays (horizontal) and bins
+        # (vertical); anyway, it should be clear enough.
+        nbin = backscat532.shape[1]
+    except KeyError: pass
+    try: # Try CALIPSO layer names.
+        topalt  = niofile.variables["Layer_Top_Altitude"]
+        basealt = niofile.variables["Layer_Base_Altitude"]
+        backscat532_layer = niofile.variables["Integrated_Attenuated_Backscatter_532"]
+        backscat1064_layer = niofile.variables["Integrated_Attenuated_Backscatter_1064"]
+        cratio_layer = niofile.variables["Integrated_Attenuated_Total_Color_Ratio"]
+        dratio_layer = niofile.variables["Integrated_Volume_Depolarization_Ratio"]
+        temperature_layer = niofile.variables["Midlayer_Temperature"]
+        nlayer = niofile.variables["Number_Layers_Found"]
+        nbin = 10 # Dummy value.
+    except KeyError: pass
+    
+    e1, e2, e3, e4 = extent
+    e1 = norm_index(e1, 0, nray)
+    e2 = norm_index(e2, 0, nray)
+    e3 = norm_index(e3, 0, nbin)
+    e4 = norm_index(e4, 0, nbin)
+    if e1 >= e2 or e3 >= e4: fail("Invalid extent")
+
+    #
+    # Determine what is requested.
+    #
+    try:
+        if what.startswith("cloudsat"):
+            product_name = "CloudSat profile"
+            lon = lon[e1:e2]
+            lat = lat[e1:e2]
+            height = height[e1:e2,e3:e4][:,::-1]
+            time = time[e1:e2]
+            start_time_dt = dt.datetime.strptime(start_time, "%Y%m%d%H%M%S")
+            time2dt = lambda t: cloudsat_time2dt(t, start_time_dt)
+        elif what.startswith("calipso"):
+            product_name = "CALIPSO profile"
+            lon = lon[e1:e2,0]
+            lat = lat[e1:e2,0]
+            # WORKAROUND: See the comment at the beginning of this file.            
+            height = calipso_height[e3:e4]
+            time = time[e1:e2,0]
+            time2dt = calipso_time2dt
+        else:
+            fail("Assertion error: Unrecogized plot type `%s'" % what)
+        
+        # CloudSat products.
+        if what == "cloudsat-reflec":
+            data = reflec[e1:e2,e3:e4].astype(np.float32)/100
+            np.place(data, data == -88.88, float("nan"))
+            title = "Radar Reflectivity Factor (dBZe)"
+            vmin = -40.0
+            vmax = 30.0
+        # CALIPSO profile products.
+        elif what == "calipso532":
+            data = backscat532[e1:e2,e3:e4]
+            #np.place(data, data < 0, float("nan"))
+            #data = data * (backscat532 > 0.0001)
+            title = "Total Attenuated Backscatter 532nm (km$^{-1}$ sr$^{-1}$)"
+            vmin = 0.001
+            vmax = 1.0
+        elif what == "calipso532p":
+            data = backscat532p[e1:e2,e3:e4]
+            title = "Perpendicular Attenuated Backscatter 532nm (km$^{-1}$ sr$^{-1}$)"
+            vmin = 0.001
+            vmax = 1.0
+        elif what == "calipso1064":
+            data = backscat1064[e1:e2,e3:e4]
+            title = "Attenuated Backscatter 1064nm (km$^{-1}$ sr$^{-1}$)"
+            vmin = 0.001
+            vmax = 1.0
+        elif what == "calipso-cratio":
+            data = backscat1064[e1:e2,e3:e4] / backscat532[e1:e2,e3:e4]
+            title = "Attenuated Color Ratio 1064nm/532nm"
+            vmin = 0.0
+            vmax = 2.0
+        elif what == "calipso-dratio":
+            data = backscat532p[e1:e2,e3:e4] / backscat532[e1:e2,e3:e4]    
+            title = "Depolarization Ratio"
+            vmin = 0.0
+            vmax = 1.0
+        # CALIPSO layer products.
+        elif what == "calipso532-layer":
+            data = backscat532_layer[e1:e2]
+            title = "Integrated Attenuated Backscatter 532nm (sr$^{-1}$)"
+            vmin = 0.001
+            vmax = 1.0
+        elif what == "calipso1064-layer":
+            data = backscat1064_layer[e1:e2]
+            title = "Integrated Attenuated Backscatter 1064nm (sr$^{-1}$)"
+            vmin = 0.001
+            vmax = 1.0
+        elif what == "calipso-cratio-layer":
+            data = cratio_layer[e1:e2]
+            title = "Integrated Attenuated Total Color Ratio 1064nm/532nm"
+            vmin = 0.0
+            vmax = 2.0
+        elif what == "calipso-dratio-layer":
+            data = dratio_layer[e1:e2]
+            title = "Integrated Volume Depolarization Ratio"
+            vmin = 0.0
+            vmax = 1.0
+        elif what == "calipso-temperature-layer":
+            data = temperature_layer[e1:e2] + 273.15
+            title = "Midlayer Temperature (K)"
+            vmin = -110
+            vmax = 60
+        else:
+            fail("Assertion error: Unrecogized plot type `%s'" % what)
+            
+        if what.endswith("-layer"):
+            product_name = "CALIPSO layer"
+            nlayer = nlayer[e1:e2,0]
+        else:
+            data = data[:,::-1]
+
+    except KeyError, err: fail("%s: Required field missing" % s)
+    except IndexError: fail("%s: Invalid extent")
+
+    ve1, ve2 = vextent
+
+    minheight, maxheight = height.min(), height.max()
+    #if ve1 < minheight: ve1 = minheight
+    #if ve2 > maxheight: ve2 = maxheight
+    if ve1 >= ve2: fail("Invalid vertical extent")
+
+    if norm == None: norm = mpl.colors.Normalize(vmin, vmax)
+
+    #
+    # Core data processing and plotting.
+    #
+    if what.endswith("-layer"):                     # Layer products.
+        axes.set_axis_bgcolor(colormap(-1.0))
+        colors = colormap(norm(data))
+        axes.set_xlim((0, e2-e1))
+        axes.set_ylim((ve1*0.001, ve2*0.001))
+        for i in np.arange(0, e2-e1)[nlayer > 0]:
+            for j in range(nlayer[i]):
+                y2 = topalt[i, j]
+                y1 = basealt[i, j]
+                r = mpl.patches.Rectangle((i,y1), 1, y2-y1, fill=True,
+                                          facecolor=colors[i, j], lw=0)
+                axes.add_patch(r)
+    else:                                           # Profile products.
+        resolution = int(get_axes_size_inches(fig, axes)[1]*fig.get_dpi())
+        
+        height0 = np.arange(ve1, ve2, 1.0*(ve2-ve1)/resolution,
+                            dtype=np.float32)
+        #data = cctk.lininty2d(data, height, height0)
+        if height.ndim == 1:
+            Y, X = np.meshgrid(height, np.arange(0, e2-e1, dtype=np.float32))
+        else:
+            Y, X = np.meshgrid(height[0,:],
+                               np.arange(0, e2-e1, dtype=np.float32))
+            Y = height
+        if radius == None: radius = int(800*resolution/(ve2-ve1))
+        data = cctk.linint2d(data, X, Y, (0, e2-e1, e2-e1),
+                             (ve1, ve2, resolution), float("nan"), 0, radius)
+        data = np.ma.masked_invalid(data)
+        # Plot data.
+        im = axes.imshow(data.T, origin="lower",
+                         extent=(0, e2-e1, ve1/1000.0, ve2/1000.0),
+                         interpolation="nearest", cmap=colormap, norm=norm)
+
+    td = time2dt(time[-1]) - time2dt(time[0])
+    nseconds = td.days*86400 + td.seconds
+    if nseconds == 0: return
+    figw, figh = expand_figure(fig, axes, aspect/nseconds*(ve2-ve1)*0.001)
+    width_in, height_in = get_axes_size_inches(fig, axes)
+    nlocs = int(width_in*1.5)
+    
+    # Time axis.
+    axes.set_xlabel("Time (UTC)")
+    axes.xaxis.set_minor_locator(TimeMinorLocator())
+    axes.xaxis.set_major_locator(TimeLocator(nlocs, time, time2dt))
+    axes.xaxis.set_major_formatter(TimeFormatter(time, time2dt))
+    
+    for line in axes.xaxis.get_ticklines() + axes.xaxis.get_minorticklines():
+        line.set_marker(mpl.lines.TICKDOWN)
+
+    for label in axes.xaxis.get_ticklabels():
+        label.set_y(-0.1/figh)
+
+    # Height axis.
+    axes.set_ylabel("Altitude (km)")
+    axes.yaxis.set_minor_locator(mpl.ticker.AutoMinorLocator())
+    axes.yaxis.set_major_locator(mpl.ticker.MaxNLocator(9, [0.5,1,5]))
+
+    for label in axes.yaxis.get_ticklabels():
+        label.set_x(-0.1/figw)
+
+    for line in axes.yaxis.get_ticklines()+axes.yaxis.get_minorticklines():
+        line.set_marker(mpl.lines.TICKLEFT)
+
+    # Hide ticks on the top and right-hand side.
+    for tick in axes.xaxis.get_major_ticks() + \
+                axes.yaxis.get_major_ticks() + \
+                axes.xaxis.get_minor_ticks() + \
+                axes.yaxis.get_minor_ticks():
+        tick.tick1On = tick.label1On = True
+        tick.tick2On = tick.label2On = False
+
+    # Colorbar.
+    cbaxes = fit_colorbar(fig, axes)
+    if what.endswith("-layer"):
+        cb = mpl.colorbar.ColorbarBase(cbaxes, orientation="vertical", \
+                                       extend="both", ticks=ticks,
+                                       cmap=colormap, norm=norm,
+                                       format=SciFormatter())
+    else:
+        cb = fig.colorbar(im, ax=axes, cax=cbaxes, orientation="vertical",
+                          extend="both", ticks=ticks, norm=norm,
+                          format=SciFormatter())        
+        
+    cb.set_label(title)
+
+    for label in cb.ax.get_yticklabels():
+        label.set_fontsize(opts.cbfontsize)
+
+    # Longitude/latitude.
+    setup_lonlat_axes(fig, axes, lon, lat)
+
+    axes_title = "%s from %s  -  %s" % \
+             (product_name,
+              time2dt(time[0]).strftime("%Y-%m-%d %H:%M:%S"),
+              time2dt(time[-1]).strftime("%Y-%m-%d %H:%M:%S"))
+    title_text = axes.set_title(axes_title, fontsize=opts.fontsize+4)
+    title_text.set_y(title_text.get_position()[1]+0.8/figh)
+
+
+def plot_orbit(fnames, niofiles, nioeosfiles, fig, axes, extent=((0,-1),(0,-1)),
+    band=1, refrad="x", proj='cyl', clipped=False, colormap=None, norm=None,
+    ticks=None, radius=None, opts=PlotOpts()):
+    """Draws a map plot of a CloudSat and CALIPSO trajectories and MODIS swath.
+    
+    Arguments:
+        niofiles    -- a list of NIO files
+        fig         -- matplotlib Figure instance
+        axes        -- matplotlib Axes instance
+        extent      -- a list containing two pairs defining along-track
+                       (first pair) and across-track (second pair)
+                       MODIS extent in bins
+        band        -- band to plot (integer or 13.5 or 14.5 for high bands)
+        refrad      -- "r" for reflectance or "x" for radiance
+        proj        -- Basemap projection name
+        clipped     -- clip map to MODIS swath
+        colormap    -- matplotlib Colormap instance
+        norm        -- matplotlib Normalize instance
+        ticks       -- a list of ticks to be drawn on colorbar
+    """
+    # Search for a MODIS data file.
+    mp = None
+    for niofile, nioeosfile in zip(niofiles, nioeosfiles):
+        if nioeosfile != None and \
+           nioeosfile.variables.has_key("Longitude_MODIS_SWATH_Type_L1B"):
+            if mp != None: warn("Multiple MODIS files supplied")
+            mp = modis_preprocess(niofile, nioeosfile, band, refrad, extent)
+
+    if mp != None and clipped:
+        minorticks_base = 10000
+        majorticks_base = 60000
+        minorparallels = np.arange(-90, 91, 1)
+        majorparallels = np.arange(-90, 91, 5)
+        minormeridians = np.arange(-180, 181, 1)
+        majormeridians = np.arange(-180, 181, 5)
+        (minlon, maxlon), (minlat, maxlat) = mp.lonlat_extent
+    else:
+        minorticks_base = 60000
+        majorticks_base = 300000
+        minorparallels = np.arange(-90, 91, 10)
+        majorparallels = np.arange(-90, 91, 30)
+        minormeridians = np.arange(-180, 181, 10)
+        majormeridians = np.arange(-180, 181, 30)
+        (minlon, maxlon), (minlat, maxlat) = ((-180, 180), (-90, 90))
+
+    def pick(x, a, b): return np.extract(np.logical_and(x > a, x < b), x)
+    minorparallels = pick(minorparallels, minlat-10, maxlat+10)
+    majorparallels = pick(majorparallels, minlat-10, maxlat+10)
+    minormeridians = pick(minormeridians, minlon-10, maxlon+10)
+    majormeridians = pick(majormeridians, minlon-10, maxlon+10)
+
+    # Plot map.
+    m = basemap.Basemap(projection=proj, llcrnrlon=minlon,
+                        urcrnrlon=maxlon, llcrnrlat=minlat, urcrnrlat=maxlat,
+                        lon_0 = (minlon+maxlon)*0.5,
+                        lat_0 = (minlat+maxlat)*0.5)
+
+    (x1, x2), (y1, y2) = m((minlon, maxlon), (minlat, maxlat))
+    print minlon, maxlon, minlat, maxlat
+    print x1, x2, y1, y2
+    (minlon, maxlon), (minlat, maxlat) = m((min(x1,x2),max(x1,x2)), (min(y1,y2),max(y1,y2)), inverse=True)
+    print minlon, maxlon, minlat, maxlat
+
+    m = basemap.Basemap(projection=proj, llcrnrlon=minlon,
+                        urcrnrlon=maxlon, llcrnrlat=minlat, urcrnrlat=maxlat,
+                        resolution=opts.mapres, ax=axes,
+                        lon_0 = (minlon+maxlon)*0.5,
+                        lat_0 = (minlat+maxlat)*0.5)
+
+    w_in, h_in = get_axes_size_inches(fig, axes)
+    aspect = w_in/h_in
+    axes.set_aspect("auto")
+    axes.apply_aspect()
+    expand_figure(fig, axes, aspect)
+
+    if opts.drawcoastlines:
+        m.drawcoastlines(linewidth=opts.coastlineslw, color=opts.coastlinescolor)
+    if opts.drawcountries:
+        m.drawcountries(linewidth=opts.countrieslw, color=opts.countriescolor)
+    if opts.drawlsmask:
+        m.drawlsmask(opts.landcolor, opts.watercolor, lakes=opts.drawlakes)
+    if opts.drawminorparallels:
+        m.drawparallels(minorparallels, dashes=[],
+                        linewidth=opts.minorparallelslw,
+                        color=opts.minorparallelscolor)
+    if opts.drawparallels:
+        m.drawparallels(majorparallels, dashes=[],
+                        linewidth=opts.majorparallelslw,
+                        color=opts.majorparallelscolor,
+                        labels=[1, 0, 0, 0])
+    if opts.drawminormeridians:
+        m.drawmeridians(minormeridians, dashes=[],
+                         linewidth=opts.minormeridianslw,
+                         color=opts.minormeridianscolor)
+    if opts.drawmeridians:
+        m.drawmeridians(majormeridians, dashes=[],
+                        linewidth=opts.majormeridianslw,
+                        color=opts.majormeridianscolor,
+                        labels=[0, 0, 0, 1])
+                        
+    # TODO: More sensible calculation by resolution.
+    if radius == None: radius = 3 
+    
+    if mp != None:
+        plot_modis(mp, m, fig, axes, colormap=colormap, norm=norm,
+            ticks=ticks, radius=radius, opts=opts)
+
+    # Plot trajectories.
+    j = 0
+    for i, (niofile, nioeosfile) in enumerate(zip(niofiles, nioeosfiles)):
+        if nioeosfile != None and \
+           nioeosfile.variables.has_key("Longitude_MODIS_SWATH_Type_L1B"):
+            continue
+
+        hit = False
+        try: # Try CALIPSO names.
+            time = niofile.variables["Profile_UTC_Time"][:, 0]
+            lon = niofile.variables["Longitude"][:, 0]
+            lat = niofile.variables["Latitude"][:, 0]
+            time2dt = calipso_time2dt
+            hit = True
+        except (KeyError, IndexError): pass
+        try: # Try CloudSat names.
+            time = nioeosfile.variables["Profile_time_2B_GEOPROF"][:]
+            lon = nioeosfile.variables["Longitude_2B_GEOPROF"][:]
+            lat = nioeosfile.variables["Latitude_2B_GEOPROF"][:]
+            start_time = nioeosfile.attributes["start_time_2B_GEOPROF"]
+            start_time_dt = dt.datetime.strptime(start_time, "%Y%m%d%H%M%S")
+            time2dt = lambda t: cloudsat_time2dt(t, start_time_dt)
+            hit = True
+        except (AttributeError, KeyError, IndexError): pass
+        
+        if hit:
+            lw = opts.trajlws[j % len(opts.trajlws)]
+            color = opts.trajcolors[j % len(opts.trajcolors)]
+            plot_trajectory(fig, axes, m, lon, lat, time,
+                time2dt, minorticks_base,
+                majorticks_base, lw=lw, color=color)
+            j = j+1
+        else: warn("%s: Unrecognized file, skipping" % fnames[i])
+
+    # Plot title.
+    #title = "%s  -  %s" % (time_from.strftime("%Y-%m-%d %H:%M:%S"),
+    #    time_to.strftime("%Y-%m-%d %H:%M:%S"))
+    #axes.set_title(title)
+
+
+def plot_trajectory(fig, axes, m, lon, lat, time, time2dt,
+    minorticks_base, majorticks_base, lw=1.0, color="#000000"):
+    global extent
+
+    #
+    # Helper functions.
+    #
+    def drawtick(i, ticksize, tickwidth, text=None):
+        # Skip if outside of the visible area.
+        if lon[i] < m.llcrnrlon or lon[i] > m.urcrnrlon or \
+           lat[i] < m.llcrnrlat or lat[i] > m.urcrnrlat:
+            return
+
+        ticksize_in = ticksize/72.0
+        w_in, h_in = fig.get_size_inches()
+
+        def t(x, y):
+            return fig.transFigure.inverted().transform(
+                axes.transData.transform((x, y)))*(w_in, h_in)
+
+        if i == 0:
+            dx, dy = t(X[1], Y[1]) - t(X[0], Y[0])
+        elif i == nray-1:
+            dx, dy = t(X[i], Y[i-1]) - t(X[i], Y[i-1])
+        else:
+            dx, dy = t(X[i+1], Y[i+1]) - t(X[i-1], Y[i-1])
+        
+        l = sqrt(dx**2 + dy**2)
+        if (l == 0): v = np.array((ticksize_in, 0))
+        else: v = np.array((dy, -dx))/l
+
+        x, y = t(X[i], Y[i])
+
+        trans = mpl.transforms.Affine2D().scale(1.0/w_in, 1.0/h_in) + \
+            fig.transFigure
+            
+        line = mpl.lines.Line2D((x, x + v[0]*ticksize_in),
+                                (y, y + v[1]*ticksize_in), transform=trans,
+                                color="black", lw=tickwidth)
+        axes.add_line(line)
+
+        if text != None:
+            doty = np.dot(v, (0, 1))
+            dotx = np.dot(v, (1, 0))
+            if dotx < -0.3: halign = "right"
+            elif dotx > 0.3: halign = "left"
+            else: halign = "center"
+            
+            if doty < -0.3: valign = "top"
+            elif doty > 0.3: valign = "bottom"
+            else: valign = "center"
+
+            axes.text(x + v[0]*(ticksize_in*2),
+                      y + v[1]*(ticksize_in*2),
+                      text,
+                      horizontalalignment=halign,
+                      verticalalignment=valign,
+                      transform=trans)
+    
+    nray = len(time)
+    time_from = time2dt(time[0])
+    time_to = time2dt(time[-1])
+    d = time_to - time_from
+    # Delta time in milliseconds.
+    time_delta = d.days*86400000 + d.seconds*1000 + d.microseconds/1000
+    del d
+
+    X, Y = m(lon, lat)
+
+    # Plot trajectory ticks.
+    ratio = 1.0*nray/time_delta if time_delta != 0 else 0
+    offset = long(ratio*(-time_from.microsecond/1000.0-time_from.second*1000+100))
+    if offset == 0: offset = -1 # For safety reasons.
+    minorticks = np.arange(offset,nray-1,ratio*minorticks_base).astype(long)
+    majorticks = np.arange(offset,nray-1,ratio*majorticks_base).astype(long)
+
+    # We need to fix the aspect ratio before drawing ticks.
+    axes.apply_aspect()
+
+    for i in minorticks:
+        if i < 0: continue
+        drawtick(i, 1.0, lw*0.5)
+
+    for i in majorticks:
+        if i < 0: continue
+        timestr = time2dt(time[i]).strftime("%H:%M:%S")
+        drawtick(i, 1.5, lw, timestr)
+
+    # Plot satellite trajectory.
+    indices = np.flatnonzero(abs(X-np.roll(X, -1)) + \
+              abs(Y-np.roll(Y, -1)) > 1) + 1
+    Xsplit = np.array_split(X, indices)
+    Ysplit = np.array_split(Y, indices)
+    for i in range(len(indices)):
+        m.plot(Xsplit[i], Ysplit[i], color=color, lw=lw)
+
+
+def modis_preprocess(niofile, nioeosfile, band, refrad, extent):
+    global wavelengths
+
+    # Load data from ticks.
+    try:
+        lon = niofile.variables["Longitude"]
+        lat = niofile.variables["Latitude"]
+    except KeyError, err:
+        warn("%s: Variable expected, but not present" % err)
+        return None
+
+    data = None
+    if band in (1, 2):
+        data = niofile.variables.get("EV_250_RefSB", data)
+        data = niofile.variables.get("EV_250_Aggr500_RefSB", data)
+        data = niofile.variables.get("EV_250_Aggr1km_RefSB", data)
+        band_offset = -1
+    elif band in (3, 4, 5, 6, 7):
+        data = niofile.variables.get("EV_500_RefSB", data)
+        data = niofile.variables.get("EV_500_Aggr1km", data)
+        band_offset = -3
+    elif band in range(8, 20) or band in (13.5, 14.5):
+        data = niofile.variables.get("EV_1KM_RefSB", data)
+        if band <= 13: band_offset = -8
+        elif band == 13.5: band_offset = -7
+        elif band == 14.0: band_offset = -7
+        else: band_offset = -6
+    # TODO: Add support for band 26.
+    elif band == 26: fail("Band 26 is not supported")
+    elif band in range(20, 37):
+        data = niofile.variables.get("EV_1KM_Emissive", data)
+        band_offset = -20
+
+    band_index = band + band_offset
+
+    if data == None or data.shape[0] <= band_index:
+        fail("%d: Band not present in the data file" % band)
+
+    # Determine parameters for dimension mapping.
+    nscan_ndet_name = stripstr(data.dimensions[1], "_MODIS_SWATH_Type_L1")
+    nfram_nsam_name = stripstr(data.dimensions[2], "_MODIS_SWATH_Type_L1")
+
+    geo_nscan_ndet_name = stripstr(lon.dimensions[0], "_MODIS_SWATH_Type_L1")
+    geo_nfram_nsam_name = stripstr(lon.dimensions[1], "_MODIS_SWATH_Type_L1")
+
+    try:
+        off1, inc1 = nioeosfile.attributes[geo_nscan_ndet_name + \
+            "_to_" + nscan_ndet_name + \
+            "_mapping_offset_and_increment_MODIS_SWATH_Type_L1B"]
+
+        off2, inc2 = nioeosfile.attributes[geo_nfram_nsam_name + \
+            "_to_" + nfram_nsam_name + \
+            "_mapping_offset_and_increment_MODIS_SWATH_Type_L1B"]
+    except KeyError, err: fail("%s: Attribute not found" % err)
+
+    if refrad == "r" and band >= 20 and band != 26: fail("Invalid band")
+
+    if refrad == "r":
+        try:
+            si_scale = data.attributes["reflectance_scales"][band_index]
+            si_offset = data.attributes["reflectance_offsets"][band_index]
+        except KeyError: fail("Reflectance parameters not present")
+    elif refrad == "x":
+        try:
+            si_scale = data.attributes["radiance_scales"][band_index]
+            si_offset = data.attributes["radiance_offsets"][band_index]
+        except KeyError: fail("Radiance parameters not present")
+    else: fail("Assertion error: Invalid ref/rad switch")
+
+    nscan_ndet = data.shape[1]
+    nfram_nsam = data.shape[2]
+
+    e1, e2, e3, e4 = extent
+    e1 = norm_index(e1, 0, nscan_ndet)
+    e2 = norm_index(e2, 0, nscan_ndet)
+    e3 = norm_index(e3, 0, nfram_nsam)
+    e4 = norm_index(e4, 0, nfram_nsam)
+    
+    ed1 = int((e1-off1)/inc1 - 0.5)
+    ed2 = int((e2-off1)/inc1 + 0.5)
+    ed3 = int((e3-off2)/inc2 - 0.5)
+    ed4 = int((e4-off2)/inc2 + 0.5)
+    if ed1 < 0: ed1 = 0
+    if ed2 > lon.shape[0]: ed2 = lon.shape[0]
+    if ed3 < 0: ed3 = 0
+    if ed4 > lon.shape[1]: ed4 = lon.shape[1]
+    lon0, lat0 = lon[ed1:ed2, ed3:ed4], lat[ed1:ed2, ed3:ed4]
+    lonlat_extent = ((lon0.min(), lon0.max()), (lat0.min(), lat0.max()))
+
+    mp = ModisParams()
+    mp.lon = lon
+    mp.lon_inc = inc1
+    mp.lon_off = off1
+    mp.lat_inc = inc2
+    mp.lat_off = off2
+    mp.lat = lat
+    mp.data = data
+    mp.band = band
+    mp.refrad = refrad
+    mp.extent = ((e1, e2), (e3, e4))
+    mp.lonlat_extent = lonlat_extent
+    mp.band_index = band_index
+    mp.si_scale = si_scale
+    mp.si_offset = si_offset
+    mp.nscan_ndet = nscan_ndet
+    mp.nfram_nsam = nfram_nsam
+    mp.wavelength = wavelengths[band]
+    return mp
+
+
+def plot_modis(mp, m, fig, axes, colormap=None, norm=None, ticks=None,
+               radius=3, opts=PlotOpts()):
+
+    (e1, e2), (e3, e4) = mp.extent
+
+    # We wouldn't need to handle this as a special case, however,
+    # PyNIO returns a single row when slicing with bounds equal,
+    # whereas numpy returns zero.
+    if e1 == e2 or e3 == e4: return
+
+    # Perform dimension mapping on lon/lat.
+    lon0 = cctk.dimmap2d(mp.lon[:,:], mp.lon_off, mp.lon_inc,
+                         mp.lat_off, mp.lat_inc)
+    lat0 = cctk.dimmap2d(mp.lat[:,:], mp.lon_off, mp.lon_inc,
+                         mp.lat_off, mp.lat_inc)
+
+    lon0 = lon0[e1:e2, e3:e4]
+    lat0 = lat0[e1:e2, e3:e4]
+
+    # Choose band and crop data.
+    data0 = mp.data[mp.band_index, e1:e2, e3:e4]
+    data0 = data0.astype(np.float32)
+
+    # Set invalid data elements to NaN.
+    np.place(data0, data0 < 0.0, float("nan"))
+    data0 = np.float32(mp.si_scale) * (data0 - np.float32(mp.si_offset))
+
+    # lon/lat to X/Y conversion.
+    X, Y = m(lon0, lat0)
+    if X.dtype != np.float32: X = np.asarray(X, dtype=np.float32)
+    if Y.dtype != np.float32: Y = np.asarray(Y, dtype=np.float32)
+    del lon0, lat0
+
+    # Interpolate data on X/Y grid.
+    nx, ny = (get_axes_size_inches(fig, axes) * dpi).astype(np.int)
+    data0 = cctk.linint2d(data0, X, Y, (m.llcrnrx, m.urcrnrx, nx),
+                          (m.llcrnry, m.urcrnry, ny), float("nan"),
+                          radius, radius)
+    del X, Y
+
+    # Mask invalid values.
+    data0 = np.ma.masked_invalid(data0)
+
+    # Radiance to temperature conversion.
+    if mp.refrad == "x":
+        data0 = radiance2temp(data0, mp.wavelength * 1E-9)
+        title = "Band %2.1f Black Body Temperature (K)" % mp.band
+    elif mp.refrad == "r":
+        data0 *= 100 # In per cent.
+        title = "Band %2.1f Albedo (%%)" % mp.band
+
+    # Plotting.
+    im = m.imshow(data0.T, cmap=colormap, norm=norm, interpolation="nearest")
+
+    cbaxes = fit_colorbar(fig, axes)
+    cb = fig.colorbar(im, ax=axes, cax=cbaxes, orientation="vertical",
+                      extend="both", norm=norm, ticks=ticks)
+    cb.set_label(title)
+
+    for label in cb.ax.get_yticklabels():
+        label.set_fontsize(opts.cbfontsize)
+
+
+#
+# The program starts here.
+#
+
+if __name__ == "__main__":
+    # We don't want the annoying KeyboadInterrupt exception on Control-C.
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+    program_name = argv[0]
+    parse_options()
+
+    # Open each file as HDF and HDF-EOS if possible.
+    niofiles = []
+    nioeosfiles = []
+    for fname in fnames:
+        try: niofile = Nio.open_file(fname, "r", format="hdf")
+        except Nio.NIOError, err: fail("%s: %s" % (fname, err))
+        niofiles.append(niofile)
+
+        nioeosfile = None
+        if niofile.attributes.has_key("HDFEOSVersion"):
+            try:
+                nioeosfile = Nio.open_file(fname, "r", format="hdfeos")
+            except Nio.NIOError, err: fail("%s: %s" % (fname, err))
+        nioeosfiles.append(nioeosfile)
+    
+    if print_info_only == True: # Print information about the file and exit.
+        print_info(niofiles[0])
+        sys.exit(0)
+
+    mpl.rcParams["font.size"] = plot_opts.fontsize
+
+    fig = plt.figure(figsize=(1, 6), dpi=dpi)
+    axes = fig.add_axes((0.1, 0.1, 0.8, 0.8))
+    
+    # Determine colormap, norm and ticks.
+    colormap = mpl.cm.Greys
+    colormap.set_bad("k", 0.0)
+    norm = None
+    ticks = None
+    if cmapfname != None:
+        (colormap, norm, ticks) = loadcolormap(cmapfname, "colormap")
+
+    # Main switch.
+    if plot_type == "cloudsat-reflec":
+        if len(nioeosfiles) != 1: fail("Signle HDF-EOS file expected")
+        plot_grid(plot_type, fnames[0], nioeosfiles[0], fig, axes,
+                  extent=extent, vextent=vextent, aspect=aspect,
+                  colormap=colormap, norm=norm, ticks=ticks, radius=radius,
+                  opts=plot_opts)
+    elif plot_type == "calipso532" or \
+       plot_type == "calipso532p" or \
+       plot_type == "calipso1064" or \
+       plot_type == "calipso-cratio" or \
+       plot_type == "calipso-dratio":
+        if len(niofiles) != 1: usage()
+        plot_grid(plot_type, fnames[0], niofiles[0], fig, axes, extent=extent,
+                  vextent=vextent, aspect=aspect, colormap=colormap, norm=norm,
+                  ticks=ticks, radius=radius, opts=plot_opts)
+    elif plot_type == "calipso532-layer" or \
+         plot_type == "calipso1064-layer" or \
+         plot_type == "calipso-cratio-layer" or \
+         plot_type == "calipso-dratio-layer" or \
+         plot_type == "calipso-temperature-layer":
+        if len(niofiles) != 1: fail("Single HDF file expected")
+        plot_grid(plot_type, fnames[0], niofiles[0], fig, axes, extent=extent,
+                  vextent=vextent, aspect=aspect,
+                  colormap=colormap, norm=norm, ticks=ticks, radius=radius,
+                  opts=plot_opts)
+    elif plot_type == "orbit":
+        plot_orbit(fnames, niofiles, nioeosfiles, fig, axes,
+                   band=modis_band, refrad=modis_refrad,
+                   extent=extent, proj=projection, colormap=colormap,
+                   norm=norm, ticks=ticks, radius=radius,
+                   opts=plot_opts)
+    elif plot_type == "orbit-clipped":
+        plot_orbit(fnames, niofiles, nioeosfiles, fig, axes,
+                   band=modis_band, refrad=modis_refrad,
+                   extent=extent, proj=projection, colormap=colormap,
+                   norm=norm, ticks=ticks, clipped=True, radius=radius,
+                   opts=plot_opts)
+    else:
+        fail("Invalid plot type `%s'" % plot_type)
+    
+    report_memory()
+
+    figw_px, figh_px = fig.get_size_inches()*dpi
+    if figw_px >= 32768 or figh_px >= 32768:
+        fail("Figure size exceeds 32767 pixels, please specify a smaller region")
+
+    if outfname != None:
+        #plt.savefig(outfname)
+        try:
+            plt.savefig(outfname, bbox_inches="tight", pad_inches=0.5, dpi=dpi)
+        except IOError, err: fail("Write error: %s", err)
+    else: plt.show()
+
+    report_memory()
