@@ -1,11 +1,12 @@
 from distutils.core import setup, Extension
 from glob import glob
+import numpy
 
 module1 = Extension('cctk',
                     sources=['cctkmodule.c'])
 
 setup(name='ccplot',
-      version='1.4.2',
+      version='1.4.3',
       description='CloudSat and CALIPSO plotting tool',
       long_description="""
       ccplot is a command-line application that reads CloudSat, CALISO
@@ -19,6 +20,7 @@ setup(name='ccplot',
       ext_modules=[module1],
       scripts=['ccplot'],
       requires=['basemap', 'matplotlib', 'numpy', 'PyNIO'],
+      include_dirs=[numpy.get_include()],
       data_files=[('share/doc/ccplot/', ['Changelog', 'NEWS']),
                   ('share/ccplot/cmap/', glob('cmap/*')),
                   ('man/man1/', ['ccplot.1'])])

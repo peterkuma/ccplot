@@ -1,6 +1,13 @@
 CCPLOT NEWS
 
-New in 1.4.2 (2010-06-11):
+New in 1.4.3 (2010-08-18):
+
+    * Fixed numpy include path in setup.py.
+    * matplotlib is imported with the cairo backend, so that X server
+      is not required to be running.
+    * Updated installation instructions in INSTALL.
+
+New in 1.42 (2010-06-11):
 
     * Support for changing meridians and parallels through the meridiansbase,
       parallelsbase, nminormeridians and nminorparallels options.
