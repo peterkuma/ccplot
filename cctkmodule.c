@@ -495,8 +495,8 @@ layermap(PyObject *data, PyObject *nlayer, PyObject *basealt,
 			alt1 = *bin;
 			bin = PyArray_GETPTR2(topalt, i, j);
 			alt2 = *bin;
-			y1 = (int) (alt1-yout1)*alt2y_ratio;
-			y2 = (int) (alt2-yout1)*alt2y_ratio;
+			y1 = (int) ((alt1-yout1)*alt2y_ratio);
+			y2 = (int) ((alt2-yout1)*alt2y_ratio);
 			if (y1 < 0) y1 = 0;
 			if (y2 >= ydim) y2 = ydim-1;
 			for (k = y1; k < y2; k++) {

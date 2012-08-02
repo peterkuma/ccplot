@@ -1,5 +1,9 @@
 CCPLOT NEWS
 
+New in 1.2.1 (2009-08-20):
+
+	* Fixed layer products precision error.
+
 New in 1.2 (2009-08-19):
 
 	* Fixed colormaps: calipso-cratio.cmap, calipso-dratio.cmap
