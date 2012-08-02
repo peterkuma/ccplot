@@ -178,11 +178,15 @@ Default is 3 for swath swath and a sensible value calculated from resolution
 for profile products.
 .It Fl v Ar extent
 Vertical extent of CloudSat and CALIPSO profiles in m in the format
-.Em from:to .
+.Em from..to .
 .It Fl x Ar extent
 For CloudSat and CALIPSO profiles
 .Ar extent
-specifies region to be plotted in rays.
+specifies region to be plotted in rays or as absolute or relative time.
+Absolute time is expected in format
+.Em hour:min[:sec]..hour:min[:sec] .
+Relative time is expected in format
+.Em +|-[hour:]min:sec..+|-[hour:]min:sec .
 For MODIS swath
 .Ar extent
 specifies horizontal extent in bins in the along-track (first)
@@ -190,9 +194,9 @@ direction and across-track (second) direction.
 The format of
 .Ar extent
 is
-.Em from:to
+.Em from..to
 (profile and layer products) or
-.Em from:to,from:to
+.Em from..to,from..to
 (swath products).
 .It Fl z Ar options
 Miscellaneous options that modifiy plot formatting.
@@ -277,17 +281,16 @@ Plot the first 1000 rays of CloudSat reflectivity profile from
 using cloudsat-reflec.cmap colormap,
 and save it as cloudsat-reflec.png:
 .Bd -literal -offset 4n
-$ ccplot -x :1000 -c cloudsat-reflec.cmap
+$ ccplot -x ..1000 -c cloudsat-reflec.cmap
 -o cloudsat-reflec.png cloudsat-reflec
 2006224184641_01550_CS_2B-GEOPROF_GRANULE_P_R03_E01.hdf
 .Ed
 .Pp
-Plot CALIPSO backscatter profile from 0 to 20km from ray 5000 to 10000 from
-CAL_LID_L1-Prov-V2-01.2006-07-06T19-50-51ZN.hdf
+Plot the first minute of CALIPSO backscatter profile from 0 to 20km
 using calipso-backscatter.cmap colormap,
 and save it as calipso532.png:
 .Bd -literal -offset 4n
-$ ccplot -v 0:20000 -x 5000:10000 -c calipso-backscatter.cmap
+$ ccplot -v 0..20000 -x ..+1:00 -c calipso-backscatter.cmap
 -o calipso532.png calipso532
 CAL_LID_L1-Prov-V2-01.2006-07-06T19-50-51ZN.hdf
 .Ed

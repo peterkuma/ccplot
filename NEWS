@@ -1,6 +1,11 @@
 CCPLOT NEWS
 
-New in 1.2.1 (2009-08-20):
+New in 1.3 (2009-09-20):
+
+    * Changed the semantics of -x command-line argument.
+    * Added support for time extent.
+
+New in 1.21 (2009-08-20):
 
 	* Fixed layer products precision error.
 

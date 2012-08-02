@@ -377,7 +377,7 @@ class SciFormatter(mpl.ticker.Formatter):
 # Default command-line options.
 #
 
-extent = np.array((0, -1, 0, -1), dtype=np.int)
+extent = [0, -1, 0, -1]
 fnames = []
 vextent = np.array((float("-infinity"), float("infinity")), dtype=np.float)
 resolution = None
@@ -454,7 +454,7 @@ def help():
 %s: -i FILE\n\
 \n\
 Plot data from CloudSat, CALIPSO and Aqua MODIS product files.\n\
-Example: %s -c calipso.cmap -x 11000:13000 -v :25000 -o out.png calipso532 \
+Example: %s -c calipso.cmap -x 11000..13000 -v ..25000 -o out.png calipso532 \
 CAL_LID_L1-Prov-V2-01.2006-08-12T19-15-34ZD.hdf\n\
 \n\
 Where OPTION is one of:\n\
@@ -468,8 +468,8 @@ Where OPTION is one of:\n\
   -o OUTFILE                    output file, type is determined by extension\n\
   -p PROJECTION                 projection type\n\
   -r RADIUS                     interpolation radius\n\
-  -v FROM:TO                    vertical extent in meters\n\
-  -x FROM:TO[,FROM:TO]          horizontal extent in bins\n\
+  -v FROM..TO                   vertical extent in meters\n\
+  -x FROM..TO[,FROM..TO]        horizontal extent in bins\n\
   -z OPTION=VAL[,OPTION=VAL]    list of option-value pairs\n\
 \n\
 OPTION is one of:\n\
@@ -559,7 +559,7 @@ def parse_options():
            projection, supported_projections, plot_opts, radius
 
     try:
-        opts, args = getopt.getopt(argv[1:], "a:c:d:him:o:p:r:t:v:x:z:")
+        opts, args = getopt.getopt(argv[1:], "a:c:d:him:o:p:r:v:x:z:")
     except getopt.error, err: usage()
     for o, a in opts:
         try:
@@ -587,21 +587,56 @@ def parse_options():
                 projection = a
                 if projection not in supported_projections:
                     raise ValueError
-            elif o == "r":
+            elif o == "-r":
                 radius = int(a)
                 if radius < 0: raise ValueError
             elif o == "-v":
-                parts = a.partition(":")
+                parts = a.partition("..")
                 if parts[0] != "": vextent[0] = int(parts[0])
                 if parts[2] != "": vextent[1] = int(parts[2])
             elif o == "-x":
-                r = re.compile(r"^(-?\d+)?:(-?\d+)?(?:,(-?\d+)?:(-?\d+)?)?$")
-                m = r.match(a)
-                if m == None: raise ValueError
-                gs = m.groups()
-                for i in range(4):
-                    g, e = gs[i], extent[i]
-                    extent[i] = int(g) if g != None else e
+                parts = a.split(",")
+                if len(parts) > 2: raise ValueError
+                for i, part in enumerate(parts):
+                    subparts = part.split("..")
+                    if len(subparts) != 2: raise ValueError
+                    for j, subpart in enumerate(subparts):
+                        # Match absolute time in format hour:min[:sec].
+                        r1 = re.compile(r"^(\d?\d):(\d\d)(?::(\d\d):)?$")                    
+                        # Match relative time in format +/-[hour:]min:sec.
+                        r2 = re.compile(r"^(\+|-)(?:(\d+):)?(\d?\d):(\d\d)$")
+
+                        m1 = r1.match(subpart)
+                        m2 = r2.match(subpart)
+
+                        if subpart == "": e = None
+                        elif m1 != None: # Match absoulte time.
+                            gs = m1.groups()
+                            hours = int(gs[0]) if gs[0] != None else 0
+                            minutes = int(gs[1]) if gs[1] != None else 0
+                            seconds = int(gs[2]) if gs[2] != None else 0
+                            if hours > 23 or minutes > 59 or seconds > 59:
+                                raise ValueError
+                            e = dt.time(hours, minutes, seconds)
+                                                    
+                        elif m2 != None: # Match relative time.
+                            gs = m2.groups()
+                            sign = -1 if gs[0] == "-" else 1
+                            hours = int(gs[1]) if gs[1] != None else 0
+                            minutes = int(gs[2]) if gs[2] != None else 0
+                            seconds = int(gs[3]) if gs[3] != None else 0
+                            if minutes > 59 or seconds > 59: raise ValueError
+
+                            e = sign*dt.timedelta(0, seconds,
+                                                  0, 0,
+                                                  minutes, hours)
+                        else: # Match integer.
+                            e = int(subpart)
+                        if e != None: extent[2*i+j] = e
+                if type(extent[2]) != int or \
+                   type(extent[3]) != int:
+                    raise ValueError
+                    
             elif o == "-z":
                 parts = a.split(",")
                 for p in parts:
@@ -714,7 +749,7 @@ def print_info(niofile):
     """Prints information about the file.
        
     Arguments:
-        niofile -- NIO module file to read the information from.
+        niofile -- NIO module file from which the information is to be read
     """
     ftype = None
     try: # Try CALIPSO names.
@@ -733,7 +768,7 @@ def print_info(niofile):
         time = niofile.variables["Profile_time_2B_GEOPROF"]
         lat = niofile.variables["Latitude_2B_GEOPROF"]
         lon = niofile.variables["Longitude_2B_GEOPROF"]
-        height = niofile.variables["Height_2B_GEOPROF"][0]
+        height = niofile.variables["Height_2B_GEOPROF"][0][::-1]
         time2dt = cloudsat_time2dt
         st = niofile.attributes["start_time_2B_GEOPROF"]
         start_time = dt.datetime.strptime(st, "%Y%m%d%H%M%S")
@@ -758,12 +793,12 @@ def print_info(niofile):
         time1 = time2dt(time[0], start_time).strftime("%Y-%m-%d %H:%M:%S")
         time2 = time2dt(time[-1], start_time).strftime("%Y-%m-%d %H:%M:%S")
         print "Type: %s" % ftype
-        print "Time: %s %s" % (time1, time2)
-        print "Height: %d %d" % (height[0], height[-1])
+        print "Time: %s, %s" % (time1, time2)
+        print "Height: %d, %d" % (height[0], height[-1])
         print "nray: %d" % nray
         print "nbin: %d" % nbin
-        print "Longitude: %f %f" % (lon[0], lon[-1])
-        print "Latitude: %f %f" % (lat[0], lat[-1])
+        print "Longitude: %f, %f" % (lon[0], lon[-1])
+        print "Latitude: %f, %f" % (lat[0], lat[-1])
 
 
 def calipso_time2dt(time, start_time=None):
@@ -901,10 +936,46 @@ def expand_figure(fig, axes, aspect):
     return figw, figh
 
 
-def plot_grid(what, fname, niofile, fig, axes, extent=((0,-1),(0,-1)),
-                 vextent=np.array((float("-infinity"), float("infinity"))),
-                 aspect=2.0, colormap=None, norm=None, ticks=None, radius=None,
-                 opts=PlotOpts()):
+def time2ray(t, time, time2dt):
+    """Returns index i of 1-dimensional array time whose value of
+    time2dt(time[i]) best matches dt.time instance t. Returns -1 if time
+    is empty.
+    """
+    
+    a = 0
+    b = len(time)-1
+    i = 0
+    
+    if len(time) == 0: return -1
+
+    if isinstance(t, dt.timedelta):
+        if t < dt.timedelta(0): ref_dt = time2dt(time[-1]) + t
+        else: ref_dt = time2dt(time[0]) + t
+    else: # dt.time expected.    
+        date0 = time2dt(time[0]).date()
+        time0 = time2dt(time[0]).time()
+        if t < time0: ref_dt = dt.datetime.combine(date0 + dt.timedelta(1), t)
+        else: ref_dt = dt.datetime.combine(date0, t)
+    
+    # Simple binary search.
+    # TODO: Search by taking differentials would be much faster.
+    while a < b: 
+        i = (a + b)/2
+        dti = time2dt(time[i])
+        if ref_dt < dti:
+            b = i
+        else:
+            a = i+1
+    try:
+        if abs(ref_dt - time2dt(time[i-1])) < abs(ref_dt-dti): return i - 1
+        if abs(ref_dt - time2dt(time[i+1])) < abs(ref_dt-dti): return i + 1
+    except KeyError: pass
+    return i
+
+def plot_grid(what, fname, niofile, fig, axes, extent=(0,-1,0,-1),
+              vextent=np.array((float("-infinity"), float("infinity"))),
+              aspect=2.0, colormap=None, norm=None, ticks=None, radius=None,
+              opts=PlotOpts()):
     """Draws a plot of a profile product identified by argument what.
 
     Arguments:
@@ -923,6 +994,29 @@ def plot_grid(what, fname, niofile, fig, axes, extent=((0,-1),(0,-1)),
         ticks           -- a list of ticks to be drawn on colorbar
     """
     global calipso_height
+
+    #
+    # Variable initialization.
+    #
+    time = None
+    lat = None
+    lon = None
+    reflec = None
+    height = None
+    start_time = None
+    nbin = 0
+    nray = 0
+    backscat532 = None
+    backscat532p = None
+    backscat1064 = None
+    topalt = None
+    basealt = None
+    backscat532_layer = None
+    backscat1064_layer = None
+    cratio_layer = None
+    dratio_layer = None
+    temperature_layer = None
+    nlayer = 0
 
     #
     # Data retrieval.
@@ -962,26 +1056,34 @@ def plot_grid(what, fname, niofile, fig, axes, extent=((0,-1),(0,-1)),
         nlayer = niofile.variables["Number_Layers_Found"]
         nbin = len(calipso_height)
     except KeyError: pass
-    
-    e1, e2, e3, e4 = extent
-    e1 = norm_index(e1, 0, nray)
-    e2 = norm_index(e2, 0, nray)
-    e3 = norm_index(e3, 0, nbin)
-    e4 = norm_index(e4, 0, nbin)
-    if e1 >= e2 or e3 >= e4: fail("Invalid extent")
 
-    #
-    # Determine what is requested.
-    #
     try:
+        # Determine what time conversion function to apply. We need this now
+        # in order to convert time extent (if set) to extent in rays.
+        if what.startswith("cloudsat"):
+            start_time_dt = dt.datetime.strptime(start_time, "%Y%m%d%H%M%S")
+            time2dt = lambda t: cloudsat_time2dt(t, start_time_dt)
+        else: time2dt = calipso_time2dt
+
+        e1, e2, e3, e4 = extent 
+        if type(e1) in (dt.time, dt.timedelta):
+            e1 = time2ray(e1, time, time2dt)
+        if type(e2) in (dt.time, dt.timedelta):
+            e2 = time2ray(e2, time, time2dt)
+
+        e1 = norm_index(e1, 0, nray)
+        e2 = norm_index(e2, 0, nray)
+        e3 = norm_index(e3, 0, nbin)
+        e4 = norm_index(e4, 0, nbin)
+
+        if e1 >= e2 or e3 >= e4: fail("Invalid extent")        
+        
         if what.startswith("cloudsat"):
             product_name = "CloudSat profile"
             lon = lon[e1:e2]
             lat = lat[e1:e2]
             height = height[e1:e2,e3:e4][:,::-1]
             time = time[e1:e2]
-            start_time_dt = dt.datetime.strptime(start_time, "%Y%m%d%H%M%S")
-            time2dt = lambda t: cloudsat_time2dt(t, start_time_dt)
         elif what.startswith("calipso"):
             product_name = "CALIPSO profile"
             lon = lon[e1:e2,0]
@@ -989,7 +1091,6 @@ def plot_grid(what, fname, niofile, fig, axes, extent=((0,-1),(0,-1)),
             # WORKAROUND: See the comment at the beginning of this file.            
             height = calipso_height[e3:e4]
             time = time[e1:e2,0]
-            time2dt = calipso_time2dt
         else:
             fail("Assertion error: Unrecogized plot type `%s'" % what)
         
@@ -1065,8 +1166,7 @@ def plot_grid(what, fname, niofile, fig, axes, extent=((0,-1),(0,-1)),
         else:
             data = data[:,::-1]
 
-    except (KeyError, UnboundLocalError):
-        fail("Required fields not in the data file")
+    except KeyError: fail("Required fields not in the data file")
     except IndexError: fail("%s: Invalid extent")
 
     ve1, ve2 = vextent
@@ -1161,7 +1261,7 @@ def plot_grid(what, fname, niofile, fig, axes, extent=((0,-1),(0,-1)),
     title_text.set_y(title_text.get_position()[1]+0.8/figh)
 
 
-def plot_orbit(fnames, niofiles, nioeosfiles, fig, axes, extent=((0,-1),(0,-1)),
+def plot_orbit(fnames, niofiles, nioeosfiles, fig, axes, extent=(0,-1,0,-1),
     band=1, refrad="x", proj='cyl', clipped=False, colormap=None, norm=None,
     ticks=None, radius=None, opts=PlotOpts()):
     """Draws a map plot of a CloudSat and CALIPSO trajectories and MODIS swath.
@@ -1310,7 +1410,6 @@ def plot_orbit(fnames, niofiles, nioeosfiles, fig, axes, extent=((0,-1),(0,-1)),
 
 def plot_trajectory(fig, axes, m, lon, lat, time, time2dt,
     minorticks_base, majorticks_base, lw=1.0, color="#000000"):
-    global extent
 
     #
     # Helper functions.
@@ -1477,7 +1576,7 @@ def modis_preprocess(niofile, nioeosfile, band, refrad, extent):
     nscan_ndet = data.shape[1]
     nfram_nsam = data.shape[2]
 
-    e1, e2, e3, e4 = extent
+    e1, e2, e3, e4 = extent 
     e1 = norm_index(e1, 0, nscan_ndet)
     e2 = norm_index(e2, 0, nscan_ndet)
     e3 = norm_index(e3, 0, nfram_nsam)
@@ -1602,7 +1701,8 @@ if __name__ == "__main__":
         nioeosfiles.append(nioeosfile)
     
     if print_info_only == True: # Print information about the file and exit.
-        print_info(niofiles[0])
+        if nioeosfiles[0] == None: print_info(niofiles[0])
+        else: print_info(nioeosfiles[0])
         sys.exit(0)
 
     mpl.rcParams["font.size"] = plot_opts.fontsize
@@ -1618,11 +1718,17 @@ if __name__ == "__main__":
     if cmapfname != None:
         (colormap, norm, ticks) = loadcolormap(cmapfname, "colormap")
 
+    if plot_type in ("orbit", "orbit-clipped"):
+        for e in extent:
+            if type(e) != int:
+                fail("Numeric-only extent supported for orbit plots")
+
     # Main switch.
     if plot_type == "cloudsat-reflec":
         if len(nioeosfiles) != 1: fail("Signle HDF-EOS file expected")
         plot_grid(plot_type, fnames[0], nioeosfiles[0], fig, axes,
-                  extent=extent, vextent=vextent, aspect=aspect,
+                  extent=extent, vextent=vextent,
+                  aspect=aspect,
                   colormap=colormap, norm=norm, ticks=ticks, radius=radius,
                   opts=plot_opts)
     elif plot_type == "calipso532" or \
