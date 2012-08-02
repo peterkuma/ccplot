@@ -5,7 +5,7 @@ module1 = Extension('cctk',
                     sources=['cctkmodule.c'])
 
 setup(name='ccplot',
-      version='1.0',
+      version='1.1',
       description='CloudSat/CALIPSO data processing helper routines',
       author='Peter Kuma',
       author_email='peterkuma@waveland.org',
@@ -13,5 +13,6 @@ setup(name='ccplot',
       ext_modules=[module1],
       scripts=['ccplot'],
       requires=['matplotlib', 'PyNIO', 'basemap'],
-      data_files=[('share/ccplot/cmap/', glob('cmap/*')),
+      data_files=[('share/doc/ccplot/', ['Changelog', 'NEWS']),
+                  ('share/ccplot/cmap/', glob('cmap/*')),
                   ('man/man1/', ['ccplot.1'])])

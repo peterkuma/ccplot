@@ -1,0 +1,17 @@
+CCPLOT NEWS
+
+New in 1.1 (2009-08-18):
+
+	* Interpolation method was changed from quadratic to nearest
+	  for all products.
+	* Support for older versions of matplotlib (at least 0.98.1) was added.
+	* Layer products performance improvements (re-implementation of data
+	  processing C).
+	* Fixed singular matrix bug with CloudSat profile products.
+	* Traceback no longer reported when trying to plot a product
+	  that is not contained within a data file.
+
+New in 1.0 (2009-08-10):
+
+	* Initial release.
+

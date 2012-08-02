@@ -1,3 +1,6 @@
+.\" ccplot.1
+.\" This file is a part of ccplot - CloudSat and CALIPSO data plotting tool.
+.\"
 .\" Copyright (c) 2009 Peter Kuma
 .Dd August 1, 2009
 .Dt CCPLOT 1
@@ -171,6 +174,8 @@ The same holds for swath products, but here radius specifies a square.
 If radius is too low with respect to
 .Cm dpi
 data will be sparsely distributed on the image.
+Default is 3 for swath swath and a sensible value calculated from resolution
+for profile products.
 .It Fl v Ar extent
 Vertical extent of CloudSat and CALIPSO profiles in m in the format
 .Em from:to .
@@ -180,15 +185,15 @@ For CloudSat and CALIPSO profiles
 specifies region to be plotted in rays.
 For MODIS swath
 .Ar extent
-specifies horizontal extent in bins in the along-track
-direction and across-track direction.
+specifies horizontal extent in bins in the along-track (first)
+direction and across-track (second) direction.
 The format of
 .Ar extent
-qis
+is
 .Em from:to
-or
+(profile and layer products) or
 .Em from:to,from:to
-(respectively).
+(swath products).
 .It Fl z Ar options
 Miscellaneous options that modifiy plot formatting.
 .Ar options
@@ -261,7 +266,11 @@ Options that accept a list of values are specified in the form
 key=value1:value2[:value...].
 .El
 .\" .Sh ENVIRONMENT
-.\" .Sh FILES
+.Sh FILES
+.Bl -tag -width Ds -compact
+.It /usr/share/ccplot/cmap/*
+Example cmap files. 
+.El
 .Sh EXAMPLES
 Plot the first 1000 rays of CloudSat reflectivity profile from
 2006224184641_01550_CS_2B-GEOPROF_GRANULE_P_R03_E01.hdf

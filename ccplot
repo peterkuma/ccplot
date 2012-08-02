@@ -1,8 +1,14 @@
 #!/usr/bin/env python2.5
 #
-# ccplot - CloudSat and CALIPSO data plotting tool
+# ccplot
+# This file is a part of ccplot - CloudSat and CALIPSO data plotting tool.
+#
 # Copyright (c) 2009 Peter Kuma
 #
+
+# We don't want the annoying KeyboadInterrupt exception on Control-C.
+import signal
+signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 #
 # Includes.
@@ -17,7 +23,6 @@ import getopt
 import datetime as dt
 import gc
 import re
-import signal
 
 # Other includes.
 import Nio
@@ -147,6 +152,40 @@ wavelengths[1:37] = (645,858.500,469,555,1240,1640,2130,412.5,443,488,531,551,
 #
 # Classes.
 #
+
+class AutoMinorLocator(mpl.ticker.Locator):
+    """
+    Dynamically find minor tick positions based on the positions of
+    major ticks. Assumes the scale is linear and major ticks are
+    evenly spaced.
+    """
+    def __call__(self):
+        'Return the locations of the ticks'
+        majorlocs = self.axis.get_majorticklocs()
+        try:
+            majorstep = majorlocs[1] - majorlocs[0]
+        except IndexError:
+            raise ValueError('Need at least two major ticks to find minor '
+                             'tick locations')
+        # see whether major step should be divided by 5, 4 or 2. This
+        # should cover most cases.
+        temp = float(('%e' % majorstep).split('e')[0])
+        if temp % 5 < 1e-10:
+            minorstep = majorstep / 5.
+        elif temp % 2 < 1e-10:
+            minorstep = majorstep / 4.
+        else:
+            minorstep = majorstep / 2.
+
+        tmin = majorlocs[0] - majorstep
+        tmax = majorlocs[-1] + majorstep
+        locs = np.arange(tmin, tmax, minorstep)
+        vmin, vmax = self.axis.get_view_interval()
+        if vmin > vmax:
+            vmin,vmax = vmax,vmin
+
+        return locs[(vmin < locs) & (locs < vmax)]
+
 
 class ModisParams(object):
     lon = None
@@ -292,7 +331,8 @@ class TimeLocator(mpl.ticker.Locator):
         base = ratio * self.steps[i]
         minorbase = ratio * self.minorsteps[i]
         offset = offset % base
-        self.minorlocs = np.arange(vmin + offset, vmax + offset, minorbase)
+        self.minorlocs = np.arange(vmin + offset - base, vmax + offset + base,
+                                   minorbase)
         return np.arange(vmin + offset, vmax + offset, base)
 
 
@@ -391,7 +431,7 @@ def radiance2temp(L, lamb):
         lamb    -- wavelength in m
 
     Returns:
-        temerature in K
+        Temerature in K.
     """
     global planck_c1, planck_c2
     return planck_c2 / (lamb * np.log(planck_c1 / (lamb**5 * L * 1E6) + 1))
@@ -613,7 +653,7 @@ def loadcolormap(filename, name):
         name        -- name for the matplotlib colormap object
 
     Returns:
-        (instance of ListedColormap, instance of BoundaryNorm, ticks)
+        A tuple of: instance of ListedColormap, instance of BoundaryNorm, ticks.
     """
     bounds = []
     ticks = []
@@ -735,7 +775,7 @@ def calipso_time2dt(time, start_time=None):
         start_time  -- ignored 
     
     Returns:
-        instance of datetime
+        An instance of datetime.
     """
     d = int(time % 100)
     m = int((time-d) % 10000)
@@ -751,7 +791,7 @@ def cloudsat_time2dt(time, start_time):
         start_time  -- python datetime
     
     Returns:
-        instance of datetime
+        An instance of datetime.
     """
     return start_time + dt.timedelta(0, float(time))
     
@@ -774,7 +814,7 @@ def fit_colorbar(fig, axes, aspect=0.03, shrink=1.0, space_in=0.4):
                    relative to the the height of the main axes
     
     Returns:
-        an instance of matplotlib axes
+        An instance of matplotlib axes.
     """
     (x, y, width, height) = axes.get_position().bounds
     width_in = fig.get_size_inches()[0] * width
@@ -849,7 +889,7 @@ def expand_figure(fig, axes, aspect):
         aspect  -- aspect ratio
     
     Returns:
-        a pair of new figure width and figure height in inches
+        A pair of new figure width and figure height in inches.
     """
     figw, figh = fig.get_size_inches()
     x, y, w, h = axes.get_position().bounds
@@ -920,7 +960,7 @@ def plot_grid(what, fname, niofile, fig, axes, extent=((0,-1),(0,-1)),
         dratio_layer = niofile.variables["Integrated_Volume_Depolarization_Ratio"]
         temperature_layer = niofile.variables["Midlayer_Temperature"]
         nlayer = niofile.variables["Number_Layers_Found"]
-        nbin = 10 # Dummy value.
+        nbin = len(calipso_height)
     except KeyError: pass
     
     e1, e2, e3, e4 = extent
@@ -1020,42 +1060,31 @@ def plot_grid(what, fname, niofile, fig, axes, extent=((0,-1),(0,-1)),
         if what.endswith("-layer"):
             product_name = "CALIPSO layer"
             nlayer = nlayer[e1:e2,0]
+            basealt = basealt[e1:e2,:]
+            topalt = topalt[e1:e2,:]
         else:
             data = data[:,::-1]
 
-    except KeyError, err: fail("%s: Required field missing" % s)
+    except (KeyError, UnboundLocalError):
+        fail("Required fields not in the data file")
     except IndexError: fail("%s: Invalid extent")
 
     ve1, ve2 = vextent
 
     minheight, maxheight = height.min(), height.max()
-    #if ve1 < minheight: ve1 = minheight
-    #if ve2 > maxheight: ve2 = maxheight
+    if ve1 < minheight: ve1 = minheight
+    if ve2 > maxheight: ve2 = maxheight
     if ve1 >= ve2: fail("Invalid vertical extent")
-
     if norm == None: norm = mpl.colors.Normalize(vmin, vmax)
 
     #
     # Core data processing and plotting.
     #
-    if what.endswith("-layer"):                     # Layer products.
-        axes.set_axis_bgcolor(colormap(-1.0))
-        colors = colormap(norm(data))
-        axes.set_xlim((0, e2-e1))
-        axes.set_ylim((ve1*0.001, ve2*0.001))
-        for i in np.arange(0, e2-e1)[nlayer > 0]:
-            for j in range(nlayer[i]):
-                y2 = topalt[i, j]
-                y1 = basealt[i, j]
-                r = mpl.patches.Rectangle((i,y1), 1, y2-y1, fill=True,
-                                          facecolor=colors[i, j], lw=0)
-                axes.add_patch(r)
-    else:                                           # Profile products.
-        resolution = int(get_axes_size_inches(fig, axes)[1]*fig.get_dpi())
-        
-        height0 = np.arange(ve1, ve2, 1.0*(ve2-ve1)/resolution,
-                            dtype=np.float32)
-        #data = cctk.lininty2d(data, height, height0)
+    resolution = int(get_axes_size_inches(fig, axes)[1]*fig.get_dpi())
+    if what.endswith("-layer"):     # Layer products.
+        data = cctk.layermap(data, nlayer, basealt, topalt,
+                             (ve1*0.001, ve2*0.001, resolution), float("nan"))
+    else:                           # Profile products.
         if height.ndim == 1:
             Y, X = np.meshgrid(height, np.arange(0, e2-e1, dtype=np.float32))
         else:
@@ -1063,14 +1092,14 @@ def plot_grid(what, fname, niofile, fig, axes, extent=((0,-1),(0,-1)),
                                np.arange(0, e2-e1, dtype=np.float32))
             Y = height
         if radius == None: radius = int(800*resolution/(ve2-ve1))
-        data = cctk.linint2d(data, X, Y, (0, e2-e1, e2-e1),
+        data = cctk.interpolate2d(data, X, Y, (0, e2-e1, e2-e1),
                              (ve1, ve2, resolution), float("nan"), 0, radius)
-        data = np.ma.masked_invalid(data)
-        # Plot data.
-        im = axes.imshow(data.T, origin="lower",
-                         extent=(0, e2-e1, ve1/1000.0, ve2/1000.0),
-                         interpolation="nearest", cmap=colormap, norm=norm)
-
+    # Plot data.
+    data = np.ma.masked_invalid(data)
+    im = axes.imshow(data.T, origin="lower",
+                     extent=(0, e2-e1, ve1*0.001, ve2*0.001),
+                     interpolation="nearest", cmap=colormap, norm=norm)
+    
     td = time2dt(time[-1]) - time2dt(time[0])
     nseconds = td.days*86400 + td.seconds
     if nseconds == 0: return
@@ -1092,7 +1121,7 @@ def plot_grid(what, fname, niofile, fig, axes, extent=((0,-1),(0,-1)),
 
     # Height axis.
     axes.set_ylabel("Altitude (km)")
-    axes.yaxis.set_minor_locator(mpl.ticker.AutoMinorLocator())
+    axes.yaxis.set_minor_locator(AutoMinorLocator())
     axes.yaxis.set_major_locator(mpl.ticker.MaxNLocator(9, [0.5,1,5]))
 
     for label in axes.yaxis.get_ticklabels():
@@ -1111,15 +1140,9 @@ def plot_grid(what, fname, niofile, fig, axes, extent=((0,-1),(0,-1)),
 
     # Colorbar.
     cbaxes = fit_colorbar(fig, axes)
-    if what.endswith("-layer"):
-        cb = mpl.colorbar.ColorbarBase(cbaxes, orientation="vertical", \
-                                       extend="both", ticks=ticks,
-                                       cmap=colormap, norm=norm,
-                                       format=SciFormatter())
-    else:
-        cb = fig.colorbar(im, ax=axes, cax=cbaxes, orientation="vertical",
-                          extend="both", ticks=ticks, norm=norm,
-                          format=SciFormatter())        
+    cb = fig.colorbar(im, ax=axes, cax=cbaxes, orientation="vertical",
+                      extend="both", ticks=ticks, norm=norm,
+                      format=SciFormatter())
         
     cb.set_label(title)
 
@@ -1130,9 +1153,9 @@ def plot_grid(what, fname, niofile, fig, axes, extent=((0,-1),(0,-1)),
     setup_lonlat_axes(fig, axes, lon, lat)
 
     axes_title = "%s from %s  -  %s" % \
-             (product_name,
-              time2dt(time[0]).strftime("%Y-%m-%d %H:%M:%S"),
-              time2dt(time[-1]).strftime("%Y-%m-%d %H:%M:%S"))
+                 (product_name,
+                  time2dt(time[0]).strftime("%Y-%m-%d %H:%M:%S"),
+                  time2dt(time[-1]).strftime("%Y-%m-%d %H:%M:%S"))
     title_text = axes.set_title(axes_title, fontsize=opts.fontsize+4)
     title_text.set_y(title_text.get_position()[1]+0.8/figh)
 
@@ -1526,7 +1549,7 @@ def plot_modis(mp, m, fig, axes, colormap=None, norm=None, ticks=None,
 
     # Interpolate data on X/Y grid.
     nx, ny = (get_axes_size_inches(fig, axes) * dpi).astype(np.int)
-    data0 = cctk.linint2d(data0, X, Y, (m.llcrnrx, m.urcrnrx, nx),
+    data0 = cctk.interpolate2d(data0, X, Y, (m.llcrnrx, m.urcrnrx, nx),
                           (m.llcrnry, m.urcrnry, ny), float("nan"),
                           radius, radius)
     del X, Y
@@ -1559,9 +1582,6 @@ def plot_modis(mp, m, fig, axes, colormap=None, norm=None, ticks=None,
 #
 
 if __name__ == "__main__":
-    # We don't want the annoying KeyboadInterrupt exception on Control-C.
-    signal.signal(signal.SIGINT, signal.SIG_DFL)
-
     program_name = argv[0]
     parse_options()
 
@@ -1638,7 +1658,7 @@ if __name__ == "__main__":
     else:
         fail("Invalid plot type `%s'" % plot_type)
     
-    report_memory()
+    #report_memory()
 
     figw_px, figh_px = fig.get_size_inches()*dpi
     if figw_px >= 32768 or figh_px >= 32768:
@@ -1651,4 +1671,4 @@ if __name__ == "__main__":
         except IOError, err: fail("Write error: %s", err)
     else: plt.show()
 
-    report_memory()
+    #report_memory()
