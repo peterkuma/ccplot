@@ -2,7 +2,7 @@
 .\" This file is a part of ccplot - CloudSat and CALIPSO data plotting tool.
 .\"
 .\" Copyright (c) 2009, 2010 Peter Kuma
-.Dd May 07, 2010
+.Dd May 13, 2010
 .Dt CCPLOT 1
 .Os
 .Sh NAME
@@ -15,7 +15,9 @@
 .Op Fl d Ar dpi
 .Op Fl m Ar band
 .Op Fl o Ar outfile
-.Op Fl p Ar projection
+.Sm off
+.Op Fl p Ar \ projection Op : Ar projoptions
+.Sm on
 .Op Fl r Ar radius
 .Op Fl v
 .Op Fl x Ar extent
@@ -115,11 +117,11 @@ Output file. Format is determined by extension Supported formats are
 and
 .Tn PS
 (.ps). Defaults to ccplot.png.
-.It Fl p Ar projection
-For MODIS
-.Cm orbit-clipped
-plots specifies the projection type. Default projection type is
-.Cm cyl .
+.Sm off
+.It Fl p Ar \ projection Op : Ar projoptions
+.Sm on
+.Ar projection
+specifies the mapping projection for orbit plots.
 Supported projection types are:
 .Pp
 .Bl -tag -offset 4n -width "npstere" -compact
@@ -176,6 +178,32 @@ South-Polar Lambert Azimuthal
 .It Cm robin
 Robinson
 .El
+.Pp
+.Ar projection
+can be followed by a comma-separated list of option-value
+pairs
+.Ar projoptions .
+Supported projection options are:
+.Pp
+.Bl -tag -offset 4n -width "boundinglat" -compact
+.It Cm boundinglat
+Bounding latitude for polar projections.
+.It Cm lat_0
+Central latitude.
+.It Cm lat_1
+First standard parallel.
+.It Cm lat_2
+Second standard parallel.
+.It Cm lat_ts
+Latitude of true scale.
+.It Cm lon_1
+Longitude of one of the two points on the projection centerline for oblique mercator.
+.It Cm lon_2
+Longitude of one of the two points on the projection centerline for oblique mercator.
+.El
+.Pp
+Longitude and latitude have to be valid positive decimal numbers
+followed by E or W, or S or N literal (respectively) to indicate direction.
 .Pp
 Use -p help to get a list of available projections.
 .It Fl r Ar radius
@@ -246,6 +274,12 @@ Supported general options are:
 color bar font size (defaults to 8)
 .It Cm cbspacing
 spacing between the axes and color bar (defaults to 0.4)
+.It Cm drawelev (default to 1)
+draw surface elevation line (CALIPSO)
+.It Cm elevlw (defaults to 0.5)
+surface elevation line width
+.It Cm elevcolor (defaults to #FF0000)
+surface elevation line color
 .It Cm fontsize
 font size (defaults to 10)
 .It Cm padding

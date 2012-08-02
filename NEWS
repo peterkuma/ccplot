@@ -1,5 +1,18 @@
 CCPLOT NEWS
 
+New in 1.4.1 (2010-05-13):
+
+    * Wrong dimension mapping of MODIS Swath near 180E was fixed.
+    * Missing meridians on polar plots were fixed.
+    * Projection options like central latitude, central meridian,
+      bounding latitude and latitude of true scale
+      can now be set with the -p switch.
+    * Wrong interpolation radius calculation on Equidistant Cylindrical
+      plots was fixed.
+    * Ticks on profile plot are now more dense by default.
+    * Sufrace elevation line can now be plotted for CALIPSO profile products
+      (and is on by default).
+
 New in 1.4 (2010-05-07):
 
     * The way aspect ratio is specified was changed.

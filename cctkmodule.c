@@ -31,7 +31,8 @@
 #include <numpy/arrayobject.h>
 
 static void
-dimmap2d(PyObject *data, PyObject *out, int off1, int inc1, int off2, int inc2)
+dimmap2d(PyObject *data, PyObject *out, int off1, int inc1, int off2, int inc2,
+float modulus)
 {
 	npy_intp i = 0, j = 0;
 	npy_intp k0 = 0, k1 = 0, l0 = 0, l1 = 0;
@@ -39,6 +40,7 @@ dimmap2d(PyObject *data, PyObject *out, int off1, int inc1, int off2, int inc2)
 	npy_intp xdim = 0, ydim = 0, xoutdim = 0, youtdim = 0;
 	npy_float *outbin = NULL;
 	npy_float *b1 = NULL, *b2 = NULL, *b3 = NULL, *b4 = NULL;
+	float br1, br2, br3, br4;
 
 	xdim = PyArray_DIMS(data)[0];
 	ydim = PyArray_DIMS(data)[1];
@@ -74,10 +76,17 @@ dimmap2d(PyObject *data, PyObject *out, int off1, int inc1, int off2, int inc2)
 			b2 = PyArray_GETPTR2(data, k0, l1);
 			b3 = PyArray_GETPTR2(data, k1, l0);
 			b4 = PyArray_GETPTR2(data, k1, l1);
-			*outbin = *b1 * (1-dk)*(1-dl) +
-				  *b2 * (1-dk)* dl +
-				  *b3 *    dk *(1-dl) +
-				  *b4 *    dk * dl; 
+			
+			br1 = 0.f;
+			br2 = remainderf(*b2 - *b1, modulus);
+			br3 = remainderf(*b3 - *b1, modulus);
+			br4 = remainderf(*b4 - *b1, modulus);
+			
+			*outbin = *b1 + (
+			    br1 * (1-dk)*(1-dl) +
+			    br2 * (1-dk)* dl +
+			    br3 *    dk *(1-dl) +
+			    br4 *    dk * dl);
 		}
 	}
 }
@@ -88,13 +97,14 @@ cctk_dimmap2d(PyObject *self, PyObject *args)
 	PyObject *arg1 = NULL;
 	PyObject *data = NULL;
 	int off1, inc1, off2, inc2;
+	float modulus;
 	PyObject *out = NULL;
 
 	npy_intp *dims;
 	npy_intp outdims[2] = { 0, 0 };
 
-	if (!PyArg_ParseTuple(args, "Oiiii", &arg1, &off1, &inc1, &off2,
-	    &inc2) ) {
+	if (!PyArg_ParseTuple(args, "Oiiiif", &arg1, &off1, &inc1, &off2,
+	    &inc2, &modulus) ) {
 		return NULL;
 	}
 
@@ -125,7 +135,7 @@ cctk_dimmap2d(PyObject *self, PyObject *args)
 	if (out == NULL) goto fail;
 	
 	/* Core function call. */
-	dimmap2d(data, out, off1, inc1, off2, inc2);
+	dimmap2d(data, out, off1, inc1, off2, inc2, modulus);
 
 	Py_DECREF(data);
 	return out;
