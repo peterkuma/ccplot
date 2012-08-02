@@ -1,6 +1,13 @@
 CCPLOT NEWS
 
-New in 1.4.1 (2010-05-13):
+New in 1.4.2 (2010-06-11):
+
+    * Support for changing meridians and parallels through the meridiansbase,
+      parallelsbase, nminormeridians and nminorparallels options.
+    * Updated installation instructions in INSTALL.
+    * Updated information in README.
+
+New in 1.41 (2010-05-13):
 
     * Wrong dimension mapping of MODIS Swath near 180E was fixed.
     * Missing meridians on polar plots were fixed.

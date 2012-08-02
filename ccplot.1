@@ -213,7 +213,7 @@ regions of two data points overlap value is determined by averaging
 with a weight coefficient of 1 over distance squared.
 The same holds for swath products, but here radius specifies a square.
 If radius is too low with respect to
-.Cm dpi
+.Cm dpi ,
 data will be sparsely distributed on the image.
 Default is 3 for swath swath and a sensible value calculated from resolution
 for profile products.
@@ -329,6 +329,8 @@ major parallels line color (defaults to #000000)
 major parallels line width (defaults to 0.3)
 .It Cm mapres
 map resolution: c (crude), l (low), i (intermediate), h (high), f (full); (defaults to i)
+.It Cm meridiansbase
+meridians base, or 0 for automatic (defaults to 0)
 .It Cm minormeridianscolor
 minor meridians color (defaults to #000000)
 .It Cm minormeridianslw
@@ -337,15 +339,23 @@ minor meridians line width (defaults to 0.1)
 minor parallels color (defaults to #000000)
 .It Cm minorparallelslw
 minor parallels line width (defaults to 0.1)
+.It Cm nminormeridians
+number of minor meridians between two major maridians, or 0 for automatic
+(defaults to 0)
+.It Cm nminorparallels
+number of minor parallels between two major parallels, or 0 for automatic
+(defaults to 0)
+.It Cm parallelsbase
+parallels base, or 0 for automatic (defaults to 0)
 .It Cm trajcolors
 list of trajectory colors (defaults to #FF0000:#0000FF:#00FF00)
 .It Cm trajlws
 list of trajectory line widths (defaults to 0.5)
 .It Cm trajnminortics
-number of minor ticks between adjecent major ticks or -1 for automatic selection
+number of minor ticks between adjecent major ticks, or -1 for automatic selection
 (defaults to -1)
 .It Cm trajticks
-base for trajectory major ticks in seconds or -1 for automatic selection
+base for trajectory major ticks in seconds, or -1 for automatic selection
 (defaults to -1)
 .It Cm watercolor
 water color (defaults to #FFFFFF)
@@ -359,7 +369,7 @@ Use -z help to get a list of available options.
 .Sh ENVIRONMENT
 .Bl -tag -width Ds -compact
 .It Ev CCPLOT_CMAP_PATH
-This is a colon-separated list of search paths for colormap files.
+Colon-separated list of search paths for colormap files.
 .El
 .Sh FILES
 .Bl -tag -width Ds -compact

@@ -1,11 +1,14 @@
-Overview of ccplot
+OVERVIEW OF CCPLOT
 ==================
 
 ccplot is a python program that reads CloudSat, CALISO and Aqua MODIS HDF
 and HDF-EOS data files, and produces plots of profile, layer and swath
 products.
 
-1. PRODUCTS
+More information can be found at http://www.ccplot.org/.
+
+
+1 PRODUCTS
 
 The following products are supported:
 
@@ -24,12 +27,13 @@ The following products are supported:
 	CALIPSO trajectory
 	Aqua MODIS radiance and reflectance bands (except band 26)
 
-2. COLORMAP FILES
+
+2 COLORMAP FILES
 
 ccplot uses a custom colormap file format called cmap. You can find example
 cmap files in /usr/share/ccplot/cmap/.
 
-(a) Writing a custom cmap file
+2.1 Writing a custom cmap file
 
 cmap files are simple ASCII files in format:
     

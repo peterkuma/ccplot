@@ -1,73 +1,130 @@
-Installation instructions
+INSTALLATION INSTRUCTIONS
 =========================
 
-ccplot is indended to be installed on unix-like operation systems.
+ccplot is intended to be installed on unix-like operating systems:
+Linux, Mac OS and Solaris.
+
+More complete installation instructions can be found at http://www.ccplot.org/.
 
 
-1. REQUIREMENTS
+1 DEPENDENCIES
 
-(a) List of required programs
+The following programs are required for installation of ccplot:
 
-The following programs are required by ccplot:
-
-	Python 2.6 (or later)
-	PyNIO 1.3.0b1 (or later)
-	numpy 1.1 (or later)
-	libpng 1.1 (or later)
-	freetype 1.4 (or later)
-	matplotlib 0.98.1 (or later)
-	basemap 0.99.4 (or later) and libraries shipped with basemap
-
-(b) Installing Python
-
-Python 2.6 is likely to be a part of your OS distribution,
-or in the OS packaging system. If it is not, you can download it at
-http://www.python.org/.
-
-(c) Installing PyNIO
-
-PyNIO is the most cumbersome dependency. It can be downloaded
-from the EOS (Earth System Grid) web site; however, you will
-need have an account first (anyone is free to create one, though).
-Please follow the instructions at http://www.pyngl.ucar.edu/Download/.
-
-(d) Installing numpy
-
-If numpy is not distrubuted with your OS, you can download it at
-http://numpy.scipy.org/. numpy 1.1 is fairly common amongst stable
-linux distrubutions.
-
-(e) Installing libpng and freetype
-
-These are very likely to be in your OS distrubution. libpng can be
-downloaded at http://www.libpng.org/pub/png/libpng.html, and FreeType can be
-downloaded at http://www.freetype.org/.
-
-(f) Installing matplotlib, basemap and dependent libraries
-
-ccplot requires a recent version of matplotlib (>= 0.98.1). You will need
-an approporiate version of basemap, the best would be at least 0.99.4,
-but you may succeed with 0.99.1 and newer.
-You can download both of them at
-http://sourceforge.net/projects/matplotlib/files/.
-
-For more information about installing matplotlib and dependent libraries, go to
-http://matplotlib.sourceforge.net/users/installing.html.
-
-For more information about installing basemap and dependent libraries, go to
-http://matplotlib.sourceforge.net/basemap/doc/html/users/installing.html.
+    1. gcc and g++
+    2. libpng 1.1 (or newer) and freetype 1.4 (or newer)
+    3. Python 2.5 (or newer)
+	4. numpy 1.1 (or newer)
+	5. matplotlib 0.98.1 (or newer)
+	6. basemap 0.99.4 (or newer) and the GEOS library shipped with basemap
+	7. PyNIO 1.3.0b1 (or newer)
 
 
-2. INSTALLING CCPLOT
+2 INSTALLATION OF DEPENDENCIES
 
-Once you installed required libraries you can build and install ccplot
-and its cctk extension module by the following commands:
+    1. gcc and g++, the C and C++ compilers. These should be generally available
+       in any modern unix-like operating system. Try the packaging system if
+       your OS has one, or OS distribution installation media. 
 
-    $ python setup.py build
-    # python setup.py install   (as root)
+    2. libpng and freetype. It is very likely that you have these installed
+       already, or at least they should be in your packaging system.
+       If not, you can get them from:
+         
+           http://www.libpng.org/pub/png/libpng.html
+           http://www.freetype.org/
+    
+    3. Python 2.5 or newer and development files. If you use a modern OS
+       with a packaging system, you will almost certainly find it there.
+       If not, you can get it from:
+       
+           http://www.python.org/download/
+       
+       You will have to install the Python development files as well,
+       usually the package is called python-dev (on Debian and Ubuntu). 
+       
+    4. numpy 1.1 or newer. Again, if your OS has a packaging system,
+       it is likely that numpy is there. If not, you can get it from:
+       
+           http://numpy.scipy.org/
+    
+    5. matplotlib 0.98.1 or newer. matplotlib is not as common in
+       OS distributions as Python or numpy. Current stable versions
+       of Debian and Ubuntu have a sufficiently recent version of matplotlib
+       in their repositories. You are not lucky, you can get it from:
+       
+           http://sourceforge.net/projects/matplotlib/files/
+           
+    6. basemap 0.99.4 or newer and the GEOS library. Basemap is rare
+       in packaging systems. You can get a version of your choice from:
+       
+           http://sourceforge.net/projects/matplotlib/files/
+       
+       under matplotlib-toolkits. After you have downloaded the source
+       distribution, unpack, build and install using the following commands:
+
+           $ tar xzf basemap-0.99.4.tar.gz
+           $ cd basemap-0.99.4.tar.gz
+           $ cd geos-2.2.3
+           $ export GEOS_DIR=/usr/local        (on C shell:
+                                                setenv GEOS_DIR /usr/local)
+           $ ./configure --prefix=$GEOS_DIR
+           $ make
+           # make install                      (as root)
+           $ cd ..
+           $ python setup.py build
+           # python setup.py install           (as root)
+    
+           Test installation (optional):
+           $ python -c "import mpl_toolkits.basemap as b; print b.__version__"
+           0.99.4
+
+       If that doesn't work for you, follow the instructions in README under
+       the basemap-0.99.4 directory. 
+
+    7. PyNIO 1.3.0b1 or newer. PyNIO can be downloaded upon free registration
+    from ESG. However, to make your life easier, you can also download PyNIO
+    precompiled binaries without registration from our website (recommended):
+    
+        http://www.ccplot.org/download/
+    
+    Installing PyNIO from source is very difficult. If you want to go through
+    the ordeal of building PyNIO from the source code, follow the instructions
+    on the PyNIO website. To install PyNIO from a binary distribution:
+
+        $ tar -C /usr/local -xzf PyNIO-1.3.0b1.linux-x86_64-gcc4-2.5.tar.gz
+        (substitute with the name of binary you downloaded)
+    
+        Test installation (optional):
+        $ python -c "import Nio; print Nio.__version__"
+        1.3.0b1
 
 
-3. ADDITIONAL INFORMATION
+3 INSTALLATION OF CCPLOT
+
+Installing ccplot from the source distribution is easy.
+
+   1. Unpack the archive:
+
+          $ tar xzf ccplot-1.42.tar.gz
+
+   2. Go to the source code directory and build the source code:
+
+          $ cd ccplot-1.42
+          $ python setup.py build
+
+   3. Log in as root and install ccplot:
+
+          # python setup.py install
+
+      Alternatively, use sudo if your OS supports it:
+
+          $ sudo python setup.py install
+
+
+4 ADDITIONAL INFORMATION
 
 You can find usage information and examples in the manual page ccplot(1).
+Much more information including documentation and mailing list is at:
+
+    http://www.ccplot.org/
 

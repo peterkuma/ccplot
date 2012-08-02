@@ -57,7 +57,7 @@ import cctk
 
 # Early global variables.
 program_name = os.path.basename(sys.argv[0])
-__version__ = "1.4.1"
+__version__ = "1.4.2"
 CCPLOT_CMAP_PATH = "/usr/share/ccplot/cmap:/usr/local/share/ccplot/cmap"
 
 # Early functions.
@@ -212,19 +212,19 @@ class Swath(object):
 
 
 class AutoOpts(object):
-    def setint(self, o, v, a, b):
+    def setint(self, o, v, a=-sys.maxint-1, b=sys.maxint):
         i = int(v)
         if i < a or i > b:
             raise ValueError("%s expected between %d and %d" % (o, a, b))
         return i
 
-    def setfloat(self, o, v, a, b):
+    def setfloat(self, o, v, a=float("-infinity"), b=float("infinity")):
         f = float(v)
         if f < a or f > b:
             raise ValueError("%s expected between %f and %f" % (o, a, b))
         return f
         
-    def setstr(self, o, v, maxlen):
+    def setstr(self, o, v, maxlen=sys.maxint):
         if len(v) > maxlen:
             raise ValueError("%s can be at most %d characters long" % (o, maxlen))
         return v
@@ -287,11 +287,15 @@ class PlotOpts(AutoOpts):
     majorparallelscolor = "#000000"
     majorparallelslw = 0.3
     mapres = "i"
+    meridiansbase = 0
     minormeridianscolor = "#000000"
     minormeridianslw = 0.1
     minorparallelscolor = "#000000"
     minorparallelslw = 0.1
+    nminormeridians = 0
+    nminorparallels = 0
     padding = 1.0
+    parallelsbase = 0
     plotheight = 6.0
     title = None
     trajcolors = ("#FF0000", "#0000FF", "#00FF00")
@@ -301,12 +305,12 @@ class PlotOpts(AutoOpts):
     watercolor = "#FFFFFF"
 
     def setopt(self, o, v):
-        if   o == "cbfontsize": q = self.setfloat(o, v, 0, 50)
-        elif o == "cbspacing": q = self.setfloat(o, v, 0, 1000)
+        if   o == "cbfontsize": q = self.setfloat(o, v, 0)
+        elif o == "cbspacing": q = self.setfloat(o, v, 0)
         elif o == "coastlinecolor": q = self.setcolor(o, v)
-        elif o == "coastlinelw": q = self.setfloat(o, v, 0, 10)
+        elif o == "coastlinelw": q = self.setfloat(o, v, 0)
         elif o == "countriescolor": q = self.setcolor(o, v)
-        elif o == "countrieslw": q = self.setfloat(o, v, 0, 10)
+        elif o == "countrieslw": q = self.setfloat(o, v, 0)
         elif o == "drawcoastlines": q = self.setbool(o, v)
         elif o == "drawcountries": q = self.setbool(o, v)
         elif o == "drawelev": q = self.setbool(o, v)
@@ -316,26 +320,30 @@ class PlotOpts(AutoOpts):
         elif o == "drawminormeridians": q = self.setbool(o, v)
         elif o == "drawminorparallels": q = self.setbool(o, v)
         elif o == "elevcolor": q = self.setcolor(o, v)
-        elif o == "elevlw": q = self.setfloat(o, v, 0, 10)
-        elif o == "fontsize": q = self.setfloat(o, v, 0, 50)
+        elif o == "elevlw": q = self.setfloat(o, v, 0)
+        elif o == "fontsize": q = self.setfloat(o, v, 0)
         elif o == "landcolor": q = self.setcolor(o, v)
-        elif o == "linewidth": q = self.setfloat(o, v, 0, 10)
+        elif o == "linewidth": q = self.setfloat(o, v, 0)
         elif o == "majormeridianscolor": q = self.setcolor(o, v)
-        elif o == "majormeridianslw": q = self.setfloat(o, v, 0, 10)
+        elif o == "majormeridianslw": q = self.setfloat(o, v, 0)
         elif o == "majorparallelscolor": q = self.setcolor(o, v)
-        elif o == "majorparallelslw": q = self.setfloat(o, v, 0, 10)
+        elif o == "majorparallelslw": q = self.setfloat(o, v, 0)
         elif o == "mapres": q = self.setenum(o, v, ("c","l","i","h","f"))
+        elif o == "meridiansbase": q = self.setfloat(o, v, 0)
         elif o == "minormeridianscolor": q = self.setcolor(o, v)
-        elif o == "minormeridianslw": q = self.setfloat(o, v, 0, 10)
-        elif o == "padding": q = self.setfloat(o, v, 0, 1000)
-        elif o == "plotheight": q = self.setfloat(o, v, 0, 1000)
-        elif o == "title": q = self.setstr(o, v, 1000)
+        elif o == "minormeridianslw": q = self.setfloat(o, v, 0)
+        elif o == "nminormeridians": q = self.setint(o, v, 0)
+        elif o == "nminorparallels": q = self.setint(o, v, 0)
+        elif o == "padding": q = self.setfloat(o, v, 0)
+        elif o == "parallelsbase": q = self.setfloat(o, v, 0)
+        elif o == "plotheight": q = self.setfloat(o, v, 0)
+        elif o == "title": q = self.setstr(o, v)
         elif o == "trajcolors": q = self.settuple(o, v, self.setcolor)
-        elif o == "trajlws": q = self.settuple(o, v, self.setfloat, 0, 10)
-        elif o == "trajticks": q = self.setint(o, v, -1, sys.maxint)
-        elif o == "trajnminorticks": q = self.setint(o, v, -1, sys.maxint)
+        elif o == "trajlws": q = self.settuple(o, v, self.setfloat, 0)
+        elif o == "trajticks": q = self.setint(o, v, -1)
+        elif o == "trajnminorticks": q = self.setint(o, v, -1)
         elif o == "watercolor": q = self.setcolor(o, v)
-        else: raise ValueError
+        else: raise ValueError("Unrecognized option: %s" % o)
         setattr(self, o, q)
 
 
@@ -610,7 +618,7 @@ TYPE is one of:\n\
 \n\
 FILE is a CloudSat or Aqua MODIS HDF-EOS2 file, or a CALIPSO HDF4 file.\n\
 \n\
-Report bugs to <peter.kuma@ccplot.org>." % \
+Report bugs to <ccplot-general@lists.sourceforge.net>." % \
     (program_name, program_name, program_name, program_name)
     
     sys.exit(0)
@@ -638,11 +646,15 @@ majormeridianslw\n\
 majorparallelscolor\n\
 majorparallelslw\n\
 mapres\n\
+meridiansbase\n\
 minormeridianscolor\n\
 minormeridianslw\n\
 minorparallelscolor\n\
 minorparallelslw\n\
+nminormeridians\n\
+nminorparallels\n\
 padding\n\
+parallelsbase\n\
 plotheight\n\
 trajcolors\n\
 title\n\
@@ -1667,6 +1679,21 @@ def plot_orbit(fnames, niofiles, nioeosfiles, fig, axes,
         minormeridians = np.arange(-180, 180, 10)
         majormeridians = np.arange(-180, 180, 30)
 
+    if opts.parallelsbase > 0:
+        majorparallels = np.arange(-90, 90, opts.parallelsbase)
+        if opts.nminorparallels > 0:
+            minorparallels = np.arange(-90, 90,
+                                       opts.parallelsbase/opts.nminorparallels)
+        else:
+            minorparallels = np.arange(-90, 90, opts.parallelsbase/2.0)
+
+    if opts.meridiansbase > 0:
+        majormeridians = np.arange(-180, 180, opts.meridiansbase)
+        if opts.nminormeridians > 0:
+            minormeridians = np.arange(-180, 180,
+                                       opts.meridiansbase/opts.nminormeridians)
+        else:
+            minormeridians = np.arange(-180, 180, opts.meridiansbase/2.0)
 
     if hextent.extent_type == HorizontalExtent.TYPE_LON_LAT:
         # Determine projection parameters from the horizontal extent given.
