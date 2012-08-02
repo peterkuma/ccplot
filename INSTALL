@@ -16,7 +16,7 @@ The following programs are required by ccplot:
 	libpng 1.1 (or later)
 	freetype 1.4 (or later)
 	matplotlib 0.98.1 (or later)
-	basemap and libraries shipped with basemap
+	basemap 0.99.4 (or later) and libraries shipped with basemap
 
 (b) Installing Python
 

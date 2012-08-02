@@ -1,13 +1,18 @@
 Metadata-Version: 1.1
 Name: ccplot
-Version: 1.3.1
-Summary: CloudSat/CALIPSO data processing helper routines
-Home-page: UNKNOWN
+Version: 1.4
+Summary: CloudSat and CALIPSO plotting tool
+Home-page: http://www.ccplot.org/
 Author: Peter Kuma
-Author-email: peterkuma@waveland.org
+Author-email: peter.kuma@ccplot.org
 License: UNKNOWN
-Description: UNKNOWN
-Platform: UNKNOWN
-Requires: matplotlib
-Requires: PyNIO
+Description: 
+        ccplot is a command-line application that reads CloudSat, CALISO
+        and Aqua MODIS HDF files, and produces plots of profile, layer and swath
+        products.
+        
+Platform: any
 Requires: basemap
+Requires: matplotlib
+Requires: numpy
+Requires: PyNIO

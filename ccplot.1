@@ -1,8 +1,8 @@
 .\" ccplot.1
 .\" This file is a part of ccplot - CloudSat and CALIPSO data plotting tool.
 .\"
-.\" Copyright (c) 2009 Peter Kuma
-.Dd August 1, 2009
+.\" Copyright (c) 2009, 2010 Peter Kuma
+.Dd May 07, 2010
 .Dt CCPLOT 1
 .Os
 .Sh NAME
@@ -17,8 +17,9 @@
 .Op Fl o Ar outfile
 .Op Fl p Ar projection
 .Op Fl r Ar radius
-.Op Fl v Ar extent
+.Op Fl v
 .Op Fl x Ar extent
+.Op Fl y Ar extent
 .Op Fl z Ar options
 .Ar type
 .Ar
@@ -26,6 +27,8 @@
 .Fl i Ar file
 .Nm
 .Fl h
+.Nm
+.Fl V
 .Sh DESCRIPTION
 .Nm
 is a tool that produces 2D plots of data stored in CloudSat, CALIPSO
@@ -69,14 +72,26 @@ and Aqua MODIS radiance or reflectance swath depending on files supplied
 The options are as follows:
 .Bl -tag
 .It Fl a Ar ratio
-Aspect ratio of profile products in seconds per km. Defaults to 2.
+Aspect ratio of profile and layer products in km horizontal per km vertical.
+Defaults to 14.0.
 .It Fl c Ar cmapfile
-Path to a cmap file defining colormap
+Path to a cmap file defining a colormap
 .Em boundaries ,
 colorbar
 .Em ticks
 and
 .Em colors .
+This can be a filename relative
+to any path defined by the
+.Ev CCPLOT_CMAP_PATH
+environment variable.
+Such paths take precendence over the current working directory,
+unless
+.Ar cmapfile
+is an absolute path or begins with
+.Em ./
+or
+.Em ../ .
 See the example cmap files that are distrubuted with
 .Nm
 for information about the format.
@@ -85,7 +100,7 @@ DPI of
 .Ar outfile
 if a raster image is to be output.
 .It Fl m Ar band
-MODIS band specifier in format r# for reflective bands and x# for radiation
+MODIS band specifier in the form r# for reflective bands and x# for radiation
 bands, where # is the band number.
 .It Fl o Ar outfile
 Output file. Format is determined by extension Supported formats are
@@ -99,7 +114,7 @@ Output file. Format is determined by extension Supported formats are
 (.eps)
 and
 .Tn PS
-(.ps).
+(.ps). Defaults to ccplot.png.
 .It Fl p Ar projection
 For MODIS
 .Cm orbit-clipped
@@ -130,8 +145,6 @@ Mercator
 Stereographic
 .It Cm npstere
 North-Polar Stereographic
-.It Cm geos
-Geostationary
 .It Cm vandg
 van der Grinten
 .It Cm laea
@@ -150,8 +163,6 @@ North-Polar Azimuthal Equidistant
 Equidistant Conic
 .It Cm cyl
 Cylindrical Equidistant
-.It Cm omerc
-Oblique Mercator
 .It Cm aea
 Albers Equal Area
 .It Cm spaeqd
@@ -165,6 +176,8 @@ South-Polar Lambert Azimuthal
 .It Cm robin
 Robinson
 .El
+.Pp
+Use -p help to get a list of available projections.
 .It Fl r Ar radius
 Interpolation radius in pixels. In profile products radius specifies
 vertical extent which a data point is mapped onto. If such vertical
@@ -176,28 +189,52 @@ If radius is too low with respect to
 data will be sparsely distributed on the image.
 Default is 3 for swath swath and a sensible value calculated from resolution
 for profile products.
-.It Fl v Ar extent
-Vertical extent of CloudSat and CALIPSO profiles in m in the format
-.Em from..to .
+.It Fl v
+Enable verbose mode.
+.It Fl V
+Print version information and exit.
 .It Fl x Ar extent
-For CloudSat and CALIPSO profiles
+Horizontal region to be plotted.
 .Ar extent
-specifies region to be plotted in rays or as absolute or relative time.
-Absolute time is expected in format
-.Em hour:min[:sec]..hour:min[:sec] .
-Relative time is expected in format
-.Em +|-[hour:]min:sec..+|-[hour:]min:sec .
-For MODIS swath
+can be specified in a number of formats depending on the plot type.
+.Pp
+For profile and layer products
 .Ar extent
-specifies horizontal extent in bins in the along-track (first)
-direction and across-track (second) direction.
-The format of
-.Ar extent
-is
+can either be specified by rays or by a time interval.
+In the first case it takes the form
 .Em from..to
-(profile and layer products) or
+where
+.Em from
+and
+.Em to
+are the first and the last ray (resp.) to be plotted.
+In the latter case,
+.Ar extent
+can be an absolute time interval in the form
+.Em hour:min[:sec]..hour:min[:sec] .
+or a relative time interval in the form
+.Em +|-[hour:]min:sec..+|-[hour:]min:sec .
+.Pp
+For swath products 
+.Ar extent
+can be specified by scanlines (along-track) and samples (across-track),
+or by geographical coordinates.
+In the first case
+.Ar extent
+takes the form
 .Em from..to,from..to
-(swath products).
+where the first term is the first and the last scanline to be plotted,
+and the second term is the first and the last sample to be plotted.
+In the latter case
+.Ar extent
+takes the form
+.Em lon(E|W)..lon(E|W),lat(S|N)..lat(S|N)
+where
+.Em lon , lat
+are numbers (in degrees) and E, W, S, N are literals, (A|B) means either A or B.
+.It Fl y Ar extent
+Vertical extent of CloudSat and CALIPSO profiles in meters in the form
+.Em from..to .
 .It Fl z Ar options
 Miscellaneous options that modifiy plot formatting.
 .Ar options
@@ -207,8 +244,16 @@ Supported general options are:
 .Bl -tag -offset 4n -width "cbfontsize" -compact
 .It Cm cbfontsize
 color bar font size (defaults to 8)
+.It Cm cbspacing
+spacing between the axes and color bar (defaults to 0.4)
 .It Cm fontsize
 font size (defaults to 10)
+.It Cm padding
+padding around the axes and color bar in inches (defaults to 1)
+.It Cm plotheight
+plot height in inches (defaults to 6)
+.It Cm title
+figure title (set automatically by default)
 .El
 .Pp
 Supported options for orbit plots are:
@@ -262,14 +307,26 @@ minor parallels line width (defaults to 0.1)
 list of trajectory colors (defaults to #FF0000:#0000FF:#00FF00)
 .It Cm trajlws
 list of trajectory line widths (defaults to 0.5)
+.It Cm trajnminortics
+number of minor ticks between adjecent major ticks or -1 for automatic selection
+(defaults to -1)
+.It Cm trajticks
+base for trajectory major ticks in seconds or -1 for automatic selection
+(defaults to -1)
 .It Cm watercolor
 water color (defaults to #FFFFFF)
 .El
 .Pp
 Options that accept a list of values are specified in the form
 key=value1:value2[:value...].
+.Pp
+Use -z help to get a list of available options.
 .El
-.\" .Sh ENVIRONMENT
+.Sh ENVIRONMENT
+.Bl -tag -width Ds -compact
+.It Ev CCPLOT_CMAP_PATH
+This is a colon-separated list of search paths for colormap files.
+.El
 .Sh FILES
 .Bl -tag -width Ds -compact
 .It /usr/share/ccplot/cmap/*
@@ -281,7 +338,7 @@ Plot the first 1000 rays of CloudSat reflectivity profile from
 using cloudsat-reflec.cmap colormap,
 and save it as cloudsat-reflec.png:
 .Bd -literal -offset 4n
-$ ccplot -x ..1000 -c cloudsat-reflec.cmap
+$ ccplot -x 0..1000 -c cloudsat-reflectivity.cmap
 -o cloudsat-reflec.png cloudsat-reflec
 2006224184641_01550_CS_2B-GEOPROF_GRANULE_P_R03_E01.hdf
 .Ed
@@ -290,7 +347,7 @@ Plot the first minute of CALIPSO backscatter profile from 0 to 20km
 using calipso-backscatter.cmap colormap,
 and save it as calipso532.png:
 .Bd -literal -offset 4n
-$ ccplot -v 0..20000 -x ..+1:00 -c calipso-backscatter.cmap
+$ ccplot -y 0..20000 -x +0:00..+1:00 -c calipso-backscatter.cmap
 -o calipso532.png calipso532
 CAL_LID_L1-Prov-V2-01.2006-07-06T19-50-51ZN.hdf
 .Ed

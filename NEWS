@@ -1,6 +1,27 @@
 CCPLOT NEWS
 
-New in 1.3.1 (2009-09-21):
+New in 1.4 (2010-05-07):
+
+    * The way aspect ratio is specified was changed.
+    * Vertical extent is now set by -y instead of -v.
+    * Horizontal extent can now be expressed in terms of geographical
+      coordinates for swath plot types.
+    * Tick on trajectories can be specified by the newly introduced
+      trajticks and trajnminortics options.
+    * ccplot now checks libraries versions at start-up.
+    * -V print version flag was added.
+    * -v be verbose flag was added.
+    * The way plot layout is constructed was rewritten. Newly added
+      options plotheight, padding and cbspacing can be used to control
+      the layout.
+    * -z options parsing would cash the program instead of failing. Fixed.
+    * Default output filename now set to ccplot.png.
+    * List of available projections and options is not printed as part of
+      the help output, but can be printed by -p help and -z help (resp.)
+    * Insufficient memory error condition is now handled gracefully.
+    * Colormap files are now searched for in some default locations first.
+
+New in 1.31 (2009-09-21):
 
     * Fixed CALIPSO plots time extent bug.
 

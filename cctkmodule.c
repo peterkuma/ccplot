@@ -1,185 +1,34 @@
 /* cctkmodule.c
- * This file is a part of ccplot - CloudSat and CALIPSO data plotting tool.
+ * This file is a part of ccplot: a CloudSat and CALIPSO plotting tool.
  *
  * Copyright (c) 2009 Peter Kuma
+ *
+ * This software is provided under the terms of a 2-clause BSD licence:
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *  1. Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *  2. Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer
+ *     in the documentation and/or other materials provided with
+ *     the distribution.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE CCPLOT PROJECT ``AS IS'' AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE CCPLOT PROJECT OR CONTRIBUTORS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+ * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
 #include <Python.h>
 #include <numpy/arrayobject.h>
-
-/*
- * Intrapolates values of a 2D array data with input y-coordinates
- * yin1d. yin1d is a 1-dimensional array. x dimension is preserved.
- * IMPORTANT: Both yin1d and yout1d are assumed to be monotonically increasing
- * with y. Each element of the output array out is set to the value of
- * the nearest element in the input array data.
- *
- * Arguments:
- * 	npy_float *data		-- Input data 2D array.
- * 	npy_float *yin1d	-- y-coordinates of data.
- * 	npy_float *yout1d	-- y-coordinates of the output array.
- *	int xdim		-- x dimension of data and out.
- *	int yindim		-- y dimension of data and x or y dimension
- *				   of yin1or2d.
- *	int youtdim		-- y dimension of yout1d and out.
- *	npy_float *out		-- Output 2D array.
- */
-static void
-lininty2d1(PyObject *data, PyObject *yin1d, PyObject *yout1d, PyObject *out)
-{
-	int i = 0, j = 0, k = 0, k0 = 0;
-	npy_float *outbin = NULL, *bin1 = NULL, *bin2 = NULL;
-	npy_float mindistance = INFINITY;
-	npy_float dist = 0;
-	int xdim = 0, yindim = 0, youtdim = 0;
-
-	xdim = PyArray_DIMS(data)[0];
-	yindim = PyArray_DIMS(data)[0];
-	youtdim = PyArray_DIMS(yout1d)[0];
-
-	for (j = 0, k0 = 0; j < youtdim; j++) {
-		mindistance = INFINITY;
-		bin1 = (npy_float *) PyArray_GETPTR1(yout1d, j);
-		for (k = k0; k < yindim; k++) {
-			bin2 = (npy_float *) PyArray_GETPTR1(yin1d, k);
-			dist = *bin1 - *bin2;
-			if (dist < 0) dist = -dist;
-			if (dist < mindistance) {
-				mindistance = dist;
-				k0 = k;
-			} else break; /* yin1d is monotonically inc. */
-		}
-		for (i = 0; i < xdim; i++) {
-			outbin = (npy_float *) PyArray_GETPTR2(out, i, j);
-			*outbin = *((npy_float *) PyArray_GETPTR2(data, i, k0));
-		}
-	}
-}
-
-/*
- * Intrapolates values of a 2D array data with input y-coordinates
- * yin2d. yin2d is a 2-dimensional array. x dimension is preserved.
- * IMPORTANT: Both yin2d and yout1d are assumed to be monotonically increasing
- * with y. Each element of the output array out is set to the value of
- * the nearest element in the input array data.
- *
- * Arguments:
- * 	npy_float *data		-- Input data 2D array.
- * 	npy_float *yin2d	-- y-coordinates of data.
- * 	npy_float *yout1d	-- y-coordinates of the output array.
- *	int xdim		-- x dimension of data and out.
- *	int yindim		-- y dimension of data and x or y dimension
- *				   of yin1or2d.
- *	int youtdim		-- y dimension of yout1d and out.
- *	npy_float *out		-- Output 2D array.
- */
-static void
-lininty2d2(PyObject *data, PyObject *yin2d, PyObject *yout1d, PyObject *out)
-{
-	npy_intp i = 0, j = 0, k = 0, k0 = 0;
-	npy_float *outbin = NULL, *bin1 = NULL, *bin2 = NULL;
-	npy_float mindistance = INFINITY;
-	npy_float dist = 0;
-	npy_intp xdim = 0, yindim = 0, youtdim = 0;
-
-	xdim = PyArray_DIMS(data)[0];
-	yindim = PyArray_DIMS(data)[1];
-	youtdim = PyArray_DIMS(yout1d)[0];
-	
-	/*
-	 * Iterate over the output array and find the nearest point
-	 * in the input array.
-	 */
-	for (i = 0; i < xdim; i++) {
-		for (j = 0, k0 = 0; j < youtdim; j++) {
-			bin1 = (npy_float *) PyArray_GETPTR1(yout1d, j);
-
-			mindistance = INFINITY;
-			for (k = k0; k < yindim; k++) {
-				bin2 = (npy_float *)
-				    PyArray_GETPTR2(yin2d, i, k);
-				dist = *bin1 - *bin2;
-				if (dist < 0) dist = -dist;
-				if (dist < mindistance) {
-					mindistance = dist;
-					k0 = k;
-				} else break; /* yin2d is monotonically inc. */
-			}
-			outbin = (npy_float *) PyArray_GETPTR2(out, i, j);
-			*outbin = *((npy_float *)
-			    PyArray_GETPTR2(data, i, k0));
-		}
-	}
-}
-
-static PyObject *
-cctk_lininty2d(PyObject *self, PyObject *args)
-{
-	PyObject *arg1 = NULL, *arg2 = NULL, *arg3 = NULL;
-	PyObject *data = NULL, *yin1or2d = NULL, *yout1d = NULL;
-	PyObject *out = NULL;
-	npy_intp *dims1 = NULL, *dims2 = NULL, *dims3 = NULL;
-	npy_intp dims4[2] = { 0, 0 };
-
-	if (!PyArg_ParseTuple(args, "OOO", &arg1, &arg2, &arg3) ) {
-		return NULL;
-	}
-
-	data = PyArray_FROM_OTF(arg1, NPY_FLOAT, NPY_IN_ARRAY);
-	if (data == NULL) goto fail;
-	yin1or2d = PyArray_FROM_OTF(arg2, NPY_FLOAT, NPY_IN_ARRAY);
-	if (yin1or2d == NULL) goto fail;
-	yout1d = PyArray_FROM_OTF(arg3, NPY_FLOAT, NPY_IN_ARRAY);
-	if (yout1d == NULL) goto fail;
-
-	if (PyArray_NDIM(data) != 2 ||
-	    (PyArray_NDIM(yin1or2d) != 1 && PyArray_NDIM(yin1or2d) != 2) ||
-	    PyArray_NDIM(yout1d) != 1) {
-		PyErr_SetString(PyExc_ValueError, "Incorrect dimensions.");
-		goto fail;
-	}
-
-	dims1 = PyArray_DIMS(data);
-	dims2 = PyArray_DIMS(yin1or2d);
-	dims3 = PyArray_DIMS(yout1d);
-
-	/* We want to be flexible and support both 1D and 2D Y-coordinate. */
-	if (PyArray_NDIM(yin1or2d) == 2) {
-		if (	dims1[0] != dims2[0] ||
-			dims1[1] != dims2[1]) {
-			PyErr_SetString(PyExc_ValueError,
-			    "Dimensions do not match");
-			goto fail;
-		}
-	} else { /* PyArray_NDIM(yin1or2d) == 1 */
-		if (dims1[1] != dims2[0]) {
-			PyErr_SetString(PyExc_ValueError,
-			    "Dimensions do not match");
-			goto fail;
-		}		
-	}
-	dims4[0] = dims1[0]; dims4[1] = dims3[0];
-	
-	out = PyArray_ZEROS(2, dims4, NPY_FLOAT, 0);
-	if (out == NULL) goto fail;
-	
-	/* Core function call. */
-	if (PyArray_NDIM(yin1or2d) == 2)
-		lininty2d2(data, yin1or2d, yout1d, out);
-	else /* PyArray_NDIM(yin1or2d) == 1 */
-		lininty2d1(data, yin1or2d, yout1d, out);
-
-	Py_DECREF(data);
-	Py_DECREF(yin1or2d);
-	Py_DECREF(yout1d);
-	return out;
-fail:
-	Py_XDECREF(data);
-	Py_XDECREF(yin1or2d);
-	Py_XDECREF(yout1d);
-	Py_XDECREF(out);
-	return NULL;
-}
 
 static void
 dimmap2d(PyObject *data, PyObject *out, int off1, int inc1, int off2, int inc2)
@@ -327,8 +176,8 @@ interpolate2d(PyObject *data, PyObject *xin2d, PyObject *yin2d, PyObject *out,
 			
 			kf = (x - xout1) / (xout2 - xout1) * xoutn;
 			lf = (y - yout1) / (yout2 - yout1) * youtn;
-			k = kf > 0.f ? kf+0.5 : kf-1.f;
-			l = lf > 0.f ? lf+0.5 : lf-1.f;
+			k = lroundf(kf);
+			l = lroundf(lf);
 
 			for (p = -radiusx; p <= radiusx; p++) {
 				for (q = -radiusy; q <= radiusy; q++) {
@@ -443,7 +292,7 @@ fail:
 }
 
 /*
- * Performs mapping of (CALIPSO) layer data onto a rectilinear grid.
+ * Performs mapping of CALIPSO layer data onto a regular grid.
  *
  * Arguments:
  *	PyObject *data		-- 2D numpy float array
@@ -454,8 +303,8 @@ fail:
  *	PyObject *topalt	-- 2D numpy float array storing top altitude
  *				   for earch ray and layer
  *	PyObject *out		-- output grid; 2D numpy float array
- *	float yout1		-- altitude corresponding to the bottom of out
- *	float yout2		-- altitude corresponding to the top of out
+ *	float y0		-- altitude corresponding to the bottom of out
+ *	float ym		-- altitude corresponding to the top of out
  *	float fill		-- background fill value
  *
  * Returns:
@@ -463,43 +312,46 @@ fail:
  */
 static PyObject *
 layermap(PyObject *data, PyObject *nlayer, PyObject *basealt,
-    PyObject *topalt, PyObject *out, float yout1, float yout2, float fill)
+    PyObject *topalt, PyObject *out, float y0, float ym, float fill)
 {
 	npy_intp i, j, k;
-	npy_intp xdim, ydim, nlayer_max;
+	npy_intp n, m, nlayer_max;
 	npy_float *bin = NULL, *outbin = NULL;
-	npy_uint8 n;
-	npy_float alt1, alt2;
-	float alt2y_ratio;
-	int y1, y2;
+	npy_uint8 nlayer_i;
+	npy_float yb, yt;
+	npy_float alt2y_ratio;
+	npy_float pf, qf;
+	npy_intp p, q;
 	
-	xdim = PyArray_DIMS(out)[0];
-	ydim = PyArray_DIMS(out)[1];
+	n = PyArray_DIMS(out)[0];
+	m = PyArray_DIMS(out)[1];
 	nlayer_max = PyArray_DIMS(data)[1];
 
-	alt2y_ratio = ydim/(yout2 - yout1);
+	alt2y_ratio = m/(ym - y0);
 
 	/* Fill output with a value of fill. */
-	for (i = 0; i < xdim; i++) {
-		for (j = 0; j < ydim; j++) {
+	for (i = 0; i < n; i++) {
+		for (j = 0; j < m; j++) {
 			bin = PyArray_GETPTR2(out, i, j);
 			*bin = fill;
 		}
 	}
 
 	/* Iterate over layers and fill out. */
-	for (i = 0; i < xdim; i++) {
-		n = *((npy_uint8 *) PyArray_GETPTR1(nlayer, i));
-		for (j = 0; j < n && j < nlayer_max; j++) {
+	for (i = 0; i < n; i++) {
+		nlayer_i = *((npy_uint8 *) PyArray_GETPTR1(nlayer, i));
+		for (j = 0; j < nlayer_i && j < nlayer_max; j++) {
 			bin = PyArray_GETPTR2(basealt, i, j);
-			alt1 = *bin;
+			yb = *bin;
 			bin = PyArray_GETPTR2(topalt, i, j);
-			alt2 = *bin;
-			y1 = (int) ((alt1-yout1)*alt2y_ratio);
-			y2 = (int) ((alt2-yout1)*alt2y_ratio);
-			if (y1 < 0) y1 = 0;
-			if (y2 >= ydim) y2 = ydim-1;
-			for (k = y1; k < y2; k++) {
+			yt = *bin;
+			pf = (yb - y0) * alt2y_ratio;
+			qf = (yt - y0) * alt2y_ratio;
+			p = lroundf(pf);
+			q = lroundf(qf);
+			if (p < 0) p = 0;
+			if (q > m) q = m;
+			for (k = p; k < q; k++) {
 				bin = PyArray_GETPTR2(data, i, j);
 				outbin = PyArray_GETPTR2(out, i, k);
 				*outbin = *bin;
@@ -587,14 +439,12 @@ fail:
 }
 
 static PyMethodDef CCTKMethods[] = {
-	{ "lininty2d", cctk_lininty2d, METH_VARARGS,
-	    "Intrapolate y-coordinate values of a 2D array." },
 	{ "interpolate2d", cctk_interpolate2d, METH_VARARGS,
-	    "Linearly interpolate values of a 2D array on a rectilinear grid."},
+	    "Linearly interpolate values of a 2D array on a regular grid."},
 	{ "dimmap2d", cctk_dimmap2d, METH_VARARGS,
 	    "Map dimensions by linear interpolation." },
 	{ "layermap", cctk_layermap, METH_VARARGS,
-	    "Map a layer product onto a two-dimensional rectilinear grid." },
+	    "Map a layer product onto a two-dimensional regular grid." },
 	{ NULL, NULL, 0, NULL }
 };
 
