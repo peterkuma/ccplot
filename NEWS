@@ -1,5 +1,10 @@
 CCPLOT NEWS
 
+New in 1.2 (2009-08-19):
+
+	* Fixed colormaps: calipso-cratio.cmap, calipso-dratio.cmap
+	  and calipso-temperature.cmap.
+
 New in 1.1 (2009-08-18):
 
 	* Interpolation method was changed from quadratic to nearest

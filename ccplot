@@ -1094,6 +1094,7 @@ def plot_grid(what, fname, niofile, fig, axes, extent=((0,-1),(0,-1)),
         if radius == None: radius = int(800*resolution/(ve2-ve1))
         data = cctk.interpolate2d(data, X, Y, (0, e2-e1, e2-e1),
                              (ve1, ve2, resolution), float("nan"), 0, radius)
+
     # Plot data.
     data = np.ma.masked_invalid(data)
     im = axes.imshow(data.T, origin="lower",
