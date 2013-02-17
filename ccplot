@@ -3,7 +3,7 @@
 # ccplot
 # This file is a part of ccplot: a CloudSat and CALIPSO plotting tool.
 #
-# Copyright (c) 2009, 2010 Peter Kuma
+# Copyright (c) 2009-2013 Peter Kuma
 #
 # This software is provided under the terms of a 2-clause BSD licence:
 #
@@ -46,19 +46,21 @@ import datetime as dt
 import re
 
 # Other includes.
-import Nio
 import numpy as np
 import matplotlib as mpl
 mpl.use("agg")
 import matplotlib.pyplot as plt
 from mpl_toolkits import basemap
 
+from hdf import HDF
+from hdfeos import HDFEOS
+
 # CCTK is a helper module that performs various calculations.
 import cctk
 
 # Early global variables.
 program_name = os.path.basename(sys.argv[0])
-__version__ = "1.4.4"
+__version__ = "1.5-rc1"
 CCPLOT_CMAP_PATH = "/usr/share/ccplot/cmap:/usr/local/share/ccplot/cmap"
 
 # Early functions.
@@ -74,8 +76,6 @@ if basemap.__version__ < "0.99.4":
     fail("basemap 0.99.4 required, %s present" % basemap.__version__)
 if np.__version__ < "1.1":
     fail("numpy 1.1 required, %s present" % np.__version__)
-if Nio.__version__ < "1.3.0b1":
-    fail("PyNIO 1.3.0b1 required, %s present" % Nio.__version__)
 
 
 #
@@ -101,7 +101,7 @@ SUPPORTED_PROJECTIONS = ("aeqd","poly","gnom","moll","tmerc","nplaea","gall",
 
 # WORKAROUND: This array should be constant throughout CALIPSO data files.
 # We list it inline here, because the field is stored in a VData structure
-# that is not supported by PyNIO.
+# that is not supported by the hdf module.
 CALIPSO_HEIGHT = np.array((39.855106, 39.555317, 39.25553, 38.95574, 38.655952,
 38.356167, 38.056377, 37.756588, 37.4568, 37.157013, 36.857224, 36.557434,
 36.25765, 35.95786, 35.65807, 35.35828, 35.058495, 34.758705, 34.458916,
@@ -1004,41 +1004,42 @@ def loadcolormap(filename, name):
     return (colormap, norm, ticks)
 
 
-def print_info(niofile):
+def print_info(product):
     """Prints information about the file.
        
     Arguments:
-        niofile -- NIO module file from which the information is to be read
+        product -- HDF or HDFEOS instance
     """
     ftype = None
     try: # Try CALIPSO names.
-        time = niofile.variables["Profile_UTC_Time"][:,0]
+        time = product["Profile_UTC_Time"][:,0]
         start_time = None
         time2dt = calipso_time2dt
         height = CALIPSO_HEIGHT
-        backscat532 = niofile.variables["Total_Attenuated_Backscatter_532"]
-        lat  = niofile.variables["Latitude"][:,0]
-        lon  = niofile.variables["Longitude"][:,0]
+        backscat532 = product["Total_Attenuated_Backscatter_532"]
+        lat  = product["Latitude"][:,0]
+        lon  = product["Longitude"][:,0]
         nbin = backscat532.shape[1]
-        nray = len(time)
+        nray = time.shape[0]
         ftype = "CALIPSO"
     except (KeyError, IndexError): pass
     try: # Try CloudSat names.
-        time = niofile.variables["Profile_time_2B_GEOPROF"]
-        lat = niofile.variables["Latitude_2B_GEOPROF"][:]
-        lon = niofile.variables["Longitude_2B_GEOPROF"][:]
-        height = niofile.variables["Height_2B_GEOPROF"][0][::-1]
+        sw = product["2B-GEOPROF"]
+        time = sw["Profile_time"]
+        lat = sw["Latitude"][:]
+        lon = sw["Longitude"][:]
+        height = sw["Height"][0][::-1]
         time2dt = cloudsat_time2dt
-        st = niofile.attributes["start_time_2B_GEOPROF"]
+        st = sw.attributes["start_time"]
         start_time = dt.datetime.strptime(st, "%Y%m%d%H%M%S")
         del st
-        nbin = niofile.dimensions["nbin_2B_GEOPROF"]
-        nray = len(time)
+        nbin = height.shape[0]
+        nray = time.shape[0]
         ftype = "CloudSat"
     except (KeyError, IndexError): pass
     try: # Try MODIS names.
-        lon = niofile.variables["Longitude_MODIS_SWATH_Type_L1B"][:,0]
-        lat = niofile.variables["Latitude_MODIS_SWATH_Type_L1B"][:,0]
+        lon = product["MODIS_SWATH_Type_L1B"]["Longitude"][:,0]
+        lat = product["MODIS_SWATH_Type_L1B"]["Latitude"][:,0]
         ftype = "MODIS"
     except (KeyError, IndexError): pass
 
@@ -1255,7 +1256,7 @@ def figure_title(fig, opts, title):
     fig.text(opts.padding/figw, 1-opts.padding/figh/3.0, title, weight="bold")
 
 
-def plot_profile(what, fname, niofile, fig, axes, hextent=HorizontalExtent(),
+def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
               vextent=np.array((float("-infinity"), float("infinity"))),
               aspect=1410.0, colormap=None, norm=None, ticks=None, radius=None,
               opts=PlotOpts()):
@@ -1264,7 +1265,7 @@ def plot_profile(what, fname, niofile, fig, axes, hextent=HorizontalExtent(),
     Arguments:
         what            -- plot type string
         fname           -- file name
-        niofile         -- NIO module file to read data from
+        product         -- product file to read data from
         fig             -- matplotlib Figure instance to draw onto
         axes            -- matplotlib Axes instance to draw onto
         hextent         -- an instance of HorizontalExtent
@@ -1305,39 +1306,40 @@ def plot_profile(what, fname, niofile, fig, axes, hextent=HorizontalExtent(),
     # Data retrieval.
     #
     try: # Try CloudSat names.
-        time = niofile.variables["Profile_time_2B_GEOPROF"]
-        lat = niofile.variables["Latitude_2B_GEOPROF"]
-        lon = niofile.variables["Longitude_2B_GEOPROF"]
-        reflec = niofile.variables["Radar_Reflectivity_2B_GEOPROF"]
-        height = niofile.variables["Height_2B_GEOPROF"]
-        start_time = niofile.attributes["start_time_2B_GEOPROF"]
-        nbin = niofile.dimensions["nbin_2B_GEOPROF"]
-        nray = len(time)
+        sw = product["2B-GEOPROF"]
+        time = sw["Profile_time"]
+        lat = sw["Latitude"]
+        lon = sw["Longitude"]
+        reflec = sw["Radar_Reflectivity"]
+        height = sw["Height"]
+        start_time = sw.attributes["start_time"]
+        nbin = height.shape[1]
+        nray = time.shape[0]
     except KeyError: pass
     try: # Try common CALIPSO profile/layer names.
-        time = niofile.variables["Profile_UTC_Time"]
-        lat  = niofile.variables["Latitude"]
-        lon  = niofile.variables["Longitude"]
-        nray = len(time)
+        time = product["Profile_UTC_Time"]
+        lat  = product["Latitude"]
+        lon  = product["Longitude"]
+        nray = time.shape[0]
     except KeyError: pass
     try: # Try CALIPSO profile names.
-        backscat532 = niofile.variables["Total_Attenuated_Backscatter_532"]
-        backscat532p = niofile.variables["Perpendicular_Attenuated_Backscatter_532"]
-        backscat1064 = niofile.variables["Attenuated_Backscatter_1064"]
-        elevation = niofile.variables["Surface_Elevation"]
+        backscat532 = product["Total_Attenuated_Backscatter_532"]
+        backscat532p = product["Perpendicular_Attenuated_Backscatter_532"]
+        backscat1064 = product["Attenuated_Backscatter_1064"]
+        elevation = product["Surface_Elevation"]
         # CALIPSO doesn't call them rays (horizontal) and bins
         # (vertical); anyway, it should be clear enough.
         nbin = backscat532.shape[1]
     except KeyError: pass
     try: # Try CALIPSO layer names.
-        topalt  = niofile.variables["Layer_Top_Altitude"]
-        basealt = niofile.variables["Layer_Base_Altitude"]
-        backscat532_layer = niofile.variables["Integrated_Attenuated_Backscatter_532"]
-        backscat1064_layer = niofile.variables["Integrated_Attenuated_Backscatter_1064"]
-        cratio_layer = niofile.variables["Integrated_Attenuated_Total_Color_Ratio"]
-        dratio_layer = niofile.variables["Integrated_Volume_Depolarization_Ratio"]
-        temperature_layer = niofile.variables["Midlayer_Temperature"]
-        nlayer = niofile.variables["Number_Layers_Found"]
+        topalt  = product["Layer_Top_Altitude"]
+        basealt = product["Layer_Base_Altitude"]
+        backscat532_layer = product["Integrated_Attenuated_Backscatter_532"]
+        backscat1064_layer = product["Integrated_Attenuated_Backscatter_1064"]
+        cratio_layer = product["Integrated_Attenuated_Total_Color_Ratio"]
+        dratio_layer = product["Integrated_Volume_Depolarization_Ratio"]
+        temperature_layer = product["Midlayer_Temperature"]
+        nlayer = product["Number_Layers_Found"]
         nbin = len(CALIPSO_HEIGHT)
     except KeyError: pass
 
@@ -1375,8 +1377,8 @@ def plot_profile(what, fname, niofile, fig, axes, hextent=HorizontalExtent(),
         e2 = norm_index(e2, 0, nray)
         e3 = 0
         e4 = -1
-        if e1 >= e2: fail("Invalid extent")        
-        
+        if e1 >= e2: fail("Invalid extent")
+
         if what.startswith("cloudsat"):
             product_name = "CloudSat Profile"
             lon = lon[e1:e2]
@@ -1387,14 +1389,14 @@ def plot_profile(what, fname, niofile, fig, axes, hextent=HorizontalExtent(),
             product_name = "CALIPSO Profile"
             lon = lon[e1:e2,0]
             lat = lat[e1:e2,0]
-            # WORKAROUND: See the comment at the beginning of this file.            
+            # WORKAROUND: See the comment at the beginning of this file.
             height = CALIPSO_HEIGHT[e3:e4]
             time = time[e1:e2,0]
             if elevation != None:
                 elevation = elevation[e1:e2]
         else:
             fail("Assertion error: Unrecogized plot type `%s'" % what)
-        
+
         # CloudSat products.
         if what == "cloudsat-reflec":
             # TODO: Mask _FillValue too.
@@ -1433,7 +1435,7 @@ def plot_profile(what, fname, niofile, fig, axes, hextent=HorizontalExtent(),
             vmin = 0.0
             vmax = 2.0
         elif what == "calipso-dratio":
-            data = backscat532p[e1:e2,e3:e4] / backscat532[e1:e2,e3:e4]    
+            data = backscat532p[e1:e2,e3:e4] / backscat532[e1:e2,e3:e4]
             name = "Depolarization Ratio"
             vmin = 0.0
             vmax = 1.0
@@ -1465,7 +1467,7 @@ def plot_profile(what, fname, niofile, fig, axes, hextent=HorizontalExtent(),
             vmax = 60
         else:
             fail("Assertion error: Unrecogized plot type `%s'" % what)
-            
+
         if what.endswith("-layer"):
             product_name = "CALIPSO layer"
             nlayer = nlayer[e1:e2,0]
@@ -1490,7 +1492,7 @@ def plot_profile(what, fname, niofile, fig, axes, hextent=HorizontalExtent(),
     #
     resolution = int(get_axes_bounds(fig, axes)[3]*fig.get_dpi())
     if what.endswith("-layer"):     # Layer products.
-        data = cctk.layermap(data, nlayer, basealt, topalt,
+        data = cctk.layermap(data, nlayer.astype(np.uint8), basealt, topalt,
                              (ve1*0.001, ve2*0.001, resolution), float("nan"))
     else:                           # Profile products.
         if height.ndim == 1:
@@ -1582,7 +1584,7 @@ def plot_profile(what, fname, niofile, fig, axes, hextent=HorizontalExtent(),
     figure_title(fig, opts, title)
 
 
-def plot_orbit(fnames, niofiles, nioeosfiles, fig, axes,
+def plot_orbit(fnames, products, fig, axes,
     hextent=HorizontalExtent(),
     band=1, band_mode=BAND_MODE_RADIANCE, proj='cyl', proj_opts=ProjOpts(),
     clipped=False,
@@ -1591,7 +1593,7 @@ def plot_orbit(fnames, niofiles, nioeosfiles, fig, axes,
     """Draws a map plot of a CloudSat and CALIPSO trajectories and MODIS swath.
     
     Arguments:
-        niofiles    -- a list of NIO files
+        products    -- a list of products
         fig         -- matplotlib Figure instance
         axes        -- matplotlib Axes instance
         hextent     -- an instance of HorizontalExtent
@@ -1623,11 +1625,12 @@ def plot_orbit(fnames, niofiles, nioeosfiles, fig, axes,
     
     # Search for a MODIS data file.
     modis_swath = None
-    for fname, niofile, nioeosfile in zip(fnames, niofiles, nioeosfiles):
+    for fname, product in zip(fnames, products):
         info("Attempting to read MODIS swath from %s" % fname)
-        modis_swath = read_modis_swath(niofile, nioeosfile, band, band_mode,
-                                       along_track_ext, across_track_ext)
-        if modis_swath != None: break
+        if product.has_key("MODIS_SWATH_Type_L1B"):
+            modis_swath = read_modis_swath(product, band, band_mode,
+                                           along_track_ext, across_track_ext)
+            break
 
     if modis_swath != None and clipped:
         minorticks_base = 10000
@@ -1793,24 +1796,23 @@ def plot_orbit(fnames, niofiles, nioeosfiles, fig, axes,
 
     # Plot trajectories.
     j = 0
-    for i, (niofile, nioeosfile) in enumerate(zip(niofiles, nioeosfiles)):   
-        if nioeosfile != None and \
-           nioeosfile.variables.has_key("Longitude_MODIS_SWATH_Type_L1B"):
-            continue
+    for i, product in products:
+        if product.has_key("MODIS_SWATH_Type_L1B"): continue
         hit = False
         try: # Try CALIPSO names.
-            time = niofile.variables["Profile_UTC_Time"][:, 0]
-            lon = niofile.variables["Longitude"][:, 0]
-            lat = niofile.variables["Latitude"][:, 0]
+            time = product["Profile_UTC_Time"][:, 0]
+            lon = product["Longitude"][:, 0]
+            lat = product["Latitude"][:, 0]
             time2dt = calipso_time2dt
             satellite = "CALIPSO"
             hit = True
         except (KeyError, IndexError): pass
         try: # Try CloudSat names.
-            time = nioeosfile.variables["Profile_time_2B_GEOPROF"][:]
-            lon = nioeosfile.variables["Longitude_2B_GEOPROF"][:]
-            lat = nioeosfile.variables["Latitude_2B_GEOPROF"][:]
-            start_time = nioeosfile.attributes["start_time_2B_GEOPROF"]
+            sw = product["2B-GEOPROF"]
+            time = sw["Profile_time"][:]
+            lon = sw["Longitude"][:]
+            lat = sw["Latitude"][:]
+            start_time = sw.attributes["start_time"]
             start_time_dt = dt.datetime.strptime(start_time, "%Y%m%d%H%M%S")
             time2dt = lambda t: cloudsat_time2dt(t, start_time_dt)
             satellite = "CloudSat"
@@ -1958,42 +1960,40 @@ def plot_trajectory(fig, axes, m, lon, lat, time, time2dt,
 #        m.plot(Xsplit[i], Ysplit[i], color=color, lw=lw)
 
 
-def read_modis_swath(niofile, nioeosfile, band, band_mode,
+def read_modis_swath(product, band, band_mode,
                      along_track_ext=(0,-1), across_track_ext=(0,-1)):
 
-    if nioeosfile == None or \
-       not nioeosfile.variables.has_key("Longitude_MODIS_SWATH_Type_L1B"):
-        return None # This is not a valid MODIS file.
+    sw = product["MODIS_SWATH_Type_L1B"]
 
     try:
-        lon = niofile.variables["Longitude"]
-        lat = niofile.variables["Latitude"]
+        lon = sw["Longitude"]
+        lat = sw["Latitude"]
     except KeyError, err: 
         return None
 
     data = None
     if band in (1, 2):
-        data = niofile.variables.get("EV_250_RefSB", data)
-        data = niofile.variables.get("EV_250_Aggr500_RefSB", data)
-        data = niofile.variables.get("EV_250_Aggr1km_RefSB", data)
+        data = sw.get("EV_250_RefSB", data)
+        data = sw.get("EV_250_Aggr500_RefSB", data)
+        data = sw.get("EV_250_Aggr1km_RefSB", data)
         band_offset = -1
     elif band in (3, 4, 5, 6, 7):
-        data = niofile.variables.get("EV_500_RefSB", data)
-        data = niofile.variables.get("EV_500_Aggr1km", data)
+        data = sw.get("EV_500_RefSB", data)
+        data = sw.get("EV_500_Aggr1km", data)
         band_offset = -3
     elif band in range(8, 20) or band in (13.5, 14.5):
-        data = niofile.variables.get("EV_1KM_RefSB", data)
+        data = sw.get("EV_1KM_RefSB", data)
         if band <= 13: band_offset = -8
         elif band == 13.5: band_offset = -7
         elif band == 14.0: band_offset = -7
         else: band_offset = -6
     elif band in range(20, 26):
-        data = niofile.variables.get("EV_1KM_Emissive", data)
+        data = sw.get("EV_1KM_Emissive", data)
         band_offset = -20
     # TODO: Add support for band 26.
     elif band == 26: fail("Band 26 is not supported")
     elif band in range(27, 37):
-        data = niofile.variables.get("EV_1KM_Emissive", data)
+        data = sw.get("EV_1KM_Emissive", data)
         band_offset = -21
 
     band_index = band + band_offset
@@ -2001,22 +2001,8 @@ def read_modis_swath(niofile, nioeosfile, band, band_mode,
     if data == None or data.shape[0] <= band_index:
         fail("%d: Band not present in the data file" % band)
 
-    # Determine parameters for dimension mapping.
-    nscan_ndet_name = stripstr(data.dimensions[1], "_MODIS_SWATH_Type_L1B")
-    nfram_nsam_name = stripstr(data.dimensions[2], "_MODIS_SWATH_Type_L1B")
-
-    geo_nscan_ndet_name = stripstr(lon.dimensions[0], "_MODIS_SWATH_Type_L1B")
-    geo_nfram_nsam_name = stripstr(lon.dimensions[1], "_MODIS_SWATH_Type_L1B")
-
-    try:
-        off1, inc1 = nioeosfile.attributes[geo_nscan_ndet_name + \
-            "_to_" + nscan_ndet_name + \
-            "_mapping_offset_and_increment_MODIS_SWATH_Type_L1B"]
-
-        off2, inc2 = nioeosfile.attributes[geo_nfram_nsam_name + \
-            "_to_" + nfram_nsam_name + \
-            "_mapping_offset_and_increment_MODIS_SWATH_Type_L1B"]
-    except KeyError, err: fail("%s: Attribute not found" % err)
+    off1, inc1 = sw.maps[(lon.dims[0], data.dims[1])]
+    off2, inc2 = sw.maps[(lon.dims[1], data.dims[2])]
 
     if band_mode == BAND_MODE_REFLECTANCE and band >= 20 and band != 26:
         fail("Invalid band")
@@ -2130,24 +2116,25 @@ def main(argv):
     opts = parse_options(argv)
 
     # Open each file as HDF and HDF-EOS if possible.
-    niofiles = []
-    nioeosfiles = []
+    products = []
     for fname in opts.fnames:
-        try: niofile = Nio.open_file(fname, "r", format="hdf")
-        except Nio.NIOError, err: fail("%s: %s" % (fname, err))
-        niofiles.append(niofile)
+        try: product = HDF(fname)
+        except IOError as e: fail("%s: %s" % (fname, e))
 
-        nioeosfile = None
-        if niofile.attributes.has_key("HDFEOSVersion"):
-            try:
-                nioeosfile = Nio.open_file(fname, "r", format="hdfeos")
-            except Nio.NIOError, err: fail("%s: %s" % (fname, err))
-        nioeosfiles.append(nioeosfile)
+        try: hdfeosversion = product.attributes['HDFEOSVersion']
+        except KeyError: hdfeosversion = None
+
+        if hdfeosversion is not None:
+            # Reopen with HDFEOS.
+            product.close()
+            try: product = HDFEOS(fname)
+            except IOError as e: fail("%s: %s" % (fname, e))
+
+        products.append(product)
     
     if opts.print_info_only:
         # Print information about the file and exit.
-        if nioeosfiles[0] == None: print_info(niofiles[0])
-        else: print_info(nioeosfiles[0])
+        print_info(products[0])
         sys.exit(0)
 
     mpl.rcParams["font.size"] = opts.plot_opts.fontsize
@@ -2169,9 +2156,9 @@ def main(argv):
 
     # Main switch.
     if opts.plot_type == "cloudsat-reflec":
-        if len(nioeosfiles) != 1 or nioeosfiles[0] == None:
+        if len(products) != 1:
             fail("Single HDF-EOS file expected")
-        plot_profile(opts.plot_type, opts.fnames[0], nioeosfiles[0], fig, axes,
+        plot_profile(opts.plot_type, opts.fnames[0], products[0], fig, axes,
                   hextent=opts.hextent,
                   vextent=opts.vextent,
                   aspect=opts.aspect,
@@ -2186,9 +2173,9 @@ def main(argv):
          opts.plot_type == "calipso1064" or \
          opts.plot_type == "calipso-cratio" or \
          opts.plot_type == "calipso-dratio":
-        if len(niofiles) != 1: usage()
+        if len(products) != 1: usage()
         
-        plot_profile(opts.plot_type, opts.fnames[0], niofiles[0], fig, axes,
+        plot_profile(opts.plot_type, opts.fnames[0], products[0], fig, axes,
                      hextent=opts.hextent,
                      vextent=opts.vextent,
                      aspect=opts.aspect,
@@ -2204,8 +2191,8 @@ def main(argv):
          opts.plot_type == "calipso-dratio-layer" or \
          opts.plot_type == "calipso-temperature-layer":
          
-        if len(niofiles) != 1: fail("Single HDF file expected")
-        plot_profile(opts.plot_type, opts.fnames[0], niofiles[0], fig, axes,
+        if len(products) != 1: fail("Single HDF file expected")
+        plot_profile(opts.plot_type, opts.fnames[0], products[0], fig, axes,
                      hextent=opts.hextent,
                      vextent=opts.vextent,
                      aspect=opts.aspect,
@@ -2216,7 +2203,7 @@ def main(argv):
                      opts=opts.plot_opts)
                      
     elif opts.plot_type == "orbit":
-        plot_orbit(opts.fnames, niofiles, nioeosfiles, fig, axes,
+        plot_orbit(opts.fnames, products, fig, axes,
                    band=opts.modis_band,
                    band_mode=opts.modis_band_mode,
                    hextent=opts.hextent,
@@ -2229,7 +2216,7 @@ def main(argv):
                    opts=opts.plot_opts)
                    
     elif opts.plot_type == "orbit-clipped":
-        plot_orbit(opts.fnames, niofiles, nioeosfiles, fig, axes,
+        plot_orbit(opts.fnames, products, fig, axes,
                    band=opts.modis_band,
                    band_mode=opts.modis_band_mode,
                    hextent=opts.hextent,
@@ -2266,4 +2253,3 @@ if __name__ == "__main__":
         fail("Insufficient memory")
     except np.linalg.linalg.LinAlgError, err:
         fail("Linear algebra error: %s" % err)
-
