@@ -1,0 +1,2 @@
+include Changelog NEWS ccplot.1
+recursive-include cmap *
