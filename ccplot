@@ -1016,10 +1016,12 @@ def print_info(product):
         start_time = None
         time2dt = calipso_time2dt
         height = CALIPSO_HEIGHT
-        backscat532 = product["Total_Attenuated_Backscatter_532"]
+        try:
+            backscat532 = product["Total_Attenuated_Backscatter_532"]
+            nbin = backscat532.shape[1]
+        except KeyError: nbin = 0
         lat  = product["Latitude"][:,0]
         lon  = product["Longitude"][:,0]
-        nbin = backscat532.shape[1]
         nray = time.shape[0]
         ftype = "CALIPSO"
     except (KeyError, IndexError): pass
