@@ -1798,7 +1798,7 @@ def plot_orbit(fnames, products, fig, axes,
 
     # Plot trajectories.
     j = 0
-    for i, product in products:
+    for product in products:
         if product.has_key("MODIS_SWATH_Type_L1B"): continue
         hit = False
         try: # Try CALIPSO names.
