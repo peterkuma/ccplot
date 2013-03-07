@@ -1203,10 +1203,10 @@ def time2ray(t, time, time2dt):
     """
     
     a = 0
-    b = len(time)-1
+    b = time.shape[0]-1
     i = 0
     
-    if len(time) == 0: return -1
+    if time.shape[0] == 0: return -1
 
     if isinstance(t, dt.timedelta):
         if t < dt.timedelta(0): ref_dt = time2dt(time[-1]) + t
@@ -1902,7 +1902,7 @@ def plot_trajectory(fig, axes, m, lon, lat, time, time2dt,
                       verticalalignment=valign,
                       transform=trans)
     
-    nray = len(time)
+    nray = time.shape[0]
     time_from = time2dt(time[0])
     time_to = time2dt(time[-1])
     d = time_to - time_from
