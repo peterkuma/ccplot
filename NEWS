@@ -1,5 +1,9 @@
 CCPLOT NEWS
 
+New in 1.4.5 (2013-05-31):
+
+    * Fix type cast bug with numpy 1.7
+
 New in 1.4.4 (2010-09-02):
 
     * Changed backend back from cairo to AGG (though not GTK AGG as before),

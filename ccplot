@@ -58,7 +58,7 @@ import cctk
 
 # Early global variables.
 program_name = os.path.basename(sys.argv[0])
-__version__ = "1.4.4"
+__version__ = "1.4.5"
 CCPLOT_CMAP_PATH = "/usr/share/ccplot/cmap:/usr/local/share/ccplot/cmap"
 
 # Early functions.
