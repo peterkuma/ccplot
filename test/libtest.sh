@@ -77,6 +77,10 @@ expect() {
     [ $TESTING -eq 0 -o $RESULT -gt 0 ] && return
     [ "$OUTPUT" = "$STRING" ]
     R=$?
+    if [ $R -ne 0 ]; then
+        echo "---- Expected ----"
+        echo "${GREY}$STRING${Q}"
+    fi
     RESULT=$((RESULT | $R))
 }
 
