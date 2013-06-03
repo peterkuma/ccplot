@@ -1,5 +1,6 @@
 language: python
-system_site_packages: true
+virtualenv:
+  system_site_packages: true
 python:
   - "2.7"
 before_install:
