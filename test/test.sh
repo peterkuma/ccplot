@@ -108,9 +108,9 @@ testing "print info on CALIPSO"
 check ccplot -i CAL_LID_L1-ValStage1-V3-01.2007-06-12T03-42-18ZN.hdf
 expect <<EOF
 Type: CALIPSO
-Time: 2007-06-12 03:42:14, 2007-06-12 04:28:32
+Time: 2007-06-12 03:42:14, 2007-06-12 04:28:47
 Height: -1815m, 39855m
-nray: 56001
+nray: 56310
 nbin: 583
 Longitude: 179.99W, 180.00E
 Latitude: 81.85S, 55.50N
