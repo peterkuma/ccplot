@@ -4,9 +4,7 @@ virtualenv:
 python:
   - "2.7"
 before_install:
-  - sudo apt-get install cython libhdf4-dev libhdfeos-dev \
-    python-numpy python-matplotlib python-mpltoolkits.basemap \
-    ttf-bitstream-vera
+  - sudo apt-get install cython libhdf4-dev libhdfeos-dev python-numpy python-matplotlib python-mpltoolkits.basemap ttf-bitstream-vera
 install:
   - python setup.py install 
 script: cd test; ./test.sh
