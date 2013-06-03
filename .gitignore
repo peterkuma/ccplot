@@ -3,4 +3,4 @@ dist
 MANIFEST
 /hdf.c
 /hdfeos.c
-
+/test/work/
