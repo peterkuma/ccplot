@@ -1,5 +1,11 @@
 CCPLOT NEWS
 
+New in 1.4.6 (2013-06-04):
+
+    * Fixed type cast bug when plotting CALIPSO profiles
+      (previously fixed for CloudSat only in 1.4.5).
+    * Added a set of unit tests.
+
 New in 1.4.5 (2013-05-31):
 
     * Fix type cast bug with numpy 1.7

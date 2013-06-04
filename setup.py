@@ -6,7 +6,7 @@ module1 = Extension('cctk',
                     sources=['cctkmodule.c'])
 
 setup(name='ccplot',
-      version='1.4.5',
+      version='1.4.6',
       description='CloudSat and CALIPSO plotting tool',
       long_description="""
       ccplot is a command-line application that reads CloudSat, CALISO
