@@ -1499,9 +1499,9 @@ def plot_profile(what, fname, niofile, fig, axes, hextent=HorizontalExtent(),
             Y, X = np.meshgrid(height[0,:],
                                np.arange(0, e2-e1, dtype=np.float32))
             Y = height
-            X = X.astype(np.float32)
-            Y = Y.astype(np.float32)
         if radius == None: radius = int(PROFILE_BINHEIGHT*resolution/(ve2-ve1))
+        X = X.astype(np.float32)
+        Y = Y.astype(np.float32)
         data = cctk.interpolate2d(data, X, Y, (0, e2-e1, e2-e1),
                              (ve1, ve2, resolution), float("nan"), 0, radius)
 
