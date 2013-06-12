@@ -30,12 +30,16 @@ cdef extern from "hdf/hdf.h":
         DFACC_READ = 1
         MAX_VAR_DIMS = 32
         FIELDNAMELENMAX = 128
-    
+        VSNAMELENMAX = 64
+        FULL_INTERLACE = 0
+
+    ctypedef np.npy_uint8 uint8
+    ctypedef np.npy_int8 int8
     ctypedef np.npy_int16 int16
     ctypedef np.npy_int32 int32
     ctypedef int intn
     ctypedef int hdf_err_code_t
-    
+
     int32 SDstart(char *, int32)
     int32 SDnametoindex(int32, char *)
     int32 SDselect(int32, int32)
@@ -49,6 +53,30 @@ cdef extern from "hdf/hdf.h":
     intn SDfileinfo(int32, int32 *, int32 *)
     int16 HEvalue(int32)
     char *HEstring(hdf_err_code_t)
+
+    int32 Hopen(char *, intn, int16)
+    intn Vstart(int32)
+    int32 VSattach(int32, int32, char *)
+    int32 VSdetach(int32)
+    intn Vend(int32 file_id)
+    intn Hclose(int32 file_id)
+    intn VSinquire(int32, int32 *, int32 *, char *, int32 *, char *)
+    int32 VSfind(int32, char *)
+    intn VSsetfields(int32, char *)
+    int32 VSread(int32, uint8 *, int32, int32)
+    int32 VSgetname(int32, char *)
+    int32 VSgetid(int32, int32)
+    int32 VSgetclass(int32, char *)
+    int32 VSsizeof(int32 vdata_id, char *field_name_list)
+    intn VSfpack(int32, intn, char *, VOIDP, intn, intn,char *, VOIDP)
+    int32 VFfieldtype(int32, int32)
+    intn VSfindex(int32, char *, int32 *)
+    char *VFfieldname(int32, int32)
+    int32 VFnfields(int32)
+
+cdef extern from "hdf/vg.h":
+    cdef enum:
+        _HDF_VSUNPACK = 1
 
 DTYPE = {
     DFNT_UCHAR: np.ubyte,
@@ -126,6 +154,23 @@ class Dataset(object):
         else: return data.reshape(shape)
 
 
+class Vdata(DictMixin):
+    def __init__(self, hdf, name):
+        self.hdf = hdf
+        self.name = name
+        # Ensure that such Vdata exists.
+        self.fields = self.hdf._vdata_fields(name)
+
+    def __getitem__(self, key):
+        data = self.hdf._read_vdata(self.name, key)
+        if type(data) == np.ndarray and len(data) == 1:
+            return data[0]
+        return data
+
+    def keys(self):
+        return self.fields
+
+
 class SDS(object):
     def __init__(self, hdf, name):
         self.hdf = hdf
@@ -139,7 +184,7 @@ class SDS(object):
         if self.sds == FAIL:
             self.hdf._error('HDF: SDselect of dataset "%s" failed' % self.name)
         return self.sds
-    
+
     def __exit__(self, exc_type, exc_value, traceback):
         SDendaccess(self.sds)
 
@@ -147,25 +192,49 @@ class SDS(object):
 class HDF(DictMixin):
     def __init__(self, filename):
         self.filename = filename
-        self.sd = SDstart(filename, DFACC_READ);
+
+        self.sd = SDstart(filename, DFACC_READ)
         if self.sd == FAIL: self._error('HDF: SDstart failed', from_errno=True)
+
+        self.hd = Hopen(filename, DFACC_READ, 0)
+        if self.hd == FAIL: self._error('HDF: Hopen failed', from_errno=True)
+
+        res = Vstart(self.hd)
+        if res == FAIL: self._error('HDF: Vstart failed', from_errno=True)
+
         self.attributes = Attributes(self)
-    
+
     def __enter__(self):
         return self
-    
+
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
     def close(self):
         SDend(self.sd)
         self.sd = None
+        Vend(self.hd)
+        Hclose(self.hd)
+        self.hd = None
 
     def __getitem__(self, key):
-        #with SDS(self, key) as sds: pass # Ensure SDS exists.
-        return Dataset(self, key)
+        # Try SDS.
+        try:
+            with SDS(self, key) as sds: pass
+            return Dataset(self, key)
+        except KeyError: pass
+
+        # Try Vdata.
+        try:
+            return Vdata(self, key)
+        except KeyError: pass
+
+        raise KeyError(key)
 
     def keys(self):
+        return self._list_datasets() + self._list_vdata()
+
+    def _list_datasets(self):
         cdef int32 rank, data_type, num_datasets, num_global_attrs, num_attrs
         cdef np.ndarray[int32, ndim=1] dims
         cdef np.ndarray[char, ndim=1] tmp
@@ -184,6 +253,29 @@ class HDF(DictMixin):
             sds_name = bytearray(tmp).decode('ascii').rstrip('\0')
             datasets.append(sds_name)
         return datasets
+
+    def _list_vdata(self):
+        """Return a list of pure Vdata elements."""
+        cdef char[VSNAMELENMAX] tmp
+        out = []
+        ref = VSgetid(self.hd, -1)
+        while ref != FAIL:
+            id = VSattach(self.hd, ref, 'r')
+            if id == FAIL: self._error('HDF: VSattach failed')
+            try:
+                res = VSgetname(id, tmp)
+                if res == FAIL: self._error('HDF: VSgetname failed')
+                name = tmp
+                res = VSgetclass(id, tmp)
+                if res == FAIL: self._error('HDF: VSgetclass failed')
+                vdata_class = tmp
+                if vdata_class == '':
+                    out.append(name)
+            finally:
+                res = VSdetach(id)
+                if res == FAIL: self._error('HDF: VSdetach failed')
+            ref = VSgetid(self.hd, ref)
+        return out
 
     def _error(self, errmsg=None, from_errno=False):
         errcode = HEvalue(1)
@@ -304,3 +396,68 @@ class HDF(DictMixin):
             return bytearray(data).decode('ascii').rstrip('\0')
 
         return data[0] if count == 1 else data
+
+    def _read_vdata(self, vdata, name):
+        cdef int32 n_records
+        cdef np.ndarray[uint8, ndim=1] buf, data
+        cdef int32 index
+
+        ref = VSfind(self.hd, vdata)
+        if ref == 0: raise KeyError(vdata)
+        id = VSattach(self.hd, ref, 'r')
+        if id == FAIL: self._error('HDF: VSattach of "%s" failed' % vdata)
+        try:
+            res = VSinquire(id, &n_records, NULL, NULL, NULL, NULL)
+            if res == FAIL: self._error('HDF: VSinquire failed')
+
+            res = VSsetfields(id, name)
+            if res == FAIL: raise KeyError(name)
+
+            size = VSsizeof(id, name)
+            if size == FAIL: self._error('HDF: VSsizeof failed')
+
+            buf = np.zeros(size*n_records, dtype=np.uint8)
+            res = VSread(id, <uint8 *>buf.data, n_records, FULL_INTERLACE)
+            data = buf
+
+            # Find out field type.
+            res = VSfindex(id, name, &index)
+            if res == FAIL: self._error('HDF: VSfindex failed')
+            data_type = VFfieldtype(id, index)
+            if data_type == FAIL: self._error('HDF: VFfieldtype failed')
+            try:
+                dtype = DTYPE[data_type]
+            except KeyError:
+                raise NotImplementedError(
+                    '%s: %s: %s: Data type %d not implemented' %
+                    (self.filename, vdata, name, data_type)
+                )
+
+            if data_type == DFNT_CHAR:
+                return bytearray(data).decode('ascii').rstrip('\0')
+            else:
+                return data.view(dtype=dtype)
+
+        finally:
+            res = VSdetach(id)
+            if res == FAIL: self._error('HDF: VSdetach failed')
+
+    def _vdata_fields(self, name):
+        cdef char *tmp
+        fields = []
+        ref = VSfind(self.hd, name)
+        if ref == 0: raise KeyError(name)
+        id = VSattach(self.hd, ref, 'r')
+        if id == FAIL: self._error('HDF: VSattach of "%s" failed' % name)
+        try:
+            nfields = VFnfields(id)
+            if nfields == FAIL: self._error('HDF: VFnfields failed')
+            for index in range(nfields):
+                tmp = VFfieldname(id, index)
+                if tmp == NULL: self._error('HDF: VFfieldname failed')
+                name = tmp
+                fields.append(name)
+        finally:
+            res = VSdetach(id)
+            if res == FAIL: self._error('HDF: VSdetach failed')
+        return fields
