@@ -421,6 +421,38 @@ def info(s):
     if verbose: print s
 
 
+def autodetect(product):
+    # Try CALIPSO.
+    if "Longitude" in product and "Latitude" in product:
+        try:
+            product["Layer_Base_Altitude"]
+            product["Layer_Top_Altitude"]
+            return "calipso-layer"
+        except:
+            pass
+        try:
+            product["metadata"]["Lidar_Data_Altitudes"]
+            return "calipso-profile"
+        except KeyError:
+            pass
+
+    # Try CloudSat.
+    if "2B-GEOPROF" in product:
+        datasets = ("Profile_time", "Latitude", "Longitude", "Height")
+        if all(ds in product["2B-GEOPROF"] for ds in datasets):
+            return "cloudsat-2b-geoprof"
+
+    # Try MODIS.
+    if "MODIS_SWATH_Type_L1B" in product:
+        try:
+            product["MODIS_SWATH_Type_L1B"]["Latitude"]
+            product["MODIS_SWATH_Type_L1B"]["Longitude"]
+            return "modis-swath-l1b"
+        except:
+            pass
+
+    return None
+
 def norm_index(x, a, b):
     if x > b: return b
     if x < a: x += b
@@ -2034,7 +2066,7 @@ def main(argv):
     products = []
     for fname in opts.fnames:
         try: product = HDF(fname)
-        except IOError as e: fail("%s: %s" % (fname, e))
+        except IOError as e: fail("%s: %s" % (fname, e.strerror))
 
         try: hdfeosversion = product.attributes['HDFEOSVersion']
         except KeyError: hdfeosversion = None
@@ -2043,7 +2075,7 @@ def main(argv):
             # Reopen with HDFEOS.
             product.close()
             try: product = HDFEOS(fname)
-            except IOError as e: fail("%s: %s" % (fname, e))
+            except IOError as e: fail("%s: %s" % (fname, e.strerror))
 
         products.append(product)
     
@@ -2069,84 +2101,74 @@ def main(argv):
     if opts.cmapfname != None:
         (colormap, norm, ticks) = loadcolormap(opts.cmapfname, "colormap")
 
+    if len(products) == 0:
+        usage()
+
+    filetype = autodetect(products[0])
+
+    #
     # Main switch.
-    if opts.plot_type == "cloudsat-reflec":
-        if len(products) != 1:
-            fail("Single HDF-EOS file expected")
-        plot_profile(opts.plot_type, opts.fnames[0], products[0], fig, axes,
-                  hextent=opts.hextent,
-                  vextent=opts.vextent,
-                  aspect=opts.aspect,
-                  colormap=colormap,
-                  norm=norm,
-                  ticks=ticks,
-                  radius=opts.radius,
-                  opts=opts.plot_opts)
-                  
-    elif opts.plot_type == "calipso532" or \
-         opts.plot_type == "calipso532p" or \
-         opts.plot_type == "calipso1064" or \
-         opts.plot_type == "calipso-cratio" or \
-         opts.plot_type == "calipso-dratio":
-        if len(products) != 1: usage()
-        
-        plot_profile(opts.plot_type, opts.fnames[0], products[0], fig, axes,
-                     hextent=opts.hextent,
-                     vextent=opts.vextent,
-                     aspect=opts.aspect,
-                     colormap=colormap,
-                     norm=norm,
-                     ticks=ticks,
-                     radius=opts.radius,
-                     opts=opts.plot_opts)
-                     
-    elif opts.plot_type == "calipso532-layer" or \
-         opts.plot_type == "calipso1064-layer" or \
-         opts.plot_type == "calipso-cratio-layer" or \
-         opts.plot_type == "calipso-dratio-layer" or \
-         opts.plot_type == "calipso-temperature-layer":
-         
-        if len(products) != 1: fail("Single HDF file expected")
-        plot_profile(opts.plot_type, opts.fnames[0], products[0], fig, axes,
-                     hextent=opts.hextent,
-                     vextent=opts.vextent,
-                     aspect=opts.aspect,
-                     colormap=colormap,
-                     norm=norm,
-                     ticks=ticks,
-                     radius=opts.radius,
-                     opts=opts.plot_opts)
-                     
-    elif opts.plot_type == "orbit":
-        plot_orbit(opts.fnames, products, fig, axes,
-                   band=opts.modis_band,
-                   band_mode=opts.modis_band_mode,
-                   hextent=opts.hextent,
-                   proj=opts.projection,
-                   colormap=colormap,
-                   norm=norm,
-                   ticks=ticks,
-                   radius=opts.radius,
-                   proj_opts = opts.proj_opts,
-                   opts=opts.plot_opts)
-                   
-    elif opts.plot_type == "orbit-clipped":
-        plot_orbit(opts.fnames, products, fig, axes,
-                   band=opts.modis_band,
-                   band_mode=opts.modis_band_mode,
-                   hextent=opts.hextent,
-                   proj=opts.projection,
-                   colormap=colormap,
-                   norm=norm,
-                   ticks=ticks,
-                   clipped=True,
-                   radius=opts.radius,
-                   proj_opts = opts.proj_opts,
-                   opts=opts.plot_opts)
-                   
-    else:
-        fail("Invalid plot type `%s'" % opts.plot_type)
     
+    # Profile products.
+    if filetype in ("cloudsat-2b-geoprof", "calipso-profile"):
+        if len(products) > 1:
+            fail("Single file expected")
+        plot_profile(
+            opts.plot_type,
+            opts.fnames[0],
+            products[0],
+            fig,
+            axes,
+            hextent=opts.hextent,
+            vextent=opts.vextent,
+            aspect=opts.aspect,
+            colormap=colormap,
+            norm=norm,
+            ticks=ticks,
+            radius=opts.radius,
+            opts=opts.plot_opts
+        )
+    # Layer products.
+    elif filetype == "calipso-layer":
+        if len(products) > 1:
+            fail("Single file expected")
+        plot_profile(
+            opts.plot_type,
+            opts.fnames[0],
+            products[0],
+            fig,
+            axes,
+            hextent=opts.hextent,
+            vextent=opts.vextent,
+            aspect=opts.aspect,
+            colormap=colormap,
+            norm=norm,
+            ticks=ticks,
+            radius=opts.radius,
+            opts=opts.plot_opts
+        )
+    # Orbit plot.
+    elif filetype == "modis-swath-l1b":
+        plot_orbit(
+            opts.fnames,
+            products,
+            fig,
+            axes,
+            band=opts.modis_band,
+            band_mode=opts.modis_band_mode,
+            hextent=opts.hextent,
+            proj=opts.projection,
+            colormap=colormap,
+            norm=norm,
+            ticks=ticks,
+            clipped=True,
+            radius=opts.radius,
+            proj_opts=opts.proj_opts,
+            opts=opts.plot_opts
+        )
+    else:
+        fail("Unknown product type")
+
     #report_memory()
 
     figw_px, figh_px = fig.get_size_inches()*opts.dpi
