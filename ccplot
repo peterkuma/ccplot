@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # ccplot
-# This file is a part of ccplot: a CloudSat and CALIPSO plotting tool.
+# This file is a part of ccplot: CloudSat and CALIPSO plotting tool.
 #
 # Copyright (c) 2009-2013 Peter Kuma
 #
@@ -454,7 +454,7 @@ def version():
     print >> sys.stderr, "matplotlib %s" % mpl.__version__
     print >> sys.stderr, "basemap %s" % basemap.__version__
     print >> sys.stderr, ""
-    print >> sys.stderr, "Copyright 2009, 2010 Peter Kuma."
+    print >> sys.stderr, "Copyright 2009-2013 Peter Kuma."
     print >> sys.stderr, "This software is provided under the terms of a 2-clause BSD licence."
     sys.exit(0)
     
