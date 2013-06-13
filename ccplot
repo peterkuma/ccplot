@@ -480,16 +480,22 @@ def radiance2temp(L, lamb):
 def version():
     """Prints version information and exits with 0."""
     global __version__
-    print >> sys.stderr, "ccplot %s" % __version__
-    print >> sys.stderr, ""
-    print >> sys.stderr, "Third-party libraries:"
-    print >> sys.stderr, "matplotlib %s" % mpl.__version__
-    print >> sys.stderr, "basemap %s" % basemap.__version__
-    print >> sys.stderr, ""
-    print >> sys.stderr, "Copyright 2009-2013 Peter Kuma."
-    print >> sys.stderr, "This software is provided under the terms of a 2-clause BSD licence."
+    print """\
+ccplot {version}
+
+Third-party libraries:
+matplotlib {mpl_version}
+basemap {basemap_version}
+
+Copyright 2009-2013 Peter Kuma.
+This software is provided under the terms of a 2-clause BSD licence.\
+""".format(
+        version=__version__,
+        mpl_version=mpl.__version__,
+        basemap_version=basemap.__version__
+    )
     sys.exit(0)
-    
+
 
 def usage():
     """Prints usage information and exits the program with return value of 1."""
