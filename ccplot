@@ -108,6 +108,66 @@ MODIS_WAVELENGTHS[0:36] = (645,858.500,469,555,1240,1640,2130,412.5,443,488,531,
 3660,3929,3929,4020,4433,4482,1360,6535,7175,8400,9580,10780,11770,13185,13485,
 13785,14085)
 
+# Explicitly supported datasets.
+DATASETS = {
+    "cloudsat-reflec": {
+        "datasets": ["Radar_Reflectivity"],
+    },
+    "calipso532": {
+        "title": "Total Attenuated Backscatter 532nm",
+        "units": "km$^{-1}$ sr$^{-1}$",
+        "datasets": ["Total_Attenuated_Backscatter_532"],
+    },
+    "calipso532p": {
+        "title": "Perpendicular Attenuated Backscatter 532nm",
+        "units": "km$^{-1}$ sr$^{-1}$",
+        "datasets": ["Perpendicular_Attenuated_Backscatter_532"],
+    },
+    "calipso1064": {
+        "title": "Attenuated Backscatter 1064nm",
+        "units": "km$^{-1}$ sr$^{-1}$",
+        "datasets": ["Attenuated_Backscatter_1064"],
+    },
+    "calipso-cratio": {
+        "title": "Attenuated Color Ratio 1064nm/532nm",
+        "datasets": [
+            "Total_Attenuated_Backscatter_532",
+            "Attenuated_Backscatter_1064"
+        ],
+    },
+    "calipso-dratio": {
+        "title": "Depolarization Ratio",
+        "datasets": [
+            "Total_Attenuated_Backscatter_532",
+            "Perpendicular_Attenuated_Backscatter_532"
+        ],
+    },
+    "calipso532-layer": {
+        "title": "Integrated Attenuated Backscatter 532nm",
+        "units": "sr$^{-1}$",
+        "datasets": ["Integrated_Attenuated_Backscatter_532"],
+    },
+    "calipso1064-layer": {
+        "title": "Integrated Attenuated Backscatter 1064nm",
+        "units": "sr$^{-1}$",
+        "datasets": ["Integrated_Attenuated_Backscatter_1064"],
+    },
+    "calipso-cratio-layer": {
+        "title": "Integrated Attenuated Total Color Ratio 1064nm/532nm",
+        "datasets": ["Integrated_Attenuated_Total_Color_Ratio"],
+    },
+    "calipso-dratio-layer": {
+        "title": "Integrated Volume Depolarization Ratio",
+        "datasets": ["Integrated_Volume_Depolarization_Ratio"],
+    },
+    "calipso-temperature-layer": {
+        "title": "Midlayer Temperature",
+        "units": "K",
+        "offset": -273.15,
+        "datasets": ["Midlayer_Temperature"],
+    },
+}
+
 
 #
 # Global variables.
@@ -427,6 +487,7 @@ def autodetect(product):
         try:
             product["Layer_Base_Altitude"]
             product["Layer_Top_Altitude"]
+            product["Number_Layers_Found"]
             return "calipso-layer"
         except:
             pass
@@ -1232,203 +1293,186 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
     """
     global ATRAIN_SPEED, PROFILE_BINHEIGHT
 
-    #
-    # Variable initialization.
-    #
-    time = None
-    lat = None
-    lon = None
-    reflec = None
-    height = None
-    start_time = None
-    nbin = 0
-    nray = 0
-    backscat532 = None
-    backscat532p = None
-    backscat1064 = None
-    topalt = None
-    basealt = None
-    backscat532_layer = None
-    backscat1064_layer = None
-    cratio_layer = None
-    dratio_layer = None
-    temperature_layer = None
-    nlayer = 0
+    info = DATASETS.get(what, {
+        "datasets": [what],
+    })
+    filetype = autodetect(product)
+    product_name = None
+    units = None
+    title = None
     elevation = None
 
-    #
-    # Data retrieval.
-    #
-    try: # Try CloudSat names.
-        sw = product["2B-GEOPROF"]
-        time = sw["Profile_time"]
-        lat = sw["Latitude"]
-        lon = sw["Longitude"]
-        reflec = sw["Radar_Reflectivity"]
-        height = sw["Height"]
-        start_time = sw.attributes["start_time"]
+    # CloudSat.
+    if filetype == "cloudsat-2b-geoprof":
+        product_name = "CloudSat Profile"
+        try:
+            group = product["2B-GEOPROF"]
+            start_time = group.attributes["start_time"]
+            time = group["Profile_time"]
+            lat = group["Latitude"]
+            lon = group["Longitude"]
+            height = group["Height"]
+            datasets = [group[name] for name in info["datasets"]]
+        except KeyError as e:
+            fail("Field \"%s\" not found" % e.args)
+        nray = time.shape[0]
         nbin = height.shape[1]
+        # If we have single dataset, adopt its title and units.
+        if len(datasets) == 1:
+            title = datasets[0].attributes.get("long_name")
+            units = datasets[0].attributes.get("units")
+        for (key, ds) in enumerate(datasets):
+            data = ds[::]
+            if "_FillValue" in ds.attributes:
+                data = np.ma.masked_equal(data, ds.attributes["_FillValue"])
+            if "missing" in ds.attributes:
+                data = np.ma.masked_equal(data, ds.attributes["missing"])
+            factor = ds.attributes.get("factor", 1)
+            offset = ds.attributes.get("offset", 0)
+            data -= offset
+            data *= 1.0/factor
+            datasets[key] = data
+
+    # CALIPSO.
+    if filetype in ("calipso-profile", "calipso-layer"):
+        try:
+            time = product["Profile_UTC_Time"][:, 0]
+            lat = product["Latitude"][:, 0]
+            lon = product["Longitude"][:, 0]
+            height = product["metadata"]["Lidar_Data_Altitudes"]*1000
+            datasets = [product[name] for name in info["datasets"]]
+        except KeyError as e:
+            fail("Field \"%s\" not found" % e.args)
+        start_time = None
         nray = time.shape[0]
-    except KeyError: pass
-    try: # Try common CALIPSO profile/layer names.
-        time = product["Profile_UTC_Time"]
-        lat  = product["Latitude"]
-        lon  = product["Longitude"]
-        height = product["metadata"]["Lidar_Data_Altitudes"][::-1]*1000
-        nray = time.shape[0]
+        # If we have single dataset, adopt its title and units.
+        if len(datasets) == 1:
+            title = info["datasets"][0].replace("_", " ")
+            units = datasets[0].attributes.get("units")
+        for (key, ds) in enumerate(datasets):
+            data = ds[::]
+            data = np.ma.masked_equal(data, -9999)
+            if "fillvalue" in ds.attributes:
+                data = np.ma.masked_equal(data, ds.attributes["fillvalue"])
+            datasets[key] = data
+
+    # CALIPSO profile.
+    if filetype == "calipso-profile":
+        product_name = "CALIPSO Profile"
         nbin = len(height)
-    except KeyError: pass
-    try: # Try CALIPSO profile names.
-        backscat532 = product["Total_Attenuated_Backscatter_532"]
-        backscat532p = product["Perpendicular_Attenuated_Backscatter_532"]
-        backscat1064 = product["Attenuated_Backscatter_1064"]
-        elevation = product["Surface_Elevation"]
-    except KeyError: pass
-    try: # Try CALIPSO layer names.
-        topalt  = product["Layer_Top_Altitude"]
-        basealt = product["Layer_Base_Altitude"]
-        backscat532_layer = product["Integrated_Attenuated_Backscatter_532"]
-        backscat1064_layer = product["Integrated_Attenuated_Backscatter_1064"]
-        cratio_layer = product["Integrated_Attenuated_Total_Color_Ratio"]
-        dratio_layer = product["Integrated_Volume_Depolarization_Ratio"]
-        temperature_layer = product["Midlayer_Temperature"]
-        nlayer = product["Number_Layers_Found"]
-    except KeyError: pass
+        try:
+            elevation = product["Surface_Elevation"]
+        except KeyError as e:
+            elevation = None
 
+    # CALIPSO layer.
+    if filetype == "calipso-layer":
+        product_name = "CALIPSO Layer"
+        try:
+            topalt = product["Layer_Top_Altitude"]
+            basealt = product["Layer_Base_Altitude"]
+            nlayer = product["Number_Layers_Found"]
+        except KeyError as e:
+            fail("Field \"%s\" not found" % e.args)
+        try:
+            valid_range = nlayer.attributes["valid_range"]
+            try:
+                nbin = int(valid_range.split("...")[1])
+            except IndexError, ValueError:
+                warn("Invalid valid_range attribute \"%s\", assuming maximum number of layers 10" % valid_range)
+                nbin = 10  # Fall back to 10.
+        except KeyError:
+            nbin = 10  # Fall back to 10.
+
+    # Override title and units if in info.
+    if "title" in info:
+        title = info["title"]
+    if "units" in info:
+        units = info["units"]
+
+    # Make plot name from title and units.
+    if title is not None:
+        if units is not None:
+            name = "%s (%s)" % (title, units)
+        else:
+            name = title
+
+    # Apply common factor and offset.
+    for (key, ds) in enumerate(datasets):
+        if "offset" in info:
+            ds -= info["offset"]
+        if "factor" in info:
+            ds *= 1.0/info["factor"]
+        datasets[key] = ds
+
+    # Check size of datasets.
+    for ds in datasets:
+        if ds.shape != (nray, nbin):
+            fail("Dataset has shape %s, expected (%d, %d)" %
+                 (ds.shape, nray, nbin))
+
+    # Determine what time conversion function to apply. We need this now
+    # in order to convert time extent (if set) to extent in rays.
+    if what.startswith("cloudsat"):
+        start_time_dt = dt.datetime.strptime(start_time, "%Y%m%d%H%M%S")
+        time2dt = lambda t: cloudsat_time2dt(t, start_time_dt)
+    else: time2dt = calipso_time2dt
+
+    if hextent.extent_type == HorizontalExtent.TYPE_ABSOLUTE_TIME:
+        time_temp = time[:, 0] if len(time.shape) == 2 else time
+        e1 = time2ray(hextent.absolute_time[0], time_temp, time2dt)
+        e2 = time2ray(hextent.absolute_time[1], time_temp, time2dt)
+        del time_temp
+    elif hextent.extent_type == HorizontalExtent.TYPE_RELATIVE_TIME:
+        time_temp = time[:, 0] if len(time.shape) == 2 else time
+        e1 = time2ray(hextent.relative_time[0], time_temp, time2dt)
+        e2 = time2ray(hextent.relative_time[1], time_temp, time2dt)
+        del time_temp
+    elif hextent.extent_type == HorizontalExtent.TYPE_LON_LAT:
+        lon_temp = lon[:, 0] if len(lon.shape) == 2 else lon[:]
+        lat_temp = lat[:, 0] if len(lat.shape) == 2 else lat[:]
+        e1, e2 = lonlat2ray(hextent.lon, hextent.lat, lon_temp, lat_temp)
+        del lon_temp, lat_temp
+    elif hextent.extent_type == HorizontalExtent.TYPE_ALONG_TRACK:
+        e1, e2 = hextent.along_track
+    elif hextent.extent_type == HorizontalExtent.TYPE_NONE:
+        e1 = 0
+        e2 = -1
+    else: fail("Extent type not supported by profile plots")
+
+    e1 = norm_index(e1, 0, nray)
+    e2 = norm_index(e2, 0, nray)
+    e3 = 0
+    e4 = -1
+    if e1 >= e2: fail("Invalid extent")
+
+    # Subsetting by extent.
     try:
-        # Determine what time conversion function to apply. We need this now
-        # in order to convert time extent (if set) to extent in rays.
-        if what.startswith("cloudsat"):
-            start_time_dt = dt.datetime.strptime(start_time, "%Y%m%d%H%M%S")
-            time2dt = lambda t: cloudsat_time2dt(t, start_time_dt)
-        else: time2dt = calipso_time2dt
+        if what in ("calipso-cratio", "calipso-dratio"):
+            data = datasets[1][e1:e2, e3:e4] / datasets[0][e1:e2, e3:e4]
+        else:
+            if filetype == "calipso-layer":
+                data = datasets[0][e1:e2, :]
+            else:
+                data = datasets[0][e1:e2, e3:e4]
 
-        if hextent.extent_type == HorizontalExtent.TYPE_ABSOLUTE_TIME:
-            time_temp = time[:,0] if time.rank == 2 else time
-            e1 = time2ray(hextent.absolute_time[0], time_temp, time2dt)
-            e2 = time2ray(hextent.absolute_time[1], time_temp, time2dt)
-            del time_temp
-        elif hextent.extent_type == HorizontalExtent.TYPE_RELATIVE_TIME:
-            time_temp = time[:,0] if time.rank == 2 else time
-            e1 = time2ray(hextent.relative_time[0], time_temp, time2dt)
-            e2 = time2ray(hextent.relative_time[1], time_temp, time2dt)
-            del time_temp
-        elif hextent.extent_type == HorizontalExtent.TYPE_LON_LAT:
-            lon_temp = lon[:,0] if lon.rank == 2 else lon[:]
-            lat_temp = lat[:,0] if lat.rank == 2 else lat[:]
-            e1, e2 = lonlat2ray(hextent.lon, hextent.lat, lon_temp, lat_temp)
-            del lon_temp, lat_temp
-        elif hextent.extent_type == HorizontalExtent.TYPE_ALONG_TRACK:
-            e1, e2 = hextent.along_track
-        elif hextent.extent_type == HorizontalExtent.TYPE_NONE:
-            e1 = 0
-            e2 = -1
-        else: fail("Extent type not supported by profile plots")
+        if elevation is not None:
+            elevation = elevation[e1:e2]
 
-        e1 = norm_index(e1, 0, nray)
-        e2 = norm_index(e2, 0, nray)
-        e3 = 0
-        e4 = -1
-        if e1 >= e2: fail("Invalid extent")
-
-        if what.startswith("cloudsat"):
-            product_name = "CloudSat Profile"
-            lon = lon[e1:e2]
-            lat = lat[e1:e2]
-            height = height[e1:e2,e3:e4][:,::-1]
-            time = time[e1:e2]
-        elif what.startswith("calipso"):
-            product_name = "CALIPSO Profile"
-            lon = lon[e1:e2,0]
-            lat = lat[e1:e2,0]
+        time = time[e1:e2]
+        lon = lon[e1:e2]
+        lat = lat[e1:e2]
+        if len(height.shape) == 2:
+            height = height[e1:e2, e3:e4]
+        else:
             height = height[e3:e4]
-            time = time[e1:e2,0]
-            if elevation != None:
-                elevation = elevation[e1:e2]
-        else:
-            fail("Assertion error: Unrecogized plot type `%s'" % what)
 
-        # CloudSat products.
-        if what == "cloudsat-reflec":
-            # TODO: Mask _FillValue too.
-            # TODO: Read factor, offset, _FillValue, title and units from the
-            #       file.
-            # FIXME: No masking is done for Height, Longitude and Latitude,
-            #        or Profile_time,
-            #        and the interpolation algorithm doesn't take NaN
-            #        into consideration for these filed.
-            data = reflec[e1:e2,e3:e4].astype(np.float32)/100
-            np.place(data, data == -88.88, float("nan"))
-            name = "Radar Reflectivity Factor (dBZe)"
-            vmin = -40.0
-            vmax = 30.0
-        # CALIPSO profile products.
-        elif what == "calipso532":
-            data = backscat532[e1:e2,e3:e4]
-            #np.place(data, data < 0, float("nan"))
-            #data = data * (backscat532 > 0.0001)
-            name = "Total Attenuated Backscatter 532nm (km$^{-1}$ sr$^{-1}$)"
-            vmin = 0.001
-            vmax = 1.0
-        elif what == "calipso532p":
-            data = backscat532p[e1:e2,e3:e4]
-            name = "Perpendicular Attenuated Backscatter 532nm (km$^{-1}$ sr$^{-1}$)"
-            vmin = 0.001
-            vmax = 1.0
-        elif what == "calipso1064":
-            data = backscat1064[e1:e2,e3:e4]
-            name = "Attenuated Backscatter 1064nm (km$^{-1}$ sr$^{-1}$)"
-            vmin = 0.001
-            vmax = 1.0
-        elif what == "calipso-cratio":
-            data = backscat1064[e1:e2,e3:e4] / backscat532[e1:e2,e3:e4]
-            name = "Attenuated Color Ratio 1064nm/532nm"
-            vmin = 0.0
-            vmax = 2.0
-        elif what == "calipso-dratio":
-            data = backscat532p[e1:e2,e3:e4] / backscat532[e1:e2,e3:e4]
-            name = "Depolarization Ratio"
-            vmin = 0.0
-            vmax = 1.0
-        # CALIPSO layer products.
-        elif what == "calipso532-layer":
-            data = backscat532_layer[e1:e2]
-            name = "Integrated Attenuated Backscatter 532nm (sr$^{-1}$)"
-            vmin = 0.001
-            vmax = 1.0
-        elif what == "calipso1064-layer":
-            data = backscat1064_layer[e1:e2]
-            name = "Integrated Attenuated Backscatter 1064nm (sr$^{-1}$)"
-            vmin = 0.001
-            vmax = 1.0
-        elif what == "calipso-cratio-layer":
-            data = cratio_layer[e1:e2]
-            name = "Integrated Attenuated Total Color Ratio 1064nm/532nm"
-            vmin = 0.0
-            vmax = 2.0
-        elif what == "calipso-dratio-layer":
-            data = dratio_layer[e1:e2]
-            name = "Integrated Volume Depolarization Ratio"
-            vmin = 0.0
-            vmax = 1.0
-        elif what == "calipso-temperature-layer":
-            data = temperature_layer[e1:e2] + 273.15
-            name = "Midlayer Temperature (K)"
-            vmin = -110
-            vmax = 60
-        else:
-            fail("Assertion error: Unrecogized plot type `%s'" % what)
-
-        if what.endswith("-layer"):
-            product_name = "CALIPSO layer"
-            nlayer = nlayer[e1:e2,0]
-            basealt = basealt[e1:e2,:]
-            topalt = topalt[e1:e2,:]
-        else:
-            data = data[:,::-1]
-
-    except (KeyError, TypeError): fail("Required fields not in the data file")
-    except IndexError: fail("%s: Invalid extent")
+        if filetype == "calipso-layer":
+            nlayer = nlayer[e1:e2, 0]
+            basealt = basealt[e1:e2, :]
+            topalt = topalt[e1:e2, :]
+    except IndexError:
+        fail("Invalid extent")
 
     ve1, ve2 = vextent
 
@@ -1436,13 +1480,13 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
     if ve1 < minheight: ve1 = minheight
     if ve2 > maxheight: ve2 = maxheight
     if ve1 >= ve2: fail("Invalid vertical extent")
-    if norm == None: norm = mpl.colors.Normalize(vmin, vmax)
+    if norm == None: norm = mpl.colors.Normalize(data.min(), data.max())
 
     #
     # Core data processing and plotting.
     #
     resolution = int(get_axes_bounds(fig, axes)[3]*fig.get_dpi())
-    if what.endswith("-layer"):     # Layer products.
+    if filetype == "calipso-layer":
         data = cctk.layermap(data, nlayer.astype(np.uint8), basealt, topalt,
                              (ve1*0.001, ve2*0.001, resolution), float("nan"))
     else:                           # Profile products.
@@ -1453,8 +1497,12 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
                                np.arange(0, e2-e1, dtype=np.float32))
             Y = height
         if radius == None: radius = int(PROFILE_BINHEIGHT*resolution/(ve2-ve1))
+
+        # Currently, only float32 is supported by interpolation routines.
+        data = data.astype(np.float32)
         X = X.astype(np.float32)
         Y = Y.astype(np.float32)
+
         data = cctk.interpolate2d(data, X, Y, (0, e2-e1, e2-e1),
                              (ve1, ve2, resolution), float("nan"), 0, radius)
 
