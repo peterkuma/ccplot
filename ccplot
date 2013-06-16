@@ -1339,7 +1339,6 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
             time = product["Profile_UTC_Time"][:, 0]
             lat = product["Latitude"][:, 0]
             lon = product["Longitude"][:, 0]
-            height = product["metadata"]["Lidar_Data_Altitudes"]*1000
             datasets = [product[name] for name in info["datasets"]]
         except KeyError as e:
             fail("Field \"%s\" not found" % e.args)
@@ -1359,11 +1358,15 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
     # CALIPSO profile.
     if filetype == "calipso-profile":
         product_name = "CALIPSO Profile"
-        nbin = len(height)
+        try:
+            height = product["metadata"]["Lidar_Data_Altitudes"]*1000
+        except KeyError as e:
+            fail("Field \"%s\" not found" % e.args)
         try:
             elevation = product["Surface_Elevation"]
         except KeyError as e:
             elevation = None
+        nbin = len(height)
 
     # CALIPSO layer.
     if filetype == "calipso-layer":
@@ -1462,15 +1465,17 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
         time = time[e1:e2]
         lon = lon[e1:e2]
         lat = lat[e1:e2]
-        if len(height.shape) == 2:
-            height = height[e1:e2, e3:e4]
-        else:
-            height = height[e3:e4]
 
         if filetype == "calipso-layer":
             nlayer = nlayer[e1:e2, 0]
             basealt = basealt[e1:e2, :]
             topalt = topalt[e1:e2, :]
+        else:
+            if len(height.shape) == 2:
+                height = height[e1:e2, e3:e4]
+            else:
+                height = height[e3:e4]
+
     except IndexError:
         fail("Invalid extent")
 
