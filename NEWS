@@ -1,5 +1,12 @@
 CCPLOT NEWS
 
+New in 1.4.7 (2013-06-16):
+
+    * Fixed a serious bug in CALIPSO profile visualization. Height of CALIPSO
+      profile data points could be shifted by as much as 300m in the vertical 
+      relative to their correct location. This is because data and height
+      arrays were shifted by one element.
+
 New in 1.4.6 (2013-06-04):
 
     * Fixed type cast bug when plotting CALIPSO profiles
