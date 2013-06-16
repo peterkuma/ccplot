@@ -1373,22 +1373,20 @@ def plot_profile(what, fname, niofile, fig, axes, hextent=HorizontalExtent(),
 
         e1 = norm_index(e1, 0, nray)
         e2 = norm_index(e2, 0, nray)
-        e3 = 0
-        e4 = -1
         if e1 >= e2: fail("Invalid extent")        
         
         if what.startswith("cloudsat"):
             product_name = "CloudSat Profile"
             lon = lon[e1:e2]
             lat = lat[e1:e2]
-            height = height[e1:e2,e3:e4][:,::-1]
+            height = height[e1:e2][:,::-1]
             time = time[e1:e2]
         elif what.startswith("calipso"):
             product_name = "CALIPSO Profile"
             lon = lon[e1:e2,0]
             lat = lat[e1:e2,0]
             # WORKAROUND: See the comment at the beginning of this file.            
-            height = CALIPSO_HEIGHT[e3:e4]
+            height = CALIPSO_HEIGHT
             time = time[e1:e2,0]
             if elevation != None:
                 elevation = elevation[e1:e2]
@@ -1404,36 +1402,36 @@ def plot_profile(what, fname, niofile, fig, axes, hextent=HorizontalExtent(),
             #        or Profile_time,
             #        and the interpolation algorithm doesn't take NaN
             #        into consideration for these filed.
-            data = reflec[e1:e2,e3:e4].astype(np.float32)/100
+            data = reflec[e1:e2].astype(np.float32)/100
             np.place(data, data == -88.88, float("nan"))
             name = "Radar Reflectivity Factor (dBZe)"
             vmin = -40.0
             vmax = 30.0
         # CALIPSO profile products.
         elif what == "calipso532":
-            data = backscat532[e1:e2,e3:e4]
+            data = backscat532[e1:e2]
             #np.place(data, data < 0, float("nan"))
             #data = data * (backscat532 > 0.0001)
             name = "Total Attenuated Backscatter 532nm (km$^{-1}$ sr$^{-1}$)"
             vmin = 0.001
             vmax = 1.0
         elif what == "calipso532p":
-            data = backscat532p[e1:e2,e3:e4]
+            data = backscat532p[e1:e2]
             name = "Perpendicular Attenuated Backscatter 532nm (km$^{-1}$ sr$^{-1}$)"
             vmin = 0.001
             vmax = 1.0
         elif what == "calipso1064":
-            data = backscat1064[e1:e2,e3:e4]
+            data = backscat1064[e1:e2]
             name = "Attenuated Backscatter 1064nm (km$^{-1}$ sr$^{-1}$)"
             vmin = 0.001
             vmax = 1.0
         elif what == "calipso-cratio":
-            data = backscat1064[e1:e2,e3:e4] / backscat532[e1:e2,e3:e4]
+            data = backscat1064[e1:e2] / backscat532[e1:e2]
             name = "Attenuated Color Ratio 1064nm/532nm"
             vmin = 0.0
             vmax = 2.0
         elif what == "calipso-dratio":
-            data = backscat532p[e1:e2,e3:e4] / backscat532[e1:e2,e3:e4]    
+            data = backscat532p[e1:e2] / backscat532[e1:e2]    
             name = "Depolarization Ratio"
             vmin = 0.0
             vmax = 1.0
