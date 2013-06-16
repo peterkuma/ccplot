@@ -1488,6 +1488,7 @@ def plot_profile(what, fname, niofile, fig, axes, hextent=HorizontalExtent(),
     #
     resolution = int(get_axes_bounds(fig, axes)[3]*fig.get_dpi())
     if what.endswith("-layer"):     # Layer products.
+        nlayer = nlayer.astype(np.uint8)
         data = cctk.layermap(data, nlayer, basealt, topalt,
                              (ve1*0.001, ve2*0.001, resolution), float("nan"))
     else:                           # Profile products.
