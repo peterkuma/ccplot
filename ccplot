@@ -1475,10 +1475,6 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
         fail("Invalid extent")
 
     ve1, ve2 = vextent
-
-    minheight, maxheight = height.min(), height.max()
-    if ve1 < minheight: ve1 = minheight
-    if ve2 > maxheight: ve2 = maxheight
     if ve1 >= ve2: fail("Invalid vertical extent")
     if norm == None: norm = mpl.colors.Normalize(data.min(), data.max())
 
