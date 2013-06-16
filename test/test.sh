@@ -15,6 +15,7 @@ download() {
 
 PRODUCTS='http://downloads.sourceforge.net/project/ccplot/products'
 IMG="http://ccplot.org/img"
+IMG_TEST="http://downloads.sourceforge.net/project/ccplot/test"
 
 download "$PRODUCTS/2009037050924_14779_CS_2B-GEOPROF_GRANULE_P_R04_E02.hdf"
 download "$IMG/cloudsat-reflec.png" "cloudsat-reflec-ccplot.org.ref.png"
@@ -28,6 +29,8 @@ download "$IMG/orbit-modis_x31+cloudsat.png" "orbit-modis_x31+cloudsat-ccplot.or
 download "$PRODUCTS/MYD021KM.A2007163.0415.005.2009290181256.hdf"
 download "$IMG/orbit-modis_x31+calipso_spstere.png" "orbit-modis_x31+calipso_spstere-ccplot.org.ref.png"
 
+download "$PRODUCTS/CAL_LID_L2_01kmCLay-Prov-V1-20.2007-06-12T03-42-18ZN.hdf"
+download "$IMG_TEST/calipso532-layer.png" "calipso532-layer.ref.png"
 
 testing "print version information"
 check ccplot -V
@@ -155,5 +158,10 @@ testing "second MODIS example from ccplot.org"
 check ccplot -o orbit-modis_x31+calipso_spstere-ccplot.org.png -m x31 -c modis-temperature.cmap -p spstere:boundinglat=60S orbit-clipped MYD021KM.A2007163.0415.005.2009290181256.hdf CAL_LID_L1-ValStage1-V3-01.2007-06-12T03-42-18ZN.hdf
 expect ""
 check imgcompare orbit-modis_x31+calipso_spstere-ccplot.org.png orbit-modis_x31+calipso_spstere-ccplot.org.ref.png
+
+testing "CALIPSO 532nm layer plot"
+check ccplot -o calipso532-layer.png -c calipso-backscatter.cmap -a 30 -x 68S..81S,40W..140W -y 0..25000 calipso532-layer CAL_LID_L2_01kmCLay-Prov-V1-20.2007-06-12T03-42-18ZN.hdf
+expect ""
+check imgcompare calipso532-layer.png calipso532-layer.ref.png
 
 complete
