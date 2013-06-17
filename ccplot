@@ -482,6 +482,14 @@ def info(s):
 
 
 def autodetect(product):
+    """Autodetect product type. Recognition is done by feature detection.
+    Supported types:
+
+        calipso-profile         CALIPSO profile products
+        calipso-layer           CALIPSO layer products
+        cloudsat-2b-geoprof     CloudSat 2B-GEOPROF
+        modis-swath-l1b         MODIS L1B Swath
+    """
     # Try CALIPSO.
     if "Longitude" in product and "Latitude" in product:
         try:
