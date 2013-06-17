@@ -1026,60 +1026,76 @@ def loadcolormap(filename, name):
 
 
 def print_info(product):
-    """Prints information about the file.
-       
-    Arguments:
-        product -- HDF or HDFEOS instance
-    """
-    ftype = None
-    try: # Try CALIPSO names.
-        time = product["Profile_UTC_Time"][:,0]
-        start_time = None
-        time2dt = calipso_time2dt
-        height = product["metadata"]["Lidar_Data_Altitudes"][::-1]*1000
-        try:
-            backscat532 = product["Total_Attenuated_Backscatter_532"]
-            nbin = backscat532.shape[1]
-        except KeyError: nbin = 0
-        lat  = product["Latitude"][:,0]
-        lon  = product["Longitude"][:,0]
-        nray = time.shape[0]
-        ftype = "CALIPSO"
-    except (KeyError, IndexError): pass
-    try: # Try CloudSat names.
-        sw = product["2B-GEOPROF"]
-        time = sw["Profile_time"]
-        lat = sw["Latitude"][:]
-        lon = sw["Longitude"][:]
-        height = sw["Height"][0][::-1]
-        time2dt = cloudsat_time2dt
-        st = sw.attributes["start_time"]
+    """Print information about a product."""
+    filetype = autodetect(product)
+    name = None
+    subtype = None
+    time = None
+    height = None
+    nray = None
+    nbin = None
+    nlayers = None
+    lon = None
+    lat = None
+
+    # CloudSat.
+    if filetype == "cloudsat-2b-geoprof":
+        name = "CloudSat"
+        subtype = "2B-GEOPROF"
+        group = product["2B-GEOPROF"]
+        time = group["Profile_time"]
+        lat = group["Latitude"][:]
+        lon = group["Longitude"][:]
+        height = group["Height"][0][::-1]
+        st = group.attributes["start_time"]
         start_time = dt.datetime.strptime(st, "%Y%m%d%H%M%S")
-        del st
-        nbin = height.shape[0]
+        time2dt = lambda t: cloudsat_time2dt(t, start_time)
         nray = time.shape[0]
-        ftype = "CloudSat"
-    except (KeyError, IndexError): pass
-    try: # Try MODIS names.
-        lon = product["MODIS_SWATH_Type_L1B"]["Longitude"][:,0]
-        lat = product["MODIS_SWATH_Type_L1B"]["Latitude"][:,0]
-        ftype = "MODIS"
-    except (KeyError, IndexError): pass
-
-    if ftype == None: fail("Unsupported file format")
-
-    if ftype == "MODIS":
-        print "Type: %s" % ftype
-        print "Longitude: %s %s" % (lon2str(np.min(lon)), lon2str(np.max(lon)))
-        print "Latitude: %s %s" % (lat2str(np.min(lat)), lat2str(np.max(lat)))
+        nbin = height.shape[0]
+    # CALIPSO common.
+    elif filetype in ("calipso-profile", "calipso-layer"):
+        name = "CALIPSO"
+        lat = product["Latitude"][:, 0]
+        lon = product["Longitude"][:, 0]
+        time = product["Profile_UTC_Time"][:, 0]
+        time2dt = calipso_time2dt
+        nray = len(time)
+        # CALIPSO profile.
+        if filetype == "calipso-profile":
+            subtype = "profile"
+            height = product["metadata"]["Lidar_Data_Altitudes"][::-1]*1000
+            nbin = len(height)
+        # CALIPSO layer.
+        if filetype == "calipso-layer":
+            subtype = "layer"
+            nlayers = product["Number_Layers_Found"][:].max()
+    # MODIS.
+    elif filetype == "modis-swath-l1b":
+        name = "MODIS"
+        subtype = "Swath L1B"
+        lon = product["MODIS_SWATH_Type_L1B"]["Longitude"][:, 0]
+        lat = product["MODIS_SWATH_Type_L1B"]["Latitude"][:, 0]
     else:
-        time1 = time2dt(time[0], start_time).strftime("%Y-%m-%d %H:%M:%S")
-        time2 = time2dt(time[-1], start_time).strftime("%Y-%m-%d %H:%M:%S")
-        print "Type: %s" % ftype
-        print "Time: %s, %s" % (time1, time2)
+        fail("Unsupported product file")
+
+    # Print information.
+    if name is not None:
+        print "Type: %s" % name
+    if subtype is not None:
+        print "Subtype: %s" % subtype
+    if time is not None:
+        t1 = time2dt(time[0]).strftime("%Y-%m-%d %H:%M:%S")
+        t2 = time2dt(time[-1]).strftime("%Y-%m-%d %H:%M:%S")
+        print "Time: %s, %s" % (t1, t2)
+    if height is not None:
         print "Height: %dm, %dm" % (height[0], height[-1])
+    if nray is not None:
         print "nray: %d" % nray
+    if nbin is not None:
         print "nbin: %d" % nbin
+    if nlayers is not None:
+        print "nlayers: %d" % nlayers
+    if lon is not None and lat is not None:
         print "Longitude: %s, %s" % (lon2str(np.min(lon)), lon2str(np.max(lon)))
         print "Latitude: %s, %s" % (lat2str(np.min(lat)), lat2str(np.max(lat)))
 

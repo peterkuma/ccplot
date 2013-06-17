@@ -111,6 +111,7 @@ testing "print info on CALIPSO"
 check ccplot -i CAL_LID_L1-ValStage1-V3-01.2007-06-12T03-42-18ZN.hdf
 expect <<EOF
 Type: CALIPSO
+Subtype: profile
 Time: 2007-06-12 03:42:14, 2007-06-12 04:28:47
 Height: -1815m, 39855m
 nray: 56310
@@ -119,10 +120,23 @@ Longitude: 179.99W, 180.00E
 Latitude: 81.85S, 55.50N
 EOF
 
+testing "print info on CALIPSO layer products"
+check ccplot -i CAL_LID_L2_01kmCLay-Prov-V1-20.2007-06-12T03-42-18ZN.hdf
+expect <<EOF
+Type: CALIPSO
+Subtype: layer
+Time: 2007-06-12 03:42:14, 2007-06-12 04:28:39
+nray: 18720
+nlayers: 4
+Longitude: 179.97W, 179.98E
+Latitude: 81.85S, 55.50N
+EOF
+
 testing "print info on CloudSat 2B-GEOPROF"
 check ccplot -i 2009037050924_14779_CS_2B-GEOPROF_GRANULE_P_R04_E02.hdf
 expect <<EOF
 Type: CloudSat
+Subtype: 2B-GEOPROF
 Time: 2009-02-06 05:09:24, 2009-02-06 06:48:16
 Height: -4819m, 24920m
 nray: 37082
@@ -135,8 +149,9 @@ testing "print info on MODIS"
 check ccplot -i MYD021KM.A2007163.0415.005.2009290181256.hdf
 expect <<EOF
 Type: MODIS
-Longitude: 119.66W 80.45W
-Latitude: 70.71S 61.17S
+Subtype: Swath L1B
+Longitude: 119.66W, 80.45W
+Latitude: 70.71S, 61.17S
 EOF
 
 testing "CALIPSO example from ccplot.org"
