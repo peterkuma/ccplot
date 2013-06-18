@@ -38,7 +38,7 @@ setup(
         'basemap',
     ],
     include_dirs=[numpy.get_include()],
-    data_files=[('share/doc/ccplot/', ['Changelog', 'NEWS']),
+    data_files=[('share/doc/ccplot/', ['NEWS']),
                 ('share/ccplot/cmap/', glob('cmap/*')),
                 ('man/man1/', ['man/ccplot.1'])],
     cmdclass={
