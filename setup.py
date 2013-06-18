@@ -16,7 +16,7 @@ setup(
     author='Peter Kuma',
     author_email='peter.kuma@ccplot.org',
     url='http://www.ccplot.org/',
-    classifiers = [
+    classifiers=[
         "Programming Language :: Python",
         "License :: OSI Approved :: BSD License",
         "Operating System :: POSIX",
@@ -26,7 +26,10 @@ setup(
         "Topic :: Scientific/Engineering :: Atmospheric Science",
         "Natural Language :: English",
     ],
-    scripts=['ccplot'],
+    scripts=['bin/ccplot'],
+    packages=[
+        'ccplot',
+    ],
     requires=[
         'cython',
         'numpy',
@@ -37,20 +40,25 @@ setup(
     include_dirs=[numpy.get_include()],
     data_files=[('share/doc/ccplot/', ['Changelog', 'NEWS']),
                 ('share/ccplot/cmap/', glob('cmap/*')),
-                ('man/man1/', ['ccplot.1'])],
-    cmdclass = {
+                ('man/man1/', ['man/ccplot.1'])],
+    cmdclass={
         'build_ext': build_ext,
     },
     ext_modules=[
-        Extension('cctk', sources=['cctkmodule.c']),
-        Extension('hdf',
-                  ['hdf.pyx'],
-                  libraries=['mfhdf', 'df', 'jpeg', 'z'],
+        Extension(
+            'ccplot.cctk',
+            ['ccplot/cctk.c']
         ),
-        Extension('hdfeos',
-                  ['hdfeos.pyx'],
-                  libraries=['hdfeos', 'mfhdf', 'df', 'jpeg', 'z'],
-                  extra_compile_args=['-I/usr/include/hdf'],
+        Extension(
+            'ccplot.hdf',
+            ['ccplot/hdf.pyx'],
+            libraries=['mfhdf', 'df', 'jpeg', 'z'],
+        ),
+        Extension(
+            'ccplot.hdfeos',
+            ['ccplot/hdfeos.pyx'],
+            libraries=['hdfeos', 'mfhdf', 'df', 'jpeg', 'z'],
+            extra_compile_args=['-I/usr/include/hdf'],
         ),
     ],
 )

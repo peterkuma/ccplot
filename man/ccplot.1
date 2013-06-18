@@ -1,0 +1,145 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "CCPLOT" "1" "June 2013" "" ""
+.
+.SH "NAME"
+\fBccplot\fR \- CloudSat and CALIPSO data plotting tool
+.
+.SH "SYNOPSIS"
+\fBccplot\fR [\fB\-a\fR \fIratio\fR] [\fB\-c\fR \fIcmapfile\fR] [\fB\-d\fR \fIdpi\fR] [\fB\-m\fR \fIband\fR] [\fB\-o\fR \fIoutfile\fR] [\fB\-p\fR \fIprojection\fR[:\fIprojoptions\fR]] [\fB\-r\fR \fIradius\fR] [\fB\-v\fR] [\fB\-x\fR \fIextent\fR] [\fB\-y\fR \fIextent\fR] [\fB\-z\fR \fIoptions\fR] type file \.\.\. \fBccplot\fR \fB\-i\fR \fIfile\fR \fBccplot\fR \fB\-h\fR \fBccplot\fR \fB\-V\fR
+.
+.SH "DESCRIPTION"
+ccplot is a tool that produces 2D plots of data stored in CloudSat, CALIPSO and MODIS HDF files\. The plot \fItype\fR can be one of:
+.
+.IP "" 4
+.
+.nf
+
+cloudsat\-reflec            CloudSat Reflectivity Factor
+calipso532                 CALIPSO L1B Total Attenuated Backscatter 532nm
+calipso532p                CALIPSO L1B Perpendicular Attenuated Backscatter 532nm
+calipso1064                CALIPSO L1B Attenuated Backscatter 1064nm
+calipso\-cratio             CALIPSO L1B Attenuated Color Ratio 1064nm/532nm
+calipso\-dratio             CALIPSO L1B Depolarization Ratio
+calipso532\-layer           CALIPSO L2 Integrated Attenuated Backscatter 532nm
+calipso1064\-layer          CALIPSO L2 Integrated Attenuated Backscatter 1064nm
+calipso\-cratio\-layer       CALIPSO L2 Integrated Attenuated Total Color Ratio 1064nm/532nm
+calipso\-dratio\-layer       CALIPSO L2 Integrated Volume Depolarization Ratio
+calipso\-temperature\-layer  CALIPSO L2 Midlayer Temperature
+orbit                      map projection of CALIPSO and CloudSat trajectory, and Aqua MODIS radiance or
+                        reflectance swath depending on files supplied
+orbit\-clipped              MODIS\-region\-clipped map projection of CALIPSO and CloudSat trajectory, and Aqua
+                        MODIS radiance or reflectance swath depending on files supplied
+.
+.fi
+.
+.IP "" 0
+.
+.P
+The options are as follows:
+.
+.IP "\(bu" 4
+\fB\-a\fR ratio Aspect ratio of profile and layer products in km horizontal per km vertical\. Defaults to 14\.0\.
+.
+.IP "\(bu" 4
+\fB\-c\fR cmapfile
+.
+.IP "\(bu" 4
+\fB\-d\fR dpi DPI of outfile if a raster image is to be output\.
+.
+.IP "\(bu" 4
+\fB\-m\fR band MODIS band specifier in the form r# for reflective bands and x# for radiation bands, where # is the band
+.
+.IP "\(bu" 4
+\fB\-o\fR outfile Output file\. Format is determined by extension Supported formats are SVG (\.svg), PNG (\.png), PDF (\.pdf),
+.
+.IP "\(bu" 4
+\fB\-p\fR projection[:projoptions]
+.
+.IP "\(bu" 4
+\fB\-r\fR radius Interpolation radius in pixels\. In profile products radius specifies vertical extent which a data point
+.
+.IP "\(bu" 4
+\fB\-v\fR Enable verbose mode\.
+.
+.IP "\(bu" 4
+\fB\-V\fR Print version information and exit\.
+.
+.IP "\(bu" 4
+\fB\-x\fR extent Horizontal region to be plotted\. extent can be specified in a number of formats depending on the plot
+.
+.IP "\(bu" 4
+\fB\-y\fR extent Vertical extent of CloudSat and CALIPSO profiles in meters in the form from\.\.to\.
+.
+.IP "\(bu" 4
+\fB\-z\fR options Miscellaneous options that modifiy plot formatting\. options is a list of comma separeted key=value
+.
+.IP "" 0
+.
+.SH "ENVIRONMENT"
+\fBCCPLOT_CMAP_PATH\fR Colon\-separated list of search paths for colormap files\.
+.
+.SH "FILES"
+\fB/usr/share/ccplot/cmap/*\fR Example cmap files\.
+.
+.SH "EXAMPLES"
+Plot the first 1000 rays of CloudSat reflectivity profile from 2006224184641_01550_CS_2B\-GEOPROF_GRAN‐ ULE_P_R03_E01\.hdf using cloudsat\-reflec\.cmap colormap, and save it as cloudsat\-reflec\.png:
+.
+.IP "" 4
+.
+.nf
+
+$ ccplot \-x 0\.\.1000 \-c cloudsat\-reflectivity\.cmap
+\-o cloudsat\-reflec\.png cloudsat\-reflec
+2006224184641_01550_CS_2B\-GEOPROF_GRANULE_P_R03_E01\.hdf
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Plot the first minute of CALIPSO backscatter profile from 0 to 20km using calipso\-backscatter\.cmap colormap, and save it as calipso532\.png:
+.
+.IP "" 4
+.
+.nf
+
+$ ccplot \-y 0\.\.20000 \-x +0:00\.\.+1:00 \-c calipso\-backscatter\.cmap
+\-o calipso532\.png calipso532
+CAL_LID_L1\-Prov\-V2\-01\.2006\-07\-06T19\-50\-51ZN\.hdf
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Plot map projection of CALIPSO trajectory superimposed on Aqua MODIS band 31 radiance using modis\-temperature\.cmap colormap, and save it as orbit\-calipso\.png:
+.
+.IP "" 4
+.
+.nf
+
+$ ccplot \-m x31 \-c modis\-temperature\.cmap \-p tmerc
+\-o orbit\-calipso\.png orbit\-clipped
+MYD021KM\.A2006224\.1945\.005\.2007140113559\.hdf
+CAL_LID_L1\-Prov\-V2\-01\.2006\-07\-06T19\-50\-51ZN\.hdf
+.
+.fi
+.
+.IP "" 0
+.
+.SH "SEE ALSO"
+\fICloudSat Standard Data Products Handbook, April 25th, 2008\.\fR
+.
+.P
+\fICALIPSO Data Products Catalog Release 2\.4, December 2007\.\fR
+.
+.P
+\fIMODIS Level 1B Product User\'s Guide, December 1, 2005\.\fR
+.
+.SH "AUTHORS"
+\fBccplot\fR was written by Peter Kuma\.
+.
+.SH "CAVEATS"
+Plot size is limited to 32767 pixels\.

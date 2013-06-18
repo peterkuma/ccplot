@@ -1,6 +1,6 @@
 build
 dist
 MANIFEST
-/hdf.c
-/hdfeos.c
+/ccplot/hdf.c
+/ccplot/hdfeos.c
 /test/work/

@@ -52,11 +52,11 @@ mpl.use("agg")
 import matplotlib.pyplot as plt
 from mpl_toolkits import basemap
 
-from hdf import HDF
-from hdfeos import HDFEOS
+from ccplot.hdf import HDF
+from ccplot.hdfeos import HDFEOS
 
 # CCTK is a helper module that performs various calculations.
-import cctk
+from ccplot import cctk
 
 # Early global variables.
 program_name = os.path.basename(sys.argv[0])
