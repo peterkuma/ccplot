@@ -1,0 +1,32 @@
+@import url(http://fonts.googleapis.com/css?family=Asap:400,700);
+
+@import "header.css";
+@import "article.css";
+@import "footer.css";
+@import "syntax.css";
+
+body {
+    text-align: center;
+    font-family: helvetica, Arial, serif;
+    font-size: 16px;
+}
+
+#main {
+    position: relative;
+    margin: 40pt auto;
+    text-align: left;
+    width: 820px;
+}
+
+a {
+    color: #1564ca;
+    text-decoration: none;
+}
+
+a img {
+    border: none;
+}
+
+h1,h2 {
+    font-family: Asap, sans-serif;
+}

@@ -1,0 +1,26 @@
+.abstract {
+    font-size: 110%;
+    color: #555753;
+}
+
+.download {
+    padding: 0.2em 0;
+    float: right;
+    text-align: right;
+    margin-top: -5em;
+}
+
+.download .latest {
+    font-size: 150%;
+    color: #333;
+}
+
+.download a {
+    font-size: 120%;
+    font-weight: bold;
+}
+
+.download .requirements {
+    color: #888;
+    font-size: 90%;
+}

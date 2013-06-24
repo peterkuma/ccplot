@@ -1,0 +1,66 @@
+---
+layout: default
+title: CloudSat and CALIPSO plotting tool
+css: home.css
+---
+<div class="download">
+    <p class="latest">Latest:</p>
+    <p><a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.4.7.tar.gz">ccplot-1.4.7.tar.gz</a></p>
+    <p class="requirements">Linux &amp; Mac OS X</p>
+    <p class="latest">Beta:</p>
+    <p><a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5-rc4.tar.gz">ccplot-1.5-rc4.tar.gz</a></p>
+</div>
+
+<p class="abstract">
+    ccplot is an open source command-line program for
+    plotting profile, layer and earth view data sets from CloudSat, CALIPSO
+    and Aqua MODIS products.
+</p>
+
+<h1>Features</h1>
+<h3>CALIPSO profile and layer plots</h3>
+<p>
+    Including surface elevation, custom colormaps and easy extent selection.
+</p>
+<div class="code">
+    ccplot -o calipso532.png -c calipso-backscatter.cmap -a 30
+    -x 4:16:20..4:21:50 -y 0..30000 calipso532
+    <a href="https://sourceforge.net/projects/ccplot/files/products/CAL_LID_L1-ValStage1-V3-01.2007-06-12T03-42-18ZN.hdf">CAL_LID_L1-ValStage1-V3-01.2007-06-12T03-42-18ZN.hdf</a>
+</div>
+<a href="img/calipso532.png">
+    <img src="img/calipso532-small.png" />
+</a>
+
+<h3>CloudSat profile plots</h3>
+<div class="code">
+    ccplot -c cloudsat-reflectivity.cmap -a 15 -x 24.60S..31S,50W..60W
+    -y -1000..18000 cloudsat-reflec
+    <a href="https://sourceforge.net/projects/ccplot/files/products/2009037050924_14779_CS_2B-GEOPROF_GRANULE_P_R04_E02.hdf">2009037050924_14779_CS_2B-GEOPROF_GRANULE_P_R04_E02.hdf</a>
+</div>
+<a href="img/cloudsat-reflec.png">
+    <img src="img/cloudsat-reflec-small.png" />
+</a>
+
+<h3>CloudSat and CALIPSO trajectories on top of MODIS swath</h3>
+<p>Several projections and MODIS bands are supported.</p>
+<div class="code">
+    ccplot -o orbit-modis_x31+cloudsat.png -m x31 -c modis-temperature.cmap
+    -p tmerc orbit-clipped
+    <a href="https://sourceforge.net/projects/ccplot/files/products/MYD021KM.A2009037.0515.005.2009332033315.hdf">MYD021KM.A2009037.0515.005.2009332033315.hdf</a>
+    <a href="https://sourceforge.net/projects/ccplot/files/products/2009037050924_14779_CS_2B-GEOPROF_GRANULE_P_R04_E02.hdf">2009037050924_14779_CS_2B-GEOPROF_GRANULE_P_R04_E02.hdf</a>
+</div>
+<div class="code">
+    ccplot -o orbit-modis_x31+calipso_spstere.png -m x31 -c modis-temperature.cmap -p spstere:boundinglat=60S orbit-clipped
+    <a href="https://sourceforge.net/projects/ccplot/files/products/MYD021KM.A2007163.0415.005.2009290181256.hdf">MYD021KM.A2007163.0415.005.2009290181256.hdf</a>
+    <a href="https://sourceforge.net/projects/ccplot/files/products/CAL_LID_L1-ValStage1-V3-01.2007-06-12T03-42-18ZN.hdf">CAL_LID_L1-ValStage1-V3-01.2007-06-12T03-42-18ZN.hdf</a>
+</div>
+<a href="img/orbit-modis_x31+cloudsat.png">
+    <img src="img/orbit-modis_x31+cloudsat-small.png" />
+</a>
+<a href="img/orbit-modis_x31+calipso_spstere.png">
+    <img src="img/orbit-modis_x31+calipso_spstere-small.png" />
+</a>
+
+<p class="intro"><a href="features/">And more…</a>
+
+<!--#include virtual="footer.shtml" -->

@@ -1,0 +1,23 @@
+--- Nio.py	2010-08-13 00:03:52.000000000 +0200
++++ /usr/local/lib/python2.5/site-packages/PyNIO/Nio.py	2010-08-13 00:38:08.000000000 +0200
+@@ -140,14 +140,12 @@
+ 
+ def get_integer_version(strversion):
+     ''' converts string version number into an integer '''
+-    d = strversion.split('.')
+-    if len(d) > 2:
+-       v = int(d[0]) * 10000 + int(d[1]) * 100 + int(d[2])
+-    elif len(d) is 2:
+-       v = int(d[0]) * 10000 + int(d[1]) * 100
+-    else:
+-       v = int(d[0]) * 10000
+-    return v
++    import re
++    m = re.match(r'(\d\d?)(?:\.(\d\d?))?(?:\.(\d\d?))?', strversion)
++    if not m:
++       return 0
++    d = m.groups(0)
++    return int(d[0]) * 10000 + int(d[1]) * 100 + int(d[2])
+ 
+ _is_new_ma = get_integer_version(np.__version__) > 10004
+ del get_integer_version

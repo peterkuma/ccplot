@@ -1,0 +1,117 @@
+---
+layout: default
+title: Features
+---
+<h1>Features</h1>
+
+<div class="col1">
+<h3>Support for several CloudSat CPR, CALIPSO CALIOP,
+and Aqua MODIS data sets</h3>
+<p>
+ccplot can plot profile, layer, and MODIS earth view data sets.
+See <a href="#supported-products">table below</a>.
+</p>
+<h3>Extent selection</h3>
+<p>
+Extent to be plotted can
+be selected vertically by height, and horizontally by
+rays, time, geographical coordinates, or scanlines and samples (MODIS).
+</p>
+<h3>Custom colormaps</h3>
+<p>
+Custom colormaps can
+be constructed if you don't like any of those bundled with ccplot.
+</p>
+<h3>Aspect ratio</h3>
+<p>
+Aspect ratio of profile and layer
+plots can be set. This means your CloudSat and CALIPSO plots
+will have a uniform look, and thereby be easily comparable.
+</p>
+<h3>Multiple output formats</h3>
+<p>
+ccplot supports these
+vector and raster formats: SVG, PNG, PDF, EPS and PostScript.
+</p>
+</div>
+<div class="col2">
+<h3>Multiple projections</h3>
+<p>
+ccplot uses
+<a href="http://matplotlib.sourceforge.net/basemap/doc/html/">basemap</a>
+map projection library. Several projections are supported, including
+mercator, transverse mercator, south (north) pole stereographic.
+</p>
+<h3>Interpolation radius</h3>
+<p>
+ccplot uses nearest-neighbor
+interpolation for resampling of data onto a regular grid. Interpolation
+radius can be set on the command-line.
+</p>
+<h3>Surface elevation</h3>
+<p>
+A surface elevation line
+can be plotted on CALIPSO profile products.
+</p>
+<h3>Comprehensive documentation</h3>
+<p>
+ccplot comes with a <a href="../pub/doc/pdf/ccplot.1.pdf">manual page</a>
+as well as the thesis
+<a href="../pub/doc/pdf/Visualising_Data_from_CloudSat_and_CALIPSO_Satellites.pdf">Visualising Data from CloudSat and CALIPSO Satellites</a>,
+containing an overview of the A-Train constallation, products,
+scientific basis, data processing, and a ccplot tutorial.
+</p>
+</div>
+
+<div style="clear: both"></div>
+
+<h2>Supported Products</h2>
+<p>List of supported instruments and data structures is given in the table
+below.</p>
+
+<div class="table" id="supported-products">
+    <table>
+        <thead>
+            <tr>
+                <th>Spacecraft</th>
+                <th>Instrument</th>
+                <th>Product</th>
+                <th>Data set</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td rowspan="10">CALIPSO</td>
+                <td rowspan="10">CALIOP</td>
+                <td rowspan="5">Lidar L1B Profiles</td>
+                <td>Total Attenuated Backscatter 532nm</td></tr>
+	        <tr><td>Attenuated Backscatter 1064nm</td></tr>
+	        <tr><td>Perpendicular Attenuated Backscatter 532nm</td></tr>
+	        <tr><td>Attenuated Color Ratio 1064nm/532nm</td></tr>
+	        <tr><td>Depolarization Ratio</td></tr>
+	        <tr>
+	            <td rowspan="5">Lidar L2 Cloud Layer Products
+	                            (333m, 1km, 5km)</td>
+	            <td>Integrated Attenuated Backscatter 532nm</td>
+	        </tr>
+	        <tr><td>Integrated Attenuated Backscatter 1064nm</td></tr>
+	        <tr><td>Integrated Attenuated Total Color Ratio 1064nm/532nm</td></tr>
+	        <tr><td>Integrated Volume Depolarization Ratio</td></tr>
+            <tr><td>Midlayer Temperature</td></tr>
+            <tr>
+                <td>CloudSat</td>
+                <td>CPR</td>
+                <td>2B-GEOPROF</td>
+                <td>Radar Reflectivity Factor</td>
+            </tr>
+            <tr>
+                <td rowspan="3">Aqua</td>
+                <td rowspan="3">MODIS</td>
+                <td>MYD02QKM</td>
+                <td>Bands 1, 2</td>
+            </tr>
+            <tr><td>MYD02HKM</td><td>Bands 1-7</td></tr>
+            <tr><td>MYD021KM</td><td>Bands 1-12, 13lo, 13hi, 14lo, 14hi, 15-36</td></tr>
+        </tbody>
+    </table>
+</div>

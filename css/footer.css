@@ -1,0 +1,41 @@
+.feedback {
+    margin-top: 2em;
+    background: rgba(0,0,0,0.04);
+    padding: 0.5em 0.8em;
+    width: 38.5em;
+}
+
+.feedback .heading {
+    font-weight: bold;
+    font-size: 140%;
+    color: #555;
+}
+
+.feedback input[type="text"] {
+    display: block;
+    width: 20em;
+    padding: 0.2em;
+    border: 1px solid #bbb;
+    margin: 0.5em 0;
+}
+
+.feedback textarea {
+    display: block;
+    width: 98%;
+    height: 10em;
+    padding: 0.2em;
+    border: 1px solid #bbb;
+}
+
+.feedback button {
+    display: block;
+    margin: 1em 0;
+}
+
+footer {
+    margin-top: 4em;
+    padding-top: 0.3em;
+    border-top: 1px solid #aaa;
+    font-size: 90%;
+    color: #444;
+}

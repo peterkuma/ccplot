@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ccplot ‧ {{ page.title }}</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="keywords" content="CloudSat,CALIPSO,CPR,CALIOP,MODIS,plot" />
+        <link rel="stylesheet" type="text/css" href="/css/ccplot.css" />
+        {% for file in page.css %}
+            <link rel="stylesheet" type="text/css" href="/css/{{ file }}" />
+        {% endfor %}
+        {% for header in page.headers %}
+            {{ header }}
+        {% endfor %}
+    </head>
+    <body onload="document.getElementsByClassName('feedback')[0].action+='?qts='+Math.floor(new Date().getTime()/1000)">
+        <div id="main">
+            <header>
+                <nav class="nav">
+                    <div style="float: right">
+                        <a href="https://github.com/peterkuma/ccplot"><img src="/img/github.png" alt="github"></a>
+                    </div>
+                    <a href="/">Home</a>
+                    <a href="/features/">Features</a>
+                    <a href="/download/">Getting Started</a>
+                    <a href="/doc/">Documentation</a>
+                    <a href="/data/">Data Sources</a>
+                </nav>
+                <hgroup>
+                    <a href="/">
+                        <h1>ccplot</h1>
+                        <h2>CloudSat and CALIPSO plotting tool</h2>
+                    </a>
+                </hgroup>
+            </header>
+            <article>
+                {{ content }}
+            </article>
+            <footer>
+                <p>Developed thanks to data from the respective NASA missions.</p>
+                <p>&copy; 2009-2013 Peter Kuma</p>
+                <p>
+                    Hosted by <strong><a href="http://sourceforge.net/projects/ccplot/">SourceForge</a></strong>
+                </p>
+                <form class="feedback" action="http://vcielka.darksun.sk/~peter/ccplot-feedback.php" method="post">
+                    <div class="heading">Feedback</div>
+                    <p>We are interested in hearing from you. Tell us about your
+                    experience with ccplot.</p>
+                    <input type="text" name="email" placeholder="E-mail (optional)" />
+                    <textarea name="feedback"></textarea>
+                    <button type="submit">Send</button>
+                </form>
+            </footer>
+        </div>
+    </body>
+</html>

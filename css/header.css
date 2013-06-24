@@ -1,0 +1,36 @@
+header nav {
+    font-size: 120%;
+}
+
+header nav > a {
+    display: inline-block;
+    margin-right: 1.5em;
+}
+
+header hgroup {
+    display: block;
+    font-weight: bold;
+    margin: 1.2em 0;
+}
+
+header hgroup a {
+    color: inherit;
+    display: block;
+    padding: 0.3em;
+    margin: -0.3em;
+    width: 22em;
+}
+
+header hgroup h1 {
+    font-size: 200%;
+    color: #222;
+    margin-top: 0;
+    margin-bottom: 0.3em;
+}
+
+header hgroup h2 {
+    color: #656763;
+    font-size: 130%;
+    margin-top: 0;
+    margin-bottom: 0;
+}

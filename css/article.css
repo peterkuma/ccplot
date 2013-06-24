@@ -1,0 +1,109 @@
+article p {
+    margin: 4pt 0;
+}
+
+article h1 {
+    font-weight: normal;
+    font-size: 180%;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+article h2 {
+    font-size: 130%;
+    color: #cc0000;
+    font-weight: bold;
+    margin-top: 1.2em;
+    margin-bottom: 0.5em;
+}
+
+article h3 {
+    font-size: 100%;
+    font-weight: bold;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+}
+
+article blockquote {
+    margin: 1.5em 2em;
+}
+
+.note {
+    padding: 4pt;
+    margin: 2pt 0;
+    background: #cbcbff;   
+}
+
+.box {
+    background: #dfedf8;
+    margin: 10pt 0;
+    padding: 6pt;
+}
+
+.table {
+    background: #dfedf8;
+    margin: 10pt 0;
+    padding: 6pt;
+}
+
+.table table {
+    width: 100%;
+    font-size: inherit;
+    border-collapse: collapse;
+}
+
+.table th {
+    border-bottom: 1pt solid #555;
+    padding: 0 6pt 4pt 0;
+}
+
+.table td {
+    padding: 4pt 6pt 4pt 0;
+    vertical-align: top;
+}
+
+.caption {
+    margin-bottom: 6pt;
+    font-family: Helvetica, Tahoma, sans-serif;
+}
+
+.footnote {
+    font-size: 8pt;
+    margin-top: 6pt;
+    padding-top: 2pt;
+    background: url("../img/footnoteline.png") left top no-repeat;
+}
+
+ul {
+    list-style-image: url("../img/arrow.png");
+    margin: 10pt 0;
+    padding-left: 30pt;
+}
+
+li {
+    margin: 6pt 0;
+    padding: 0;
+}
+
+pre code {
+    display: block;
+    white-space: pre-wrap;
+}
+
+code,.code {
+    font-family: "Bitstream Vera Sans Mono", monospace;
+    font-size: 90%;
+    padding: 0.5em;
+    margin: 0.7em 0;
+    background: rgba(0,0,0,0.04);
+}
+
+.col1 {
+    width: 45%;
+    float: left;
+}
+
+.col2 {
+    width: 45%;
+    float: right;
+}
