@@ -13,6 +13,9 @@ provided with ccplot to make custom plots in python. These include routines
 for reading HDF and HDF-EOS2 files, parsing time values and performing
 data interpolation. See [API Reference](reference/) for details.
 
+Examples
+--------
+
 ### Note about examples
 
 The examples below differ from the ccplot program in a number of important
@@ -28,8 +31,7 @@ which performs interpolation by averaging
 as opposed to nearest-neighbor interpolation in the ccplot program
 (but see [API reference](reference/) for details).
 
-CALIPSO example
----------------
+### CALIPSO example
 
 [![CALIPSO example](calipso-plot-small.png)](calipso-plot.png)
 
@@ -42,8 +44,7 @@ CALIPSO example
 {% include calipso-plot.py %}
 {% endhighlight %}
 
-CloudSat example
-----------------
+### CloudSat example
 
 [![CloudSat example](cloudsat-plot-small.png)](cloudsat-plot.png)
 
