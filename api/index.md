@@ -19,7 +19,7 @@ CALIPSO example
 [![CALIPSO example](calipso-plot-small.png)](calipso-plot.png)
 
 **Input file:**
-[CAL_LID_L1-ValStage1-V3-02.2013-01-01T11-55-23ZN.hdf](https://sourceforge.net/projects/ccplot/files/products/CAL_LID_L1-ValStage1-V3-02.2013-01-01T11-55-23ZN.hdf)
+[CAL_LID_L1-ValStage1-V3-01.2007-06-12T03-42-18ZN.hdf](https://sourceforge.net/projects/ccplot/files/products/CAL_LID_L1-ValStage1-V3-01.2007-06-12T03-42-18ZN.hdf)
 
 **Source:** [calipso-plot.py](calipso-plot.py)
 

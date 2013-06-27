@@ -7,7 +7,7 @@ from ccplot.hdf import HDF
 from ccplot.algorithms import interp2d_12
 import ccplot.utils
 
-filename = 'CAL_LID_L1-ValStage1-V3-02.2013-01-01T11-55-23ZN.hdf'
+filename = 'CAL_LID_L1-ValStage1-V3-01.2007-06-12T03-42-18ZN.hdf'
 name = 'Total_Attenuated_Backscatter_532'
 label = 'Total Attenuated Backscatter 532nm (km$^{-1}$ sr$^{-1}$)'
 colormap = '/usr/local/share/ccplot/cmap/calipso-backscatter.cmap'
