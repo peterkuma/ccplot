@@ -5,7 +5,7 @@ import numpy
 
 setup(
     name='ccplot',
-    version='1.5-rc4',
+    version='1.5-rc5',
     description='CloudSat and CALIPSO plotting tool',
     long_description="""
     ccplot is a command-line application that reads CloudSat, CALISO
