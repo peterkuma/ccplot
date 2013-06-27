@@ -3,15 +3,17 @@ layout: default
 title: Version History
 ---
 <h1>Version History</h1>
-<h2>New in 1.5-rc4 (2013-06-12)</h2>
+<h2>New in 1.5-rc5 (2013-06-27)</h2>
 <ul>
+    <li>Added support for arbitrary dataset plotting.</li>
+    <li>Added ccplot API functions.</li>
     <li>Removed dependency on PyNIO. ccplot now uses its own HDF reading
         module interfacing with libhdf4 and libhdfeos.</li>
-    <li>ccplot now looks for colormaps in a directory relative to
-        the executable. This fixes installation in non-standard paths.</li>
-    <li>Automatic unit testing performed by Travis CI.</li>
     <li>CALIPSO lidar altitudes are now read from the product file
         instead of being hard-coded in ccplot.</li>
+    <li>Automatic unit testing performed by Travis CI.</li>
+    <li>ccplot now looks for colormaps in a directory relative to
+        the executable. This fixes installation in non-standard paths.</li>
 </ul>
 <h2>New in 1.4.7 (2013-06-16):</h2>
 <ul>
