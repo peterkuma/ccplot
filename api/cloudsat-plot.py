@@ -1,1 +1,3 @@
-../_includes/cloudsat-plot.py
+---
+---
+{% include cloudsat-plot.py %} 

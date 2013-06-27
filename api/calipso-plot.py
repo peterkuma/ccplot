@@ -1,1 +1,3 @@
-../_includes/calipso-plot.py
+---
+---
+{% include calipso-plot.py %} 
