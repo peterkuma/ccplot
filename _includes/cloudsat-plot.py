@@ -3,38 +3,55 @@
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from ccplot.hdf import HDF
+import datetime as dt
+from ccplot.hdfeos import HDFEOS
 from ccplot.algorithms import interp2d_12
 import ccplot.utils
 
-filename = 'CAL_LID_L1-ValStage1-V3-02.2013-01-01T11-55-23ZN.hdf'
-name = 'Total_Attenuated_Backscatter_532'
-label = 'Total Attenuated Backscatter 532nm (km$^{-1}$ sr$^{-1}$)'
-colormap = '/usr/local/share/ccplot/cmap/calipso-backscatter.cmap'
-x1 = 0
-x2 = 1000
+filename = '2013119200420_37263_CS_2B-GEOPROF_GRANULE_P_R04_E06.hdf'
+swath = '2B-GEOPROF'
+name = 'Radar_Reflectivity'
+label = 'Reflectivity Factor (dBZe)'
+colormap = '/usr/local/share/ccplot/cmap/cloudsat-reflectivity.cmap'
+x1 = 1700
+x2 = 2000
 h1 = 0  # km
-h2 = 20  # km
+h2 = 10  # km
 nz = 500  # Number of pixels in the vertical.
 
 if __name__ == '__main__':
-    with HDF(filename) as product:
+    with HDFEOS(filename) as product:
         # Import datasets.
-        time = product['Profile_UTC_Time'][x1:x2, 0]
-        height = product['metadata']['Lidar_Data_Altitudes']
-        dataset = product[name][x1:x2]
+        sw = product[swath]
+        ds = sw[name]
+        dataset = ds[x1:x2]
+        time = sw['Profile_time'][x1:x2]
+        height = sw['Height'][:]
+        start_time = dt.datetime.strptime(
+            sw.attributes['start_time'],
+            '%Y%m%d%H%M%S'
+        )
 
         # Convert time to datetime.
-        time = np.array([ccplot.utils.calipso_time2dt(t) for t in time])
+        time = np.array([
+            ccplot.utils.cloudsat_time2dt(t, start_time)
+            for t in time
+        ])
+
+        # Transform data values to science values.
+        factor = ds.attributes.get("factor", 1)
+        offset = ds.attributes.get("offset", 0)
+        print factor, offset
+        dataset = 1.0/factor*(dataset - offset)
 
         # Mask missing values.
-        dataset = np.ma.masked_equal(dataset, -9999)
+        dataset = np.ma.masked_equal(dataset, ds.attributes["missing"])
 
         # Interpolate data on a regular grid.
         X = np.arange(x1, x2, dtype=np.float32)
-        Z, null = np.meshgrid(height, X)
+        Z = (height*0.001).astype(np.float32)
         data = interp2d_12(
-            dataset[::], X, Z,
+            dataset.filled(np.nan), X, Z,
             x1, x2, x2 - x1,
             h2, h1, nz,
         )
@@ -59,7 +76,7 @@ if __name__ == '__main__':
             interpolation='nearest',
         )
         ax = im.axes
-        ax.set_title('CALIPSO %s - %s' % (
+        ax.set_title('CloudSat %s - %s' % (
             time[0].strftime(TIME_FORMAT),
             time[-1].strftime(TIME_FORMAT)
         ))
@@ -73,5 +90,5 @@ if __name__ == '__main__':
         )
         cbar.set_label(label)
         fig.tight_layout()
-        plt.savefig('calipso-plot.png')
+        plt.savefig('cloudsat-plot.png')
         plt.show()
