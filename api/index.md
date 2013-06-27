@@ -13,6 +13,21 @@ provided with ccplot to make custom plots in python. These include routines
 for reading HDF and HDF-EOS2 files, parsing time values and performing
 data interpolation. See [API Reference](reference/) for details.
 
+### Note about examples
+
+The examples below differ from the ccplot program in a number of important
+details:
+
+* The aspect ratio is determined by matplotlib. The figure size is fixed
+in inches, so the actual aspect ratio depends on the horizontal and
+vertical extent. In contrast, the ccplot program sets the figure width
+according to a prespecified aspect ratio.
+
+* A new interpolation routine **ccplot.algorithms.interp2d_12** is used,
+which performs interpolation by averaging
+as opposed to nearest-neighbor interpolation in the ccplot program
+(but see [API reference](reference/) for details).
+
 CALIPSO example
 ---------------
 
