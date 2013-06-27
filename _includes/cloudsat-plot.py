@@ -38,14 +38,14 @@ if __name__ == '__main__':
             for t in time
         ])
 
+        # Mask missing values.
+        dataset = np.ma.masked_equal(dataset, ds.attributes["missing"])
+        dataset = np.ma.masked_equal(dataset, ds.attributes["_FillValue"])
+
         # Transform data values to science values.
         factor = ds.attributes.get("factor", 1)
         offset = ds.attributes.get("offset", 0)
-        print factor, offset
         dataset = 1.0/factor*(dataset - offset)
-
-        # Mask missing values.
-        dataset = np.ma.masked_equal(dataset, ds.attributes["missing"])
 
         # Interpolate data on a regular grid.
         X = np.arange(x1, x2, dtype=np.float32)
