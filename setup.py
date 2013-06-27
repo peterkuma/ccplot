@@ -60,5 +60,9 @@ setup(
             libraries=['hdfeos', 'mfhdf', 'df', 'jpeg', 'z'],
             extra_compile_args=['-I/usr/include/hdf'],
         ),
+        Extension(
+            'ccplot.algorithms',
+            ['ccplot/algorithms.pyx'],
+        ),
     ],
 )

@@ -1,6 +1,7 @@
 build
 dist
 MANIFEST
+/ccplot/algorithms.c
 /ccplot/hdf.c
 /ccplot/hdfeos.c
 /test/work/
