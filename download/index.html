@@ -4,20 +4,21 @@ title: Getting Started
 ---
 <h1>Getting Started</h1>
 
-<h2>Source distribution</h2>
-<p>Pick a ccplot source distribution from the table, and follow the installation
-instructions below.</p>
+<h2>Download</h2>
 <div class="table">
     <table>
         <thead><tr><th>Release Date</th><th>Download</th></tr></thead>
         <tbody>
             <tr>
-                <td>16 June 2013</td>
-                <td><a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.4.7.tar.gz">ccplot 1.4.7</a></td>
+                <td>18 November 2013</td>
+                <td>
+                    <a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5-rc6.tar.gz">ccplot 1.5-rc6</a><br />
+                    <a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5-rc6.win32-py2.7.exe">ccplot 1.5-rc6.win32-py2.7</a>
+                </td>
             </tr>
             <tr>
-                <td>27 June 2013</td>
-                <td><a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5-rc5.tar.gz">ccplot 1.5-rc5</a> (beta)</td>
+                <td>16 June 2013</td>
+                <td><a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.4.7.tar.gz">ccplot 1.4.7</a></td>
             </tr>
         </tbody>
         <tbody id="archive" style="display: none">
@@ -95,9 +96,25 @@ document.getElementById('hidearchived').onclick = function() {
 };
 </script>
 
-<h2>Requirements</h2>
-We recommend installing on Linux. Make sure you have the following
-programs and libraries installed:
+<h2>Windows</h2>
+<p>
+    The recommended way of installing ccplot on Windows is to use the
+    <a href="https://code.google.com/p/pythonxy/">python(x,y)</a>
+    distribution. In addition to standard modules, select the
+    <strong>cython</strong> module during installation, and install <strong>basemap</strong> from the
+    <a href="https://code.google.com/p/pythonxy/wiki/AdditionalPlugins">Additional plugins</a>
+    page. Finally, install ccplot from the executable you downloaded.
+</p>
+<p>
+    You should be able to run ccplot from the Command Prompt, e.g.:
+</p>
+<div class="code">
+    python C:\Python27\Scripts\ccplot -V
+</div>
+
+<h2>Linux / Unix</h2>
+It is recommended to install ccplot on Linux. Make sure you have the
+following programs and libraries installed:
 
 <ul>
     <li><a href="http://www.python.org/">Python</a> &gt;= 2.5 and &lt; 3.0, including development files</li>
@@ -122,6 +139,15 @@ programs and libraries installed:
     apt-get install --no-install-recommends cython libhdf4-dev libhdfeos-dev python-imaging python-numpy python-matplotlib python-mpltoolkits.basemap ttf-bitstream-vera
 </div>
 <p><strong>ccplot &lt; 1.5:</strong> PyNIO needs to be installed independently.</p>
+
+<h3>Installing ccplot</h3>
+<p>Unpack the source archive, build and install with:</p>
+<div class="code">
+    tar xzf ccplot-1.4.6.tar.gz<br>
+    cd ccplot-1.4.6<br>
+    python setup.py build<br>
+    sudo python setup.py install
+</div>
 
 <h2>Installing PyNIO</h2>
 <p><strong>ccplot &lt; 1.5</strong></p>
@@ -157,16 +183,6 @@ programs and libraries installed:
 <div class="code">
     python -c "import Nio; print Nio.__version__"<br>
     <em>1.4.0</em>
-</div>
-
-
-<h2>Installing ccplot</h2>
-<p>Unpack the source archive, build and install with:</p>
-<div class="code">
-    tar xzf ccplot-1.4.6.tar.gz<br>
-    cd ccplot-1.4.6<br>
-    python setup.py build<br>
-    sudo python setup.py install
 </div>
 
 <h2>Your Experience</h2>
