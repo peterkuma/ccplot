@@ -31,7 +31,7 @@
 #include <numpy/arrayobject.h>
 #include <numpy/npy_math.h>
 
-#define lroundf(x) ((long) roundf(x))
+#define lroundf(x) ((long)((x) >= 0 ? (x)+0.5 : (x)-0.5))
 
 static void
 dimmap2d(PyObject *data, PyObject *out, int off1, int inc1, int off2, int inc2,
