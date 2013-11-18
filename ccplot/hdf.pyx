@@ -9,7 +9,7 @@ cdef extern from "errno.h":
 cdef extern from "string.h":
     char *strerror(int)
 
-cdef extern from "hdf/hntdefs.h":
+cdef extern from "hntdefs.h":
     cdef enum:
         DFNT_UCHAR = 3
         DFNT_CHAR = 4
@@ -24,7 +24,7 @@ cdef extern from "hdf/hntdefs.h":
         DFNT_INT64 = 26
         DFNT_UINT64 = 27
 
-cdef extern from "hdf/hdf.h":
+cdef extern from "mfhdf.h":
     cdef enum:
         FAIL = -1
         DFACC_READ = 1
@@ -74,7 +74,7 @@ cdef extern from "hdf/hdf.h":
     char *VFfieldname(int32, int32)
     int32 VFnfields(int32)
 
-cdef extern from "hdf/vg.h":
+cdef extern from "vg.h":
     cdef enum:
         _HDF_VSUNPACK = 1
 

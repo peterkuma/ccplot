@@ -1,7 +1,30 @@
 from distutils.core import setup, Extension
 from Cython.Distutils import build_ext
 from glob import glob
+import sys
+import os
 import numpy
+
+# Windows build: modify to point to HDF4 and HDF-EOS2 libraries.
+WIN_HDF_PATH=r'C:\Program Files (x86)\HDF_Group\HDF\4.2.9'
+WIN_HDFEOS_PATH=r'C:\Program Files (x86)\hdfeos2.18'
+
+
+if sys.platform == 'win32':
+    hdf_libraries = ['hdf', 'mfhdf', 'libjpeg', 'libzlib', 'libszip', 'xdr', 'Ws2_32']
+    hdf_include_dirs = [os.path.join(WIN_HDF_PATH, 'include')]
+    hdf_library_dirs = [os.path.join(WIN_HDF_PATH, 'lib')]
+    hdfeos_libraries = ['hdfeos']
+    hdfeos_include_dirs = [os.path.join(WIN_HDFEOS_PATH, r'hdfeos\include')]
+    hdfeos_library_dirs = [os.path.join(WIN_HDFEOS_PATH, r'hdfeos_dev\hdfeos\Release')]
+else:
+    hdf_libraries = ['mfhdf', 'df', 'jpeg', 'z']
+    hdf_include_dirs = ['/usr/include/hdf', '/usr/local/include/hdf']
+    hdf_library_dirs = []
+    hdfeos_libraries = ['hdfeos']
+    hdfeos_include_dirs = []
+    hdfeos_library_dirs = []
+
 
 setup(
     name='ccplot',
@@ -38,9 +61,9 @@ setup(
         'basemap',
     ],
     include_dirs=[numpy.get_include()],
-    data_files=[('share/doc/ccplot/', ['NEWS']),
-                ('share/ccplot/cmap/', glob('cmap/*')),
-                ('man/man1/', ['man/ccplot.1'])],
+    data_files=[('share/doc/ccplot', ['NEWS']),
+                ('share/ccplot/cmap', glob('cmap/*')),
+                ('man/man1', ['man/ccplot.1'])],
     cmdclass={
         'build_ext': build_ext,
     },
@@ -52,13 +75,16 @@ setup(
         Extension(
             'ccplot.hdf',
             ['ccplot/hdf.pyx'],
-            libraries=['mfhdf', 'df', 'jpeg', 'z'],
+            include_dirs=hdf_include_dirs,
+            library_dirs=hdf_library_dirs,
+            libraries=hdf_libraries,
         ),
         Extension(
             'ccplot.hdfeos',
             ['ccplot/hdfeos.pyx'],
-            libraries=['hdfeos', 'mfhdf', 'df', 'jpeg', 'z'],
-            extra_compile_args=['-I/usr/include/hdf'],
+            include_dirs=(hdf_include_dirs + hdfeos_include_dirs),
+            library_dirs=(hdf_library_dirs + hdfeos_library_dirs),
+            libraries=(hdfeos_libraries + hdf_libraries),
         ),
         Extension(
             'ccplot.algorithms',

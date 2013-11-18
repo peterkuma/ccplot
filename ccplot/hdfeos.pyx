@@ -13,7 +13,7 @@ cdef extern from "errno.h":
 cdef extern from "string.h":
     char *strerror(int)
     
-cdef extern from "hdf/hntdefs.h":
+cdef extern from "hntdefs.h":
     cdef enum:
         DFNT_UCHAR = 3
         DFNT_CHAR = 4
@@ -28,7 +28,7 @@ cdef extern from "hdf/hntdefs.h":
         DFNT_INT64 = 26
         DFNT_UINT64 = 27
 
-cdef extern from "hdf/hdf.h":
+cdef extern from "hdf.h":
     cdef enum:
         FAIL = -1
         DFACC_READ = 1
@@ -55,7 +55,7 @@ cdef extern from "hdf/hdf.h":
     int16 HEvalue(int32)
     char *HEstring(hdf_err_code_t)
     
-cdef extern from "hdf/HdfEosDef.h":
+cdef extern from "HdfEosDef.h":
     int32 SWopen(char *, intn)
     int32 SWattach(int32, char *)
     intn SWfieldinfo(int32, char *, int32 *, int32 [], int32 *, char *)

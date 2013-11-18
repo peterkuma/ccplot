@@ -6,7 +6,9 @@ cdef extern from "math.h":
     double floor(double)
     double ceil(double)
     double round(double)
-    bint isnan(double x)
+
+cdef extern from "numpy/npy_math.h":
+    bint npy_isnan(double x)
 
 
 def interp2d_12(np.ndarray[float, ndim=2, mode="c"] data not None,
@@ -52,7 +54,7 @@ def interp2d_12(np.ndarray[float, ndim=2, mode="c"] data not None,
                 for m in range(<int>(m1+0.5), <int>(m2+0.5+1)):
                     if n < 0 or n >= nx: continue
                     if m < 0 or m >= nz: continue
-                    if isnan(data[i,j]): continue
+                    if npy_isnan(data[i,j]): continue
                     out[n,m] += data[i,j]
                     q[n,m] += 1
 

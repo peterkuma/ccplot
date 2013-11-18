@@ -29,6 +29,9 @@
 
 #include <Python.h>
 #include <numpy/arrayobject.h>
+#include <numpy/npy_math.h>
+
+#define lroundf(x) ((long) roundf(x))
 
 static void
 dimmap2d(PyObject *data, PyObject *out, int off1, int inc1, int off2, int inc2,
@@ -78,9 +81,9 @@ float modulus)
 			b4 = PyArray_GETPTR2(data, k1, l1);
 			
 			br1 = 0.f;
-			br2 = remainderf(*b2 - *b1, modulus);
-			br3 = remainderf(*b3 - *b1, modulus);
-			br4 = remainderf(*b4 - *b1, modulus);
+			br2 = fmodf(*b2 - *b1, modulus);
+			br3 = fmodf(*b3 - *b1, modulus);
+			br4 = fmodf(*b4 - *b1, modulus);
 			
 			*outbin = *b1 + (
 			    br1 * (1-dk)*(1-dl) +
@@ -171,7 +174,7 @@ interpolate2d(PyObject *data, PyObject *xin2d, PyObject *yin2d, PyObject *out,
 	for (i = 0; i < xoutn; i++) {
 		for (j = 0; j < youtn; j++) {
 			bin = PyArray_GETPTR2(coefa, i, j);
-			*bin = INFINITY;
+			*bin = -logf(0);
 			outbin = PyArray_GETPTR2(out, i, j);
 			*outbin = fill;
 		}
@@ -180,7 +183,7 @@ interpolate2d(PyObject *data, PyObject *xin2d, PyObject *yin2d, PyObject *out,
 	for (i = 0; i < xdim; i++) {
 		for (j = 0; j < ydim; j++) {
 			bin = PyArray_GETPTR2(data, i, j);
-			if (isnan(*bin)) continue;
+			if (npy_isnan(*bin)) continue;
 			x = *((npy_float *) PyArray_GETPTR2(xin2d, i, j));
 			y = *((npy_float *) PyArray_GETPTR2(yin2d, i, j));
 			
