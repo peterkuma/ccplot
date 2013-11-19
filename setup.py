@@ -11,6 +11,7 @@ WIN_HDFEOS_PATH=r'C:\Program Files (x86)\hdfeos2.18'
 
 
 if sys.platform == 'win32':
+    scripts = ['bin/ccplot', 'bin/ccplot.bat']
     hdf_libraries = ['hdf', 'mfhdf', 'libjpeg', 'libzlib', 'libszip', 'xdr', 'Ws2_32']
     hdf_include_dirs = [os.path.join(WIN_HDF_PATH, 'include')]
     hdf_library_dirs = [os.path.join(WIN_HDF_PATH, 'lib')]
@@ -18,6 +19,7 @@ if sys.platform == 'win32':
     hdfeos_include_dirs = [os.path.join(WIN_HDFEOS_PATH, r'hdfeos\include')]
     hdfeos_library_dirs = [os.path.join(WIN_HDFEOS_PATH, r'hdfeos_dev\hdfeos\Release')]
 else:
+    scripts = ['bin/ccplot']
     hdf_libraries = ['mfhdf', 'df', 'jpeg', 'z']
     hdf_include_dirs = ['/usr/include/hdf', '/usr/local/include/hdf']
     hdf_library_dirs = []
@@ -49,7 +51,7 @@ setup(
         "Topic :: Scientific/Engineering :: Atmospheric Science",
         "Natural Language :: English",
     ],
-    scripts=['bin/ccplot'],
+    scripts=scripts,
     packages=[
         'ccplot',
     ],

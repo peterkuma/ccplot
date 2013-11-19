@@ -1,3 +1,4 @@
 include Changelog NEWS ccplot.1
 include test/imgcompare test/libtest.sh test/test.sh
+recursive-include bin *
 recursive-include cmap *
