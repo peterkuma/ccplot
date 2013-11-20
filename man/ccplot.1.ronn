@@ -1,0 +1,357 @@
+ccplot(1) -- CloudSat and CALIPSO plotting tool
+===============================================
+
+## SYNOPSIS
+
+`ccplot` [`-v`] [`-a` <ratio>] [`-c` <file>] [`-d` <dpi>] [`-m` <band>] [`-o` <file>] [`-p` <proj>[:<projopts>]] [`-r` <radius>] [`-x` <extent>] [`-y` <extent>] [`-z` <options>] <type> <file>...<br>
+`ccplot` `-i` <file><br>
+`ccplot` `-h`<br>
+`ccplot` `-V`
+
+## DESCRIPTION
+
+ccplot is a command-line program for producing plots from CloudSat, CALIPSO
+and MODIS product files.
+
+The program reads data from <file>, and produces an image file. Dataset
+to be plotted is determined by <type>:
+
+  * `cloudsat-reflec`:
+    CloudSat Reflectivity Factor
+
+  * `calipso532`:
+    CALIPSO L1B Total Attenuated Backscatter 532nm
+
+  * `calipso532p`:
+    CALIPSO L1B Perpendicular Attenuated Backscatter 532nm
+
+  * `calipso1064`:
+    CALIPSO L1B Attenuated Backscatter 1064nm
+
+  * `calipso-cratio`:
+    CALIPSO L1B Attenuated Color Ratio 1064nm/532nm
+
+  * `calipso-dratio`:
+    CALIPSO L1B Depolarization Ratio
+
+  * `calipso532-layer`:
+    CALIPSO L2 Integrated Attenuated Backscatter 532nm
+
+  * `calipso1064-layer`:
+    CALIPSO L2 Integrated Attenuated Backscatter 1064nm
+
+  * `calipso-cratio-layer`:
+    CALIPSO L2 Integrated Attenuated Total Color Ratio 1064nm/532nm
+
+  * `calipso-dratio-layer`:
+    CALIPSO L2 Integrated Volume Depolarization Ratio
+
+  * `calipso-temperature-layer`:
+    CALIPSO L2 Midlayer Temperature
+
+  * `orbit`:
+    Map of the globe showing CALIPSO or CloudSat trajectory,
+    optionally superimposed on MODIS swath
+    (if a MODIS HDF product is supplied as the first file).
+
+  * `orbit-clipped`:
+    The same as `orbit`, but clipped to the area where MODIS data
+    is available.
+
+
+## OPTIONS
+
+  * `-a` <ratio>:
+    Aspect ratio of profile and layer products in km horizontal per km
+    vertical. Default: *14.0*.
+
+  * `-c` <file>:
+    Colormap definition file (*.cmap*).
+    Apart from an absolute path, paths relative to `CCPLOT_CMAP_PATH`
+    environment variable are also recognized, and take precedence over
+    paths relative to the current working directory.
+    See Chapter 6 of Kuma (2010) for more information about the format
+    of cmap files.
+
+  * `-d` <dpi>:
+    DPI (Dots Per Inch) of the output image file. 
+
+  * `-m` <band>:
+    MODIS band specifier in the format `r`<number> for reflective bands,
+    and `x`<number> for radiation bands, where <number> is band number.
+
+  * `-o` <file>:
+    Output image file. Format is determined by extension: SVG (*.svg*),
+    PNG (*.png*), PDF (*.pdf*), EPS (*.eps*) and PS (*.ps*).
+    Default: *ccplot.png*.
+
+  * `-p` <proj>[:<projopts>]:
+    Projection and projection options. Applies to `orbit` and `orbit-clipped`
+    plots.
+
+    `-p help` prints a list of available projections.
+
+    <projopts> are projection-specific options, specified as a comma-seperated
+    list of <key>`=`<value> pairs:
+
+      * `boundinglat`=<latitude>:
+        Bounding latitude (polar projections).
+
+      * `lat_0`=<latitude>:
+        Central latitude.
+
+      * `lat_1`=<latitude>:
+        First standard parallel.
+
+      * `lat_2`=<latitude>:
+        Second standard parallel.
+
+      * `lat_ts`=<latitude>:
+        Latitude of true scale.
+
+      * `lon_1`=<longitude>:
+        Longitude of one of the two points on the projection centerline
+        (oblique mercator).
+
+      * `lon_2`=<longitude>:
+        Longitude of one of the two points on the projection centerline
+        (oblique mercator).
+
+    <longitude> is in the format <number>`E`|`W` (East or West).
+    <latitude> is in the format <number>`S`|`N` (South or North).
+    <number> is a positive decimal number in degrees.
+
+  * `-r` <radius>:
+    Interpolation radius in pixels. In profile products radius specifies
+    vertical extent which a data point is mapped onto. If such vertical
+    regions of two data points overlap value is determined by averaging
+    with a weight coefficient of 1 over distance squared.
+    The same holds for swath products, but here radius specifies a square.
+    If radius is chosen too small relative to <dpi>, data will be plotted
+    sparsely on the image.
+
+    Defaults to *3* for swath plots. For profile products a sensible
+    value is chosen automatically depending on resolution.
+
+  * `-v`:
+    Verbose mode.
+
+  * `-V`:
+    Print version information and exit.
+
+  * `-x` <extent>:
+    Horizontal extent to be plotted. <extent> can be specified in a number of
+    formats depending on the plot <type>.
+
+    For profile and layer products <extent> can be one of:
+
+      * <x1>..<x2>:
+        Plot data between ray <x1> and <x2>.
+
+      * <hour1>:<min1>[:<sec1>]..<hour2>:<min2>[:<sec2>]:
+        Plot data in time interval (UTC).
+
+      * +|-[<hour>:]<min>:<sec>..+|-[<hour>:]<min>:<sec>:
+        Plot data in time interval relative to the beginning (+) or end (-)
+        of the granule.
+
+    For swath products <extent> can be one of:
+
+      * <x1>..<x2>,<y1>..<y2>:
+        Plot data between scanlines <x1> and <x2> (along-track),
+        and samples <y1> and <y2> (across-track).
+
+      * <lon1>..<lon2>,<lat1>..<lat2>:
+        Plot data inside geographical region between latitude <lat1> and <lat2>
+        and longitude <lon1> and <lon2>.
+
+        Longitude is in the format <number>`E`|`W` (East or West).
+        Latitude is in the format <number>`S`|`N` (South or North).
+        <number> is a positive decimal number in degrees.
+
+  * `-y` <extent>:
+    Vertical extent of profile plots in the format <y1>..<y2>,
+    where <y1> and <y2> are the lower and upper boundary (resp.) in meters above
+    sea level.
+
+  * `-z` <options>:
+    Miscellaneous formatting options. <options> is a comma-separated list of
+    <key>`=`<value> pairs.
+    Some options accept a list of values seperated by colon in the format
+    <key>=<value1>:<value2>[:<value>]... .
+
+    `-z help` prints a list of all options.
+
+    Available common options:
+
+      * `cbfontsize`:
+         Color bar font size. Default: *8*.
+
+      * `cbspacing`:
+        Spacing between axes and color bar. Default: *0.4*.
+
+      * `drawelev`:
+        Draw surface elevation line (CALIPSO). Default: *1*.
+
+      * `elevlw`:
+        Surface elevation line width. Default: *0.5*.
+
+      * `elevcolor`:
+        Surface elevation line color. Default: *#FF0000*.
+      
+      * `fontsize`:
+        Font size. Default: *10*.
+
+      * `padding`:
+        Padding around axes and color bar in inches. Default: *1*.
+
+      * `plotheight`:
+        Plot height in inches. Default: *6*.
+      
+      * `title`:
+        Figure title. Default: automatic.
+
+    Orbit plots support additional options:
+
+      * `coastlinescolor`:
+        Coastlines color. Default: *#46396D*.
+
+      * `coastlineslw`:
+        Coastlines line width. Default: *0.4*.
+
+      * `countriescolor`:
+        Countries outlines color. Default: *#46396D*.
+
+      * `countrieslw`:
+        Countries outlines line width. Default: *0.2*.
+
+      * `drawcoastlines`:
+        Draw coastlines. Default: *1*.
+
+      * `drawcountries`:
+        Draw countries outlines. Default: *1*.
+
+      * `drawlakes`:
+        Draw lakes. Default: *1*.
+
+      * `drawlsmask`:
+        Draw land-sea mask. Default: *1*.
+
+      * `drawmeridians`:
+        Draw meridians. Default: *1*.
+
+      * `drawminormeridians`:
+        Draw meridians. Default: *1*.
+
+      * `drawminorparallels`:
+        Draw minor parallels. Default: *1*.
+
+      * `drawparallels`:
+        Draw parallels. Default: *1*.
+
+      * `landcolor`:
+        Land color. Default: *#E9E4F7*.
+
+      * `majormeridianscolor`:
+        Major meridians color. Default: *#000000*.
+
+      * `majormeridianslw`:
+        Major meridians line width. Default: *0.3*.
+
+      * `majorparallelscolor`:
+        Major parallels line color. Default: *#000000*.
+
+      * `majorparallelslw`:
+        Major parallels line width. Default: *0.3*.
+
+      * `mapres`:
+        Map resolution: c (crude), l (low), i (intermediate), h (high), f (full). Default: *i*.
+
+      * `meridiansbase`:
+         Meridians base, or 0 for automatic. Default: *0*.
+
+      * `minormeridianscolor`:
+        Minor meridians color. Default: *#000000*.
+
+      * `minormeridianslw`:
+        Minor meridians line width. Default: *0.1*.
+
+      * `minorparallelscolor`:
+        Minor parallels color. Default: *#000000*.
+
+      * `minorparallelslw`:
+        Minor parallels line width. Default: *0.1*.
+
+      * `nminormeridians`:
+        Number of minor meridians between two major maridians, or 0 for
+        automatic. Default: *0*.
+
+      * `nminorparallels`:
+        Number of minor parallels between two major parallels, or 0 for
+        automatic. Default: *0*.
+
+      * `parallelsbase`:
+        Parallels base, or 0 for automatic. Default: *0*.
+
+      * `trajcolors`:
+        List of trajectory colors. Default: *#FF0000:#0000FF:#00FF00*.
+
+      * `trajlws`:
+        List of trajectory line widths. Default: *0.5*.
+
+      * `trajnminortics`:
+        Number of minor ticks between adjecent major ticks, or -1 for
+        automatic selection. Default: *-1*.
+
+      * `trajticks`:
+        Base for trajectory major ticks in seconds, or -1 for automatic
+        selection. Default: *-1*.
+
+      * `watercolor`:
+        Water color. Default: *#FFFFFF*.
+
+
+## EXAMPLES
+
+  * Plot the first 1000 rays of CloudSat Reflectivity Factor with
+    colormap *cloudsat-reflec.cmap* into *cloudsat-reflec.png*:
+
+        ccplot -x 0..1000 -c cloudsat-reflectivity.cmap -o cloudsat-reflec.png cloudsat-reflec 2006224184641_01550_CS_2B-GEOPROF_GRANULE_P_R03_E01.hdf
+
+  * Plot the first minute of CALIPSO Total Attenuated Backscatter 532nm
+    between altitude 0 and 20 km with colormap *calipso-backscatter.cmap*
+    into *calipso532.png*:
+
+        ccplot -y 0..20000 -x +0:00..+1:00 -c calipso-backscatter.cmap -o calipso532.png calipso532 CAL_LID_L1-Prov-V2-01.2006-07-06T19-50-51ZN.hdf
+
+  * Plot CALIPSO trajectory superimposed on Aqua MODIS
+    band 31 radiance with colormap *modis-temperature.cmap* into
+    *orbit-calipso.png*:
+
+        ccplot -m x31 -c modis-temperature.cmap -p tmerc -o orbit-calipso.png orbit-clipped MYD021KM.A2006224.1945.005.2007140113559.hdf CAL_LID_L1-Prov-V2-01.2006-07-06T19-50-51ZN.hdf
+
+## ENVIRONMENT
+
+  * `CCPLOT_CMAP_PATH`:
+    Colon-separated list of search paths of colormap files.
+
+## FILES
+
+  * `/usr/share/ccplot/cmap/*`:
+    Stock colormap files.
+
+## AUTHOR
+
+`ccplot` was written by Peter Kuma.
+
+## REFERENCES
+  
+  * Kuma, P. (2010). Visualising Data from CloudSat and CALIPSO Satellites.
+    Bachelor's thesis, Comenius University.
+  * CloudSat Standard Data Products Handbook
+  * CALIPSO Data Products Catalog Release 2.4
+  * MODIS Level 1B Product User's Guide
+
+## KNOWN ISSUES
+
+  * Plot size is limited to 32767 pixels.
