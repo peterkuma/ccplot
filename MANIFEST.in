@@ -1,5 +1,6 @@
-include Changelog NEWS ccplot.1
+include LICENSE MANIFEST.in NEWS README.md setup.py
+include bin/ccplot.bat
 include test/imgcompare test/libtest.sh test/test.sh
-recursive-include man *
 recursive-include bin *
 recursive-include cmap *
+recursive-include man *
