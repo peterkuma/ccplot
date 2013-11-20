@@ -30,7 +30,7 @@ else:
 
 setup(
     name='ccplot',
-    version='1.5-rc6',
+    version='1.5-rc7',
     description='CloudSat and CALIPSO plotting tool',
     long_description="""
     ccplot is a command-line application that reads CloudSat, CALISO
