@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='content-type' value='text/html;charset=utf8'>
+  <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
+  <title>ccplot(1) - CloudSat and CALIPSO plotting tool</title>
+  <style type='text/css' media='all'>
+  /* style: man */
+  body#manpage {margin:0}
+  .mp {max-width:100ex;padding:0 9ex 1ex 4ex}
+  .mp p,.mp pre,.mp ul,.mp ol,.mp dl {margin:0 0 20px 0}
+  .mp h2 {margin:10px 0 0 0}
+  .mp > p,.mp > pre,.mp > ul,.mp > ol,.mp > dl {margin-left:8ex}
+  .mp h3 {margin:0 0 0 4ex}
+  .mp dt {margin:0;clear:left}
+  .mp dt.flush {float:left;width:8ex}
+  .mp dd {margin:0 0 0 9ex}
+  .mp h1,.mp h2,.mp h3,.mp h4 {clear:left}
+  .mp pre {margin-bottom:20px}
+  .mp pre+h2,.mp pre+h3 {margin-top:22px}
+  .mp h2+pre,.mp h3+pre {margin-top:5px}
+  .mp img {display:block;margin:auto}
+  .mp h1.man-title {display:none}
+  .mp,.mp code,.mp pre,.mp tt,.mp kbd,.mp samp,.mp h3,.mp h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
+  .mp h2 {font-size:16px;line-height:1.25}
+  .mp h1 {font-size:20px;line-height:2}
+  .mp {text-align:justify;background:#fff}
+  .mp,.mp code,.mp pre,.mp pre code,.mp tt,.mp kbd,.mp samp {color:#131211}
+  .mp h1,.mp h2,.mp h3,.mp h4 {color:#030201}
+  .mp u {text-decoration:underline}
+  .mp code,.mp strong,.mp b {font-weight:bold;color:#131211}
+  .mp em,.mp var {font-style:italic;color:#232221;text-decoration:none}
+  .mp a,.mp a:link,.mp a:hover,.mp a code,.mp a pre,.mp a tt,.mp a kbd,.mp a samp {color:#0000ff}
+  .mp b.man-ref {font-weight:normal;color:#434241}
+  .mp pre {padding:0 4ex}
+  .mp pre code {font-weight:normal;color:#434241}
+  .mp h2+pre,h3+pre {padding-left:0}
+  ol.man-decor,ol.man-decor li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
+  ol.man-decor {width:100%}
+  ol.man-decor li.tl {text-align:left}
+  ol.man-decor li.tc {text-align:center;letter-spacing:4px}
+  ol.man-decor li.tr {text-align:right;float:right}
+  </style>
+</head>
+<!--
+  The following styles are deprecated and will be removed at some point:
+  div#man, div#man ol.man, div#man ol.head, div#man ol.man.
+
+  The .man-page, .man-decor, .man-head, .man-foot, .man-title, and
+  .man-navigation should be used instead.
+-->
+<body id='manpage'>
+  <div class='mp' id='man'>
+
+  <div class='man-navigation' style='display:none'>
+    <a href="#NAME">NAME</a>
+    <a href="#SYNOPSIS">SYNOPSIS</a>
+    <a href="#DESCRIPTION">DESCRIPTION</a>
+    <a href="#OPTIONS">OPTIONS</a>
+    <a href="#EXAMPLES">EXAMPLES</a>
+    <a href="#ENVIRONMENT">ENVIRONMENT</a>
+    <a href="#FILES">FILES</a>
+    <a href="#AUTHOR">AUTHOR</a>
+    <a href="#REFERENCES">REFERENCES</a>
+    <a href="#KNOWN-ISSUES">KNOWN ISSUES</a>
+  </div>
+
+  <ol class='man-decor man-head man head'>
+    <li class='tl'>ccplot(1)</li>
+    <li class='tc'></li>
+    <li class='tr'>ccplot(1)</li>
+  </ol>
+
+  <h2 id="NAME">NAME</h2>
+<p class="man-name">
+  <code>ccplot</code> - <span class="man-whatis">CloudSat and CALIPSO plotting tool</span>
+</p>
+
+<h2 id="SYNOPSIS">SYNOPSIS</h2>
+
+<p><code>ccplot</code> [<code>-v</code>] [<code>-a</code> <var>ratio</var>] [<code>-c</code> <var>file</var>] [<code>-d</code> <var>dpi</var>] [<code>-m</code> <var>band</var>] [<code>-o</code> <var>file</var>] [<code>-p</code> <var>proj</var>[:<var>projopts</var>]] [<code>-r</code> <var>radius</var>] [<code>-x</code> <var>extent</var>] [<code>-y</code> <var>extent</var>] [<code>-z</code> <var>options</var>] <var>type</var> <var>file</var>...<br />
+<code>ccplot</code> <code>-i</code> <var>file</var><br />
+<code>ccplot</code> <code>-h</code><br />
+<code>ccplot</code> <code>-V</code></p>
+
+<h2 id="DESCRIPTION">DESCRIPTION</h2>
+
+<p>ccplot is a command-line program for producing plots from CloudSat, CALIPSO
+and MODIS product files.</p>
+
+<p>The program reads data from <var>file</var>, and produces an image file. Dataset
+to be plotted is determined by <var>type</var>:</p>
+
+<dl>
+<dt><code>cloudsat-reflec</code></dt><dd><p>CloudSat Reflectivity Factor</p></dd>
+<dt><code>calipso532</code></dt><dd><p>CALIPSO L1B Total Attenuated Backscatter 532nm</p></dd>
+<dt><code>calipso532p</code></dt><dd><p>CALIPSO L1B Perpendicular Attenuated Backscatter 532nm</p></dd>
+<dt><code>calipso1064</code></dt><dd><p>CALIPSO L1B Attenuated Backscatter 1064nm</p></dd>
+<dt><code>calipso-cratio</code></dt><dd><p>CALIPSO L1B Attenuated Color Ratio 1064nm/532nm</p></dd>
+<dt><code>calipso-dratio</code></dt><dd><p>CALIPSO L1B Depolarization Ratio</p></dd>
+<dt><code>calipso532-layer</code></dt><dd><p>CALIPSO L2 Integrated Attenuated Backscatter 532nm</p></dd>
+<dt><code>calipso1064-layer</code></dt><dd><p>CALIPSO L2 Integrated Attenuated Backscatter 1064nm</p></dd>
+<dt><code>calipso-cratio-layer</code></dt><dd><p>CALIPSO L2 Integrated Attenuated Total Color Ratio 1064nm/532nm</p></dd>
+<dt><code>calipso-dratio-layer</code></dt><dd><p>CALIPSO L2 Integrated Volume Depolarization Ratio</p></dd>
+<dt><code>calipso-temperature-layer</code></dt><dd><p>CALIPSO L2 Midlayer Temperature</p></dd>
+<dt class="flush"><code>orbit</code></dt><dd><p>Map of the globe showing CALIPSO or CloudSat trajectory,
+optionally superimposed on MODIS swath
+(if a MODIS HDF product is supplied as the first file).</p></dd>
+<dt><code>orbit-clipped</code></dt><dd><p>The same as <code>orbit</code>, but clipped to the area where MODIS data
+is available.</p></dd>
+</dl>
+
+
+<h2 id="OPTIONS">OPTIONS</h2>
+
+<dl>
+<dt><code>-a</code> <var>ratio</var></dt><dd><p>Aspect ratio of profile and layer products in km horizontal per km
+vertical. Default: <em>14.0</em>.</p></dd>
+<dt class="flush"><code>-c</code> <var>file</var></dt><dd><p>Colormap definition file (<em>.cmap</em>).
+Apart from an absolute path, paths relative to <code>CCPLOT_CMAP_PATH</code>
+environment variable are also recognized, and take precedence over
+paths relative to the current working directory.
+See Chapter 6 of Kuma (2010) for more information about the format
+of cmap files.</p></dd>
+<dt class="flush"><code>-d</code> <var>dpi</var></dt><dd><p>DPI (Dots Per Inch) of the output image file.</p></dd>
+<dt class="flush"><code>-m</code> <var>band</var></dt><dd><p>MODIS band specifier in the format <code>r</code><var>number</var> for reflective bands,
+and <code>x</code><var>number</var> for radiation bands, where <var>number</var> is band number.</p></dd>
+<dt class="flush"><code>-o</code> <var>file</var></dt><dd><p>Output image file. Format is determined by extension: SVG (<em>.svg</em>),
+PNG (<em>.png</em>), PDF (<em>.pdf</em>), EPS (<em>.eps</em>) and PS (<em>.ps</em>).
+Default: <em>ccplot.png</em>.</p></dd>
+<dt><code>-p</code> <var>proj</var>[:<var>projopts</var>]</dt><dd><p>Projection and projection options. Applies to <code>orbit</code> and <code>orbit-clipped</code>
+plots.</p>
+
+<p><code>-p help</code> prints a list of available projections.</p>
+
+<p><var>projopts</var> are projection-specific options, specified as a comma-seperated
+list of <var>key</var><code>=</code><var>value</var> pairs:</p>
+
+<dl>
+<dt><code>boundinglat</code>=<var>latitude</var></dt><dd><p>Bounding latitude (polar projections).</p></dd>
+<dt><code>lat_0</code>=<var>latitude</var></dt><dd><p>Central latitude.</p></dd>
+<dt><code>lat_1</code>=<var>latitude</var></dt><dd><p>First standard parallel.</p></dd>
+<dt><code>lat_2</code>=<var>latitude</var></dt><dd><p>Second standard parallel.</p></dd>
+<dt><code>lat_ts</code>=<var>latitude</var></dt><dd><p>Latitude of true scale.</p></dd>
+<dt><code>lon_1</code>=<var>longitude</var></dt><dd><p>Longitude of one of the two points on the projection centerline
+(oblique mercator).</p></dd>
+<dt><code>lon_2</code>=<var>longitude</var></dt><dd><p>Longitude of one of the two points on the projection centerline
+(oblique mercator).</p></dd>
+</dl>
+
+
+<p><var>longitude</var> is in the format <var>number</var><code>E</code>|<code>W</code> (East or West).
+<var>latitude</var> is in the format <var>number</var><code>S</code>|<code>N</code> (South or North).
+<var>number</var> is a positive decimal number in degrees.</p></dd>
+<dt><code>-r</code> <var>radius</var></dt><dd><p>Interpolation radius in pixels. In profile products radius specifies
+vertical extent which a data point is mapped onto. If such vertical
+regions of two data points overlap value is determined by averaging
+with a weight coefficient of 1 over distance squared.
+The same holds for swath products, but here radius specifies a square.
+If radius is chosen too small relative to <var>dpi</var>, data will be plotted
+sparsely on the image.</p>
+
+<p>Defaults to <em>3</em> for swath plots. For profile products a sensible
+value is chosen automatically depending on resolution.</p></dd>
+<dt class="flush"><code>-v</code></dt><dd><p>Verbose mode.</p></dd>
+<dt class="flush"><code>-V</code></dt><dd><p>Print version information and exit.</p></dd>
+<dt><code>-x</code> <var>extent</var></dt><dd><p>Horizontal extent to be plotted. <var>extent</var> can be specified in a number of
+formats depending on the plot <var>type</var>.</p>
+
+<p>For profile and layer products <var>extent</var> can be one of:</p>
+
+<dl>
+<dt class="flush"><var>x1</var>..<var>x2</var></dt><dd><p>Plot data between ray <var>x1</var> and <var>x2</var>.</p></dd>
+<dt><var>hour1</var>:<var>min1</var>[:<var>sec1</var>]..<var>hour2</var>:<var>min2</var>[:<var>sec2</var>]</dt><dd><p>Plot data in time interval (UTC).</p></dd>
+<dt>+|-[<var>hour</var>:]<var>min</var>:<var>sec</var>..+|-[<var>hour</var>:]<var>min</var>:<var>sec</var></dt><dd><p>Plot data in time interval relative to the beginning (+) or end (-)
+of the granule.</p></dd>
+</dl>
+
+
+<p>For swath products <var>extent</var> can be one of:</p>
+
+<dl>
+<dt><var>x1</var>..<var>x2</var>,<var>y1</var>..<var>y2</var></dt><dd><p>Plot data between scanlines <var>x1</var> and <var>x2</var> (along-track),
+and samples <var>y1</var> and <var>y2</var> (across-track).</p></dd>
+<dt><var>lon1</var>..<var>lon2</var>,<var>lat1</var>..<var>lat2</var></dt><dd><p>Plot data inside geographical region between latitude <var>lat1</var> and <var>lat2</var>
+and longitude <var>lon1</var> and <var>lon2</var>.</p>
+
+<p>Longitude is in the format <var>number</var><code>E</code>|<code>W</code> (East or West).
+Latitude is in the format <var>number</var><code>S</code>|<code>N</code> (South or North).
+<var>number</var> is a positive decimal number in degrees.</p></dd>
+</dl>
+</dd>
+<dt><code>-y</code> <var>extent</var></dt><dd><p>Vertical extent of profile plots in the format <var>y1</var>..<var>y2</var>,
+where <var>y1</var> and <var>y2</var> are the lower and upper boundary (resp.) in meters above
+sea level.</p></dd>
+<dt><code>-z</code> <var>options</var></dt><dd><p>Miscellaneous formatting options. <var>options</var> is a comma-separated list of
+<var>key</var><code>=</code><var>value</var> pairs.
+Some options accept a list of values seperated by colon in the format
+<var>key</var>=<var>value1</var>:<var>value2</var>[:<var>value</var>]... .</p>
+
+<p><code>-z help</code> prints a list of all options.</p>
+
+<p>Available common options:</p>
+
+<dl>
+<dt><code>cbfontsize</code></dt><dd><p> Color bar font size. Default: <em>8</em>.</p></dd>
+<dt><code>cbspacing</code></dt><dd><p>Spacing between axes and color bar. Default: <em>0.4</em>.</p></dd>
+<dt><code>drawelev</code></dt><dd><p>Draw surface elevation line (CALIPSO). Default: <em>1</em>.</p></dd>
+<dt class="flush"><code>elevlw</code></dt><dd><p>Surface elevation line width. Default: <em>0.5</em>.</p></dd>
+<dt><code>elevcolor</code></dt><dd><p>Surface elevation line color. Default: <em>#FF0000</em>.</p></dd>
+<dt><code>fontsize</code></dt><dd><p>Font size. Default: <em>10</em>.</p></dd>
+<dt class="flush"><code>padding</code></dt><dd><p>Padding around axes and color bar in inches. Default: <em>1</em>.</p></dd>
+<dt><code>plotheight</code></dt><dd><p>Plot height in inches. Default: <em>6</em>.</p></dd>
+<dt class="flush"><code>title</code></dt><dd><p>Figure title. Default: automatic.</p></dd>
+</dl>
+
+
+<p>Orbit plots support additional options:</p>
+
+<dl>
+<dt><code>coastlinescolor</code></dt><dd><p>Coastlines color. Default: <em>#46396D</em>.</p></dd>
+<dt><code>coastlineslw</code></dt><dd><p>Coastlines line width. Default: <em>0.4</em>.</p></dd>
+<dt><code>countriescolor</code></dt><dd><p>Countries outlines color. Default: <em>#46396D</em>.</p></dd>
+<dt><code>countrieslw</code></dt><dd><p>Countries outlines line width. Default: <em>0.2</em>.</p></dd>
+<dt><code>drawcoastlines</code></dt><dd><p>Draw coastlines. Default: <em>1</em>.</p></dd>
+<dt><code>drawcountries</code></dt><dd><p>Draw countries outlines. Default: <em>1</em>.</p></dd>
+<dt><code>drawlakes</code></dt><dd><p>Draw lakes. Default: <em>1</em>.</p></dd>
+<dt><code>drawlsmask</code></dt><dd><p>Draw land-sea mask. Default: <em>1</em>.</p></dd>
+<dt><code>drawmeridians</code></dt><dd><p>Draw meridians. Default: <em>1</em>.</p></dd>
+<dt><code>drawminormeridians</code></dt><dd><p>Draw meridians. Default: <em>1</em>.</p></dd>
+<dt><code>drawminorparallels</code></dt><dd><p>Draw minor parallels. Default: <em>1</em>.</p></dd>
+<dt><code>drawparallels</code></dt><dd><p>Draw parallels. Default: <em>1</em>.</p></dd>
+<dt><code>landcolor</code></dt><dd><p>Land color. Default: <em>#E9E4F7</em>.</p></dd>
+<dt><code>majormeridianscolor</code></dt><dd><p>Major meridians color. Default: <em>#000000</em>.</p></dd>
+<dt><code>majormeridianslw</code></dt><dd><p>Major meridians line width. Default: <em>0.3</em>.</p></dd>
+<dt><code>majorparallelscolor</code></dt><dd><p>Major parallels line color. Default: <em>#000000</em>.</p></dd>
+<dt><code>majorparallelslw</code></dt><dd><p>Major parallels line width. Default: <em>0.3</em>.</p></dd>
+<dt class="flush"><code>mapres</code></dt><dd><p>Map resolution: c (crude), l (low), i (intermediate), h (high), f (full). Default: <em>i</em>.</p></dd>
+<dt><code>meridiansbase</code></dt><dd><p> Meridians base, or 0 for automatic. Default: <em>0</em>.</p></dd>
+<dt><code>minormeridianscolor</code></dt><dd><p>Minor meridians color. Default: <em>#000000</em>.</p></dd>
+<dt><code>minormeridianslw</code></dt><dd><p>Minor meridians line width. Default: <em>0.1</em>.</p></dd>
+<dt><code>minorparallelscolor</code></dt><dd><p>Minor parallels color. Default: <em>#000000</em>.</p></dd>
+<dt><code>minorparallelslw</code></dt><dd><p>Minor parallels line width. Default: <em>0.1</em>.</p></dd>
+<dt><code>nminormeridians</code></dt><dd><p>Number of minor meridians between two major maridians, or 0 for
+automatic. Default: <em>0</em>.</p></dd>
+<dt><code>nminorparallels</code></dt><dd><p>Number of minor parallels between two major parallels, or 0 for
+automatic. Default: <em>0</em>.</p></dd>
+<dt><code>parallelsbase</code></dt><dd><p>Parallels base, or 0 for automatic. Default: <em>0</em>.</p></dd>
+<dt><code>trajcolors</code></dt><dd><p>List of trajectory colors. Default: <em>#FF0000:#0000FF:#00FF00</em>.</p></dd>
+<dt class="flush"><code>trajlws</code></dt><dd><p>List of trajectory line widths. Default: <em>0.5</em>.</p></dd>
+<dt><code>trajnminortics</code></dt><dd><p>Number of minor ticks between adjecent major ticks, or -1 for
+automatic selection. Default: <em>-1</em>.</p></dd>
+<dt><code>trajticks</code></dt><dd><p>Base for trajectory major ticks in seconds, or -1 for automatic
+selection. Default: <em>-1</em>.</p></dd>
+<dt><code>watercolor</code></dt><dd><p>Water color. Default: <em>#FFFFFF</em>.</p></dd>
+</dl>
+</dd>
+</dl>
+
+
+<h2 id="EXAMPLES">EXAMPLES</h2>
+
+<ul>
+<li><p>Plot the first 1000 rays of CloudSat Reflectivity Factor with
+colormap <em>cloudsat-reflec.cmap</em> into <em>cloudsat-reflec.png</em>:</p>
+
+<pre><code>ccplot -x 0..1000 -c cloudsat-reflectivity.cmap -o cloudsat-reflec.png cloudsat-reflec 2006224184641_01550_CS_2B-GEOPROF_GRANULE_P_R03_E01.hdf
+</code></pre></li>
+<li><p>Plot the first minute of CALIPSO Total Attenuated Backscatter 532nm
+between altitude 0 and 20 km with colormap <em>calipso-backscatter.cmap</em>
+into <em>calipso532.png</em>:</p>
+
+<pre><code>ccplot -y 0..20000 -x +0:00..+1:00 -c calipso-backscatter.cmap -o calipso532.png calipso532 CAL_LID_L1-Prov-V2-01.2006-07-06T19-50-51ZN.hdf
+</code></pre></li>
+<li><p>Plot CALIPSO trajectory superimposed on Aqua MODIS
+band 31 radiance with colormap <em>modis-temperature.cmap</em> into
+<em>orbit-calipso.png</em>:</p>
+
+<pre><code>ccplot -m x31 -c modis-temperature.cmap -p tmerc -o orbit-calipso.png orbit-clipped MYD021KM.A2006224.1945.005.2007140113559.hdf CAL_LID_L1-Prov-V2-01.2006-07-06T19-50-51ZN.hdf
+</code></pre></li>
+</ul>
+
+
+<h2 id="ENVIRONMENT">ENVIRONMENT</h2>
+
+<dl>
+<dt><code>CCPLOT_CMAP_PATH</code></dt><dd>Colon-separated list of search paths of colormap files.</dd>
+</dl>
+
+
+<h2 id="FILES">FILES</h2>
+
+<dl>
+<dt><code>/usr/share/ccplot/cmap/*</code></dt><dd>Stock colormap files.</dd>
+</dl>
+
+
+<h2 id="AUTHOR">AUTHOR</h2>
+
+<p><code>ccplot</code> was written by Peter Kuma.</p>
+
+<h2 id="REFERENCES">REFERENCES</h2>
+
+<ul>
+<li>Kuma, P. (2010). Visualising Data from CloudSat and CALIPSO Satellites.
+Bachelor's thesis, Comenius University.</li>
+<li>CloudSat Standard Data Products Handbook</li>
+<li>CALIPSO Data Products Catalog Release 2.4</li>
+<li>MODIS Level 1B Product User's Guide</li>
+</ul>
+
+
+<h2 id="KNOWN-ISSUES">KNOWN ISSUES</h2>
+
+<ul>
+<li>Plot size is limited to 32767 pixels.</li>
+</ul>
+
+
+
+  <ol class='man-decor man-foot man foot'>
+    <li class='tl'></li>
+    <li class='tc'>November 2013</li>
+    <li class='tr'>ccplot(1)</li>
+  </ol>
+
+  </div>
+</body>
+</html>
