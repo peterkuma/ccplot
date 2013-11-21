@@ -32,7 +32,7 @@ cdef extern from "hdf.h":
     cdef enum:
         FAIL = -1
         DFACC_READ = 1
-        MAX_VAR_DIMS = 32
+        H4_MAX_VAR_DIMS = 32
         FIELDNAMELENMAX = 128
         DFACC_RDONLY = 1
     
@@ -221,11 +221,11 @@ class HDFEOS(DictMixin):
         cdef np.ndarray[int32, ndim=1] offset
         cdef np.ndarray[int32, ndim=1] increment
 
-        offset = np.zeros(MAX_VAR_DIMS, dtype=np.int32)
-        increment = np.zeros(MAX_VAR_DIMS, dtype=np.int32)
+        offset = np.zeros(H4_MAX_VAR_DIMS, dtype=np.int32)
+        increment = np.zeros(H4_MAX_VAR_DIMS, dtype=np.int32)
 
         cdef np.ndarray[char, ndim=1] tmp
-        tmp = np.zeros(FIELDNAMELENMAX*(MAX_VAR_DIMS+2)*2, dtype=np.byte)
+        tmp = np.zeros(FIELDNAMELENMAX*(H4_MAX_VAR_DIMS+2)*2, dtype=np.byte)
 
         with SW(self, swath) as sw:
             res = SWinqmaps(sw, <char *>tmp.data, <int32 *>offset.data, <int32 *> increment.data)
@@ -236,7 +236,7 @@ class HDFEOS(DictMixin):
         maps = {}
         for dm in dimmap.split(','):
             pair = dm.split('/')
-            if len(pair) != 2 or not n < MAX_VAR_DIMS: continue
+            if len(pair) != 2 or not n < H4_MAX_VAR_DIMS: continue
             geofield, datafield = pair
             maps[(geofield, datafield)] = (offset[n], increment[n])
             n = n + 1
@@ -275,8 +275,8 @@ class HDFEOS(DictMixin):
         cdef np.ndarray[int32, ndim=1] dims
         cdef np.ndarray[char, ndim=1] tmp
 
-        dims = np.zeros(MAX_VAR_DIMS, dtype=np.int32)
-        tmp = np.zeros(FIELDNAMELENMAX*(MAX_VAR_DIMS+2)*2, dtype=np.byte)
+        dims = np.zeros(H4_MAX_VAR_DIMS, dtype=np.int32)
+        tmp = np.zeros(FIELDNAMELENMAX*(H4_MAX_VAR_DIMS+2)*2, dtype=np.byte)
 
         with SW(self, swath) as sw:
             res = SWfieldinfo(sw, name, &rank, <int32 *>dims.data, &data_type, <char *>tmp.data)

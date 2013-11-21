@@ -28,7 +28,7 @@ cdef extern from "mfhdf.h":
     cdef enum:
         FAIL = -1
         DFACC_READ = 1
-        MAX_VAR_DIMS = 32
+        H4_MAX_VAR_DIMS = 32
         FIELDNAMELENMAX = 128
         VSNAMELENMAX = 64
         FULL_INTERLACE = 0
@@ -239,7 +239,7 @@ class HDF(DictMixin):
         cdef np.ndarray[int32, ndim=1] dims
         cdef np.ndarray[char, ndim=1] tmp
 
-        dims = np.zeros(MAX_VAR_DIMS, dtype=np.int32)
+        dims = np.zeros(H4_MAX_VAR_DIMS, dtype=np.int32)
 
         res = SDfileinfo(self.sd, &num_datasets, &num_global_attrs)
         if res == FAIL: self._error('HDF: SDfileinfo failed')
@@ -317,7 +317,7 @@ class HDF(DictMixin):
     def _getinfo(self, name):
         cdef int32 rank, data_type, num_attrs
         cdef np.ndarray[int32, ndim=1] dims
-        dims = np.zeros(MAX_VAR_DIMS, dtype=np.int32)
+        dims = np.zeros(H4_MAX_VAR_DIMS, dtype=np.int32)
         with SDS(self, name) as sds:
             res = SDgetinfo(sds, NULL, &rank, <int32 *>dims.data, &data_type, &num_attrs)
         if res == FAIL: self._error('HDF: SDgetinfo on dataset "%s" failed' % name)
