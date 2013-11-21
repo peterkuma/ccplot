@@ -96,6 +96,27 @@ document.getElementById('hidearchived').onclick = function() {
 };
 </script>
 
+<h2>Requirements</h2>
+<p>
+    ccplot works on unix-like operating systems and Windows.
+    It has been tested on Debian GNU/Linux, Ubuntu, Windows Vista and
+    Windows 8.1. For the best experience, it is recommended to install
+    ccplot on Linux.
+</p>
+<p>
+    The following programs and libraries are required:
+</p>
+<ul>
+    <li><a href="http://www.python.org/">Python</a> &gt;= 2.5 and &lt; 3.0, including development files</li>
+    <li><a href="http://www.numpy.org/">numpy</a> &gt;= 1.1</li>
+    <li><a href="http://matplotlib.org/">matplotlib</a> &gt;= 0.98.1</li>
+    <li><a href="http://matplotlib.org/basemap/">basemap</a> &gt;= 0.99.4 and the GEOS library (shipped with basemap)</li>
+    <li><strong>ccplot &lt; 1.5:</strong> <a href="http://www.pyngl.ucar.edu/Nio.shtml">PyNIO</a> &gt;= 1.3.0b1</li>
+    <li><strong>ccplot &gt;= 1.5:</strong> <a href="http://cython.org/">cython</a></li>
+    <li><strong>ccplot &gt;= 1.5:</strong> <a href="http://www.hdfgroup.org/products/hdf4/">libhdf4</a></li>
+    <li><strong>ccplot &gt;= 1.5:</strong> <a href="http://hdfeos.org/software/library.php#HDF-EOS2">libhdfeos2</a></li>
+</ul>
+
 <h2>Windows</h2>
 <p>
     The recommended way of installing ccplot on Windows is to use the
@@ -112,24 +133,10 @@ document.getElementById('hidearchived').onclick = function() {
     ccplot -V
 </div>
 
-<h2>Linux / Unix</h2>
-ccplot works best on Linux. Make sure you have the
-following programs and libraries installed:
-
-<ul>
-    <li><a href="http://www.python.org/">Python</a> &gt;= 2.5 and &lt; 3.0, including development files</li>
-    <li><a href="http://www.numpy.org/">numpy</a> &gt;= 1.1</li>
-    <li><a href="http://matplotlib.org/">matplotlib</a> &gt;= 0.98.1</li>
-    <li><a href="http://matplotlib.org/basemap/">basemap</a> &gt;= 0.99.4 and the GEOS library (shipped with basemap)</li>
-    <li><strong>ccplot &lt; 1.5:</strong> <a href="http://www.pyngl.ucar.edu/Nio.shtml">PyNIO</a> &gt;= 1.3.0b1</li>
-    <li><strong>ccplot &gt;= 1.5:</strong> <a href="http://cython.org/">cython</a></li>
-    <li><strong>ccplot &gt;= 1.5:</strong> <a href="http://www.hdfgroup.org/products/hdf4/">libhdf4</a></li>
-    <li><strong>ccplot &gt;= 1.5:</strong> <a href="http://hdfeos.org/software/library.php#HDF-EOS2">libhdfeos2</a></li>
-</ul>
-
-<h3>Debian/Ubuntu</h3>
+<h2>Unix-like Operating Systems</h2>
 <p>
-    On Debian and Ubuntu, install dependencies with:
+    Make sure you have all dependencies installed. On Debian and Ubuntu,
+    install dependencies with:
 </p>
 <div class="code">
     # ccplot &lt; 1.5<br />
