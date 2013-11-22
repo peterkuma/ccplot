@@ -22,7 +22,7 @@ else:
     scripts = ['bin/ccplot']
     hdf_libraries = ['mfhdf', 'df', 'jpeg', 'z']
     hdf_include_dirs = ['/usr/include/hdf', '/usr/local/include/hdf', '/opt/local/include']
-    hdf_library_dirs = []
+    hdf_library_dirs = ['/opt/local/lib']
     hdfeos_libraries = ['hdfeos']
     hdfeos_include_dirs = []
     hdfeos_library_dirs = []
