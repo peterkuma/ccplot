@@ -27,6 +27,9 @@ else:
     hdfeos_include_dirs = []
     hdfeos_library_dirs = []
 
+if sys.platform == 'darwin':
+    hdfeos_libraries += ['Gctp']
+
 
 setup(
     name='ccplot',
