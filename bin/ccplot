@@ -52,6 +52,7 @@ mpl.use("agg")
 import matplotlib.pyplot as plt
 from mpl_toolkits import basemap
 
+import ccplot.config
 from ccplot.hdf import HDF
 from ccplot.hdfeos import HDFEOS
 
@@ -61,10 +62,8 @@ from ccplot import cctk
 # Early global variables.
 program_name = os.path.basename(sys.argv[0])
 __version__ = "1.5-rc7"
-CCPLOT_CMAP_PATH = os.path.join(
-    os.path.dirname(os.path.dirname(__file__)), 'share', 'ccplot', 'cmap'
-)
-CCPLOT_CMAP_PATH += ":/usr/share/ccplot/cmap:/usr/local/share/ccplot/cmap"
+CCPLOT_CMAP_PATH = os.path.join(ccplot.config.sharepath, 'cmap') \
+                 + ":/usr/share/ccplot/cmap:/usr/local/share/ccplot/cmap"
 
 # Early functions.
 def fail(s):
