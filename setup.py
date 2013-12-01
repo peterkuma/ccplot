@@ -36,30 +36,34 @@ setup(
     version='1.5-rc7',
     description='CloudSat and CALIPSO plotting tool',
     long_description="""
-    ccplot is a command-line application that reads CloudSat, CALISO
-    and Aqua MODIS HDF files, and produces plots of profile, layer and swath
-    products.
+    ccplot is an open source command-line program for plotting profile, layer
+    and earth view data sets from CloudSat, CALIPSO and Aqua MODIS products. 
     """,
     platforms='any',
     author='Peter Kuma',
     author_email='peter.kuma@ccplot.org',
     url='http://www.ccplot.org/',
     classifiers=[
-        "Programming Language :: Python",
-        "License :: OSI Approved :: BSD License",
-        "Operating System :: POSIX",
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
         "Intended Audience :: Science/Research",
-        "Topic :: Scientific/Engineering :: Atmospheric Science",
+        "License :: OSI Approved :: BSD License",
         "Natural Language :: English",
+        "Operating System :: MacOS :: MacOS X",
+        "Operating System :: Microsoft :: Windows",
+        "Operating System :: POSIX",
+        "Programming Language :: C",
+        "Programming Language :: Cython",
+        "Programming Language :: Python :: 2 :: Only",
+        "Topic :: Scientific/Engineering :: Atmospheric Science",
+        "Topic :: Scientific/Engineering :: Visualization",
     ],
     scripts=scripts,
     packages=[
         'ccplot',
     ],
     requires=[
-        'cython',
+        'Cython',
         'numpy',
         'scipy',
         'matplotlib',
