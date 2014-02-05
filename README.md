@@ -44,3 +44,12 @@ License
 
 This program can be freely distributed and modified under the terms
 of the 2-clause BSD license. You can find the full text in the file LICENSE.
+
+Thanks
+------
+
+A number of people helped to make ccplot better for others.
+Special thanks goes to:
+
+  * Ryan Scott for helping to port ccplot to Mac OS X.
+  * Yin and to Subok Kim for reporting bugs.
