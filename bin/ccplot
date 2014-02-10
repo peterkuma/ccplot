@@ -1923,7 +1923,8 @@ def plot_trajectory(fig, axes, m, lon, lat, time, time2dt,
                       text,
                       horizontalalignment=halign,
                       verticalalignment=valign,
-                      transform=trans)
+                      transform=trans,
+                      clip_on=True)
     
     nray = time.shape[0]
     time_from = time2dt(time[0])
