@@ -1400,6 +1400,8 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
             nlayer = product["Number_Layers_Found"]
         except KeyError as e:
             fail("Field \"%s\" not found" % e.args)
+        topalt = np.ma.masked_equal(topalt[::], -9999)
+        basealt = np.ma.masked_equal(basealt[::], -9999)
         try:
             valid_range = nlayer.attributes["valid_range"]
             try:
@@ -1472,6 +1474,8 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
     e4 = -1
     if e1 >= e2: fail("Invalid extent")
 
+    ve1, ve2 = vextent
+
     # Subsetting by extent.
     try:
         if what in ("calipso-cratio", "calipso-dratio"):
@@ -1493,16 +1497,29 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
             nlayer = nlayer[e1:e2, 0]
             basealt = basealt[e1:e2, :]
             topalt = topalt[e1:e2, :]
+            if not np.isfinite(ve1):
+                ve1 = np.min(basealt)*1000
+            if not np.isfinite(ve2):
+                ve2 = np.max(topalt)*1000
         else:
             if len(height.shape) == 2:
                 height = height[e1:e2, e3:e4]
             else:
                 height = height[e3:e4]
+            if not np.isfinite(ve1):
+                ve1 = np.min(height)
+            if not np.isfinite(ve2):
+                ve2 = np.max(height)
+
+        # Fall back to default values.
+        if not np.isfinite(ve1):
+            ve1 = 0
+        if not np.isfinite(ve2):
+            ve2 = 20000
 
     except IndexError:
         fail("Invalid extent")
 
-    ve1, ve2 = vextent
     if ve1 >= ve2: fail("Invalid vertical extent")
     if norm == None: norm = mpl.colors.Normalize(data.min(), data.max())
 
