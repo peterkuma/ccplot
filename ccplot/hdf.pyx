@@ -269,7 +269,7 @@ class HDF(DictMixin):
                 res = VSgetclass(id, tmp)
                 if res == FAIL: self._error('HDF: VSgetclass failed')
                 vdata_class = tmp
-                if vdata_class == '':
+                if len(vdata_class) == 0:
                     out.append(name)
             finally:
                 res = VSdetach(id)
