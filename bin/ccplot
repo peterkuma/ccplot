@@ -1554,7 +1554,7 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
                      interpolation="nearest", cmap=colormap, norm=norm)
     axes.set_aspect("auto")
 
-    if elevation != None and opts.drawelev:
+    if elevation is not None and opts.drawelev:
         line = mpl.lines.Line2D(np.arange(0, e2-e1), elevation,
                                 color=opts.elevcolor, lw=opts.elevlw)
         axes.add_line(line)
