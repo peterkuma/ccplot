@@ -19,6 +19,14 @@ Download
                 </td>
             </tr>
             <tr>
+                <td>21 March 2015</td>
+                <td>
+                    <a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.win32-py2.7.exe">ccplot 1.5.win32-py2.7</a>
+                </td>
+            </tr>
+        </tbody>
+        <tbody id="archive" style="display: none">
+            <tr>
                 <td>1 December 2013</td>
                 <td>
                     <a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5-rc8.tar.gz">ccplot 1.5-rc8</a>
@@ -34,8 +42,6 @@ Download
                 <td>16 June 2013</td>
                 <td><a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.4.7.tar.gz">ccplot 1.4.7</a></td>
             </tr>
-        </tbody>
-        <tbody id="archive" style="display: none">
             <tr>
                 <td>4 June 2013</td>
                 <td><a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.4.6.tar.gz">ccplot 1.4.6</a></td>
