@@ -3,7 +3,7 @@
 # ccplot
 # This file is a part of ccplot: CloudSat and CALIPSO plotting tool.
 #
-# Copyright (c) 2009-2013 Peter Kuma
+# Copyright (c) 2009-2015 Peter Kuma
 #
 # This software is provided under the terms of a 2-clause BSD licence:
 #
@@ -555,7 +555,7 @@ Third-party libraries:
 matplotlib {mpl_version}
 basemap {basemap_version}
 
-Copyright 2009-2013 Peter Kuma.
+Copyright (c) 2009-2015 Peter Kuma.
 This software is provided under the terms of a 2-clause BSD licence.\
 """.format(
         version=__version__,
