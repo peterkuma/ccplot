@@ -1,5 +1,20 @@
 CCPLOT NEWS
 
+New in 1.5 (2015-03-21):
+
+   * Added support for arbitrary dataset plotting (experimental).
+   * Added ccplot API functions (experimental).
+   * Removed dependency on PyNIO. ccplot now uses its own HDF reading module,
+     interfacing with libhdf4 and libhdfeos.
+   * Support for Windows.
+   * Support for Mac OS X.
+   * CALIPSO LIDAR altitudes are now read from the product file instead of being
+     hard-coded in ccplot.
+   * Automatic unit testing performed by Travis CI.
+   * ccplot now looks for colormaps in a directory relative to the executable.
+     This fixes installation in non-standard paths.
+   * New man page in ronn.
+
 New in 1.4.5 (2013-05-31):
 
     * Fix type cast bug with numpy 1.7
