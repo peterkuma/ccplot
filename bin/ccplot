@@ -59,6 +59,8 @@ from ccplot.hdfeos import HDFEOS
 # CCTK is a helper module that performs various calculations.
 from ccplot import cctk
 
+import ccplot.algorithms
+
 # Early global variables.
 program_name = os.path.basename(sys.argv[0])
 __version__ = "1.5"
@@ -1530,12 +1532,12 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
     if filetype == "calipso-layer":
         data = cctk.layermap(data, nlayer.astype(np.uint8), basealt, topalt,
                              (ve1*0.001, ve2*0.001, resolution), float("nan"))
-    else:                           # Profile products.
+    else:
+        # Profile products.
+        X = np.arange(e1, e2, dtype=np.float32)
         if height.ndim == 1:
-            Y, X = np.meshgrid(height, np.arange(0, e2-e1, dtype=np.float32))
+            Y = np.meshgrid(height, X)[0]
         else:
-            Y, X = np.meshgrid(height[0,:],
-                               np.arange(0, e2-e1, dtype=np.float32))
             Y = height
         if radius == None: radius = int(PROFILE_BINHEIGHT*resolution/(ve2-ve1))
 
@@ -1544,14 +1546,25 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
         X = X.astype(np.float32)
         Y = Y.astype(np.float32)
 
-        data = cctk.interpolate2d(data, X, Y, (0, e2-e1, e2-e1),
-                             (ve1, ve2, resolution), float("nan"), 0, radius)
+        # Deprecated interpolation algorithm.
+        # data = cctk.interpolate2d(data, X, Y,
+        #     (0, e2 - e1, e2 - e1),
+        #     (ve1, ve2, resolution),
+        #     float("nan"), 0, radius
+        # )
+
+        data = ccplot.algorithms.interp2d_12(data, X, Y,
+            e1, e2, e2 - e1,
+            ve2, ve1, resolution
+        )
 
     # Plot data.
     data = np.ma.masked_invalid(data)
-    im = axes.imshow(data.T, origin="lower",
+    im = axes.imshow(data.T,
                      extent=(0, e2-e1, ve1*0.001, ve2*0.001),
-                     interpolation="nearest", cmap=colormap, norm=norm)
+                     cmap=colormap,
+                     norm=norm
+    )
     axes.set_aspect("auto")
 
     if elevation is not None and opts.drawelev:
