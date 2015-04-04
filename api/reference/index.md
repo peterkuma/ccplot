@@ -164,7 +164,7 @@ X and Z on a regular grid given by (x1, x2, nx) and (z1, z2, nz).
 
 * `data(N, M)` is a 2D float32 array of data values.
 * `X(N)` is a 1D float32 array of x-coorinates of data points.
-* `Z(N, M)` is a 2D float32 arrays of z-coordinates of data points.
+* `Z(N, M)` is a 2D float32 array of z-coordinates of data points.
 * `(x1, x2, nx)` define start, end and spacing of the regular grid
   in the x-direction.
 * `(z1, x2, nz)` define start, end and spacing of the regular grid
