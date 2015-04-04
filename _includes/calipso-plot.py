@@ -34,7 +34,9 @@ if __name__ == '__main__':
         X = np.arange(x1, x2, dtype=np.float32)
         Z, null = np.meshgrid(height, X)
         data = interp2d_12(
-            dataset[::], X, Z,
+            dataset[::],
+            X.astype(np.float32),
+            Z.astype(np.float32),
             x1, x2, x2 - x1,
             h2, h1, nz,
         )
