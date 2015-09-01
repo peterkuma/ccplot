@@ -1530,8 +1530,13 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
     #
     resolution = int(get_axes_bounds(fig, axes)[3]*fig.get_dpi())
     if filetype == "calipso-layer":
-        data = cctk.layermap(data, nlayer.astype(np.uint8), basealt, topalt,
-                             (ve1*0.001, ve2*0.001, resolution), float("nan"))
+        data = cctk.layermap(
+            data,
+            nlayer.astype(np.uint8),
+            basealt, topalt,
+            (ve1*0.001, ve2*0.001, resolution),
+            float("nan")
+        )[:,::-1]
     else:
         # Profile products.
         X = np.arange(e1, e2, dtype=np.float32)
