@@ -1,5 +1,10 @@
 CCPLOT NEWS
 
+New in 1.5.1 (2015-09-01):
+
+   * Switched to interp2d_12 interpolation.
+   * Fixed compilation on new Ubuntu/Debian releases.
+
 New in 1.5 (2015-03-21):
 
    * Added support for arbitrary dataset plotting (experimental).
