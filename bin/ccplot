@@ -1568,7 +1568,8 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
     im = axes.imshow(data.T,
                      extent=(0, e2-e1, ve1*0.001, ve2*0.001),
                      cmap=colormap,
-                     norm=norm
+                     norm=norm,
+                     interpolation='nearest',
     )
     axes.set_aspect("auto")
 
