@@ -275,6 +275,14 @@ commercial products without restrictions.
 Known Issues
 ------------
 
+### 10 October 2015
+
+A bug in matplotlib 1.4.3 causes a warning to be printed:
+
+    matplotlib/collections.py:590: FutureWarning: elementwise comparison failed; returning scalar instead, but in the future will perform elementwise comparison
+
+It should be fixed in matplotlib 1.5.0.
+
 ### 4 June 2013
 
 There is a bug with python-dap which causes a warning to be printed:
