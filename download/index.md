@@ -281,7 +281,7 @@ A bug in matplotlib 1.4.3 causes a warning to be printed:
 
     matplotlib/collections.py:590: FutureWarning: elementwise comparison failed; returning scalar instead, but in the future will perform elementwise comparison
 
-It should be fixed in matplotlib 1.5.0.
+It should be fixed in matplotlib 1.5.0 (issue [#5209](https://github.com/matplotlib/matplotlib/issues/5209)).
 
 ### 4 June 2013
 
