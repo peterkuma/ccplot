@@ -193,26 +193,18 @@ Mac OS X
 
 2. Install [MacPorts](https://www.macports.org/install.php).
 
-3. Install the following packages from MacPorts:
+    Set MacPorts python27 as the default python:
 
-   * hdf4
-   * hdfeos
-   * py27-cython
-   * py27-numpy
-   * py27-matplotlib
-   * py27-matplotlib-basemap
+        sudo port select --set python python27
 
-   You can do that with this commmand:
+3. Install additional packages from MacPorts:
 
-       sudo port install hdf4 hdfeos py27-cython py27-numpy py27-matplotlib py27-matplotlib-basemap
+        sudo port install hdf4 hdfeos py27-cython py27-numpy py27-matplotlib py27-matplotlib-basemap
 
-   **Note:** Replace "py27-" with a prefix matching your python version,
-   e.g. "py26-" for Python 2.6.
+5. Build and install ccplot:
 
-3. Build and install ccplot:
-
-       tar xzf ccplot-1.5-rc8.tar.gz
-       cd ccplot-1.5-rc8
+       tar xzf ccplot-1.5.1.tar.gz
+       cd ccplot-1.5.1
        python setup.py build
        sudo python setup.py install
 
