@@ -1347,7 +1347,7 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
             title = datasets[0].attributes.get("long_name")
             units = datasets[0].attributes.get("units")
         for (key, ds) in enumerate(datasets):
-            data = ds[::]
+            data = ds[::].astype('float32')
             if "_FillValue" in ds.attributes:
                 data = np.ma.masked_equal(data, ds.attributes["_FillValue"])
             if "missing" in ds.attributes:
