@@ -1,5 +1,13 @@
 CCPLOT NEWS
 
+New in 1.5.2 (2015-10-18):
+
+  * Fix inverted layer products.
+  * Fix type casting error arising in recent versions of numpy.
+  * Fix MODIS swath dimension mapping
+    (values on the 180th meridian are misplaced).
+  * Fix matplotlib image interpolation.
+
 New in 1.5.1 (2015-09-01):
 
    * Switched to interp2d_12 interpolation.
