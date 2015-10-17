@@ -60,6 +60,8 @@ from ccplot.hdfeos import HDFEOS
 from ccplot import cctk
 
 import ccplot.algorithms
+import ccplot.utils
+
 
 # Early global variables.
 program_name = os.path.basename(sys.argv[0])
@@ -2095,8 +2097,14 @@ def read_modis_swath(product, band, band_mode,
     if e1 >= e2 or e3 >= e4: return None
 
     # Perform dimension mapping on lon/lat.
-    lon = cctk.dimmap2d(lon[:,:], off1, inc1, off2, inc2, 360.0)[e1:e2, e3:e4]
-    lat = cctk.dimmap2d(lat[:,:], off1, inc1, off2, inc2, 180.0)[e1:e2, e3:e4]
+    lat = ccplot.utils.dimmap(
+        ccplot.utils.dimmap(lat[:,:], e2 - e1, off1, inc1, 0, 360),
+        e4 - e3, off2, inc2, 1, 360
+    )
+    lon = ccplot.utils.dimmap(
+        ccplot.utils.dimmap(lon[:,:], e2 - e1, off1, inc1, 0, 360),
+        e4 - e3, off2, inc2, 1, 360
+    )
     lon = (lon + 180.0) % 360.0 - 180.0
     lat = (lat + 90.0) % 180.0 - 90.0
 

@@ -16,6 +16,60 @@ def cloudsat_time2dt(time, start_time):
     return start_time + dt.timedelta(0, float(time))
 
 
+def dimmap(x, n, off, inc, axis=0, modulus=None):
+    """
+    Perform dimension mapping on array `x` along axis `axis`
+    with offset `off` and increment `inc`. The axis is extended to the length
+    `n`. Intermediate values are interpolated by linear interpolation.
+    Values outside of `x` are extrapolated by linear gradient
+    at the boundaries.
+
+    Optional argument `modulus` causes dimmap
+    to operate in modular arithmetic with the given modulus. In such case
+    intermediate values are interpolated over the shortest path between
+    the adjacent values in `x`.
+
+    Examples
+    --------
+
+    >>> dimmap(np.array([350, 5, 20, 10, 350]), 30, 4, 5, 0, 360)
+    array([ 338.,  341.,  344.,  347.,  350.,  353.,  356.,  359.,    2.,
+              5.,    8.,   11.,   14.,   17.,   20.,   18.,   16.,   14.,
+             12.,   10.,    6.,    2.,  358.,  354.,  350.,  346.,  342.,
+            338.,  334.,  330.])
+
+    References
+    ----------
+
+    - HDF-EOS Library User's Guide for the ECS Project, Volume 1:
+    Overview and Examples
+    """
+    if modulus is not None:
+        diff = np.diff(x, axis=axis) % modulus
+        d = np.where(
+            np.abs(diff) < modulus - np.abs(diff),
+            diff,
+            -np.sign(diff)*(modulus - np.abs(diff))
+        )
+    else:
+        d = np.diff(x, axis=axis)
+    indices = 1.0*(np.arange(n) - off)/inc
+    indices_int = np.minimum(
+        x.shape[axis] - 1,
+        np.maximum(0, np.floor(indices))
+    ).astype(np.int64)
+    shape = list(x.shape)
+    shape[axis] = n
+    d_indices = np.minimum(max(0, x.shape[axis] - 2), indices_int)
+    out = np.swapaxes(x, axis, 0)[indices_int] + \
+        (np.swapaxes(d, axis, 0)[d_indices].T*(indices - indices_int)).T
+    out = np.swapaxes(out, 0, axis)
+    if modulus is not None:
+        return out % modulus
+    else:
+        return out
+
+
 def cmap(filename):
     """Load colormap from file. The expected format of the file is:
 
