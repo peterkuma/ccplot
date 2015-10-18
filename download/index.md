@@ -15,13 +15,13 @@ Download
             <tr>
                 <td>18 October 2015</td>
                 <td>
-                    <a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.2.tar.gz">ccplot 1.5.2</a>
+                    <a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.2.tar.gz">ccplot 1.5.2 (Linux &amp; Mac OS X)</a>
                 </td>
             </tr>
             <tr>
                 <td>18 October 2015</td>
                 <td>
-                    <a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.2.win32-py2.7.exe">ccplot-1.5.2.win32-py2.7.exe</a>
+                    <a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.2.win32-py2.7.exe">ccplot-1.5.2.win32-py2.7 (Windows)</a>
                 </td>
             </tr>
         </tbody>
