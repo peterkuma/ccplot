@@ -13,9 +13,9 @@ Download
         <thead><tr><th>Release Date</th><th>Download</th></tr></thead>
         <tbody>
             <tr>
-                <td>1 September 2015</td>
+                <td>18 October 2015</td>
                 <td>
-                    <a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.1.tar.gz">ccplot 1.5.1</a>
+                    <a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.2.tar.gz">ccplot 1.5.2</a>
                 </td>
             </tr>
             <tr>
@@ -26,6 +26,12 @@ Download
             </tr>
         </tbody>
         <tbody id="archive" style="display: none">
+            <tr>
+                <td>1 September 2015</td>
+                <td>
+                    <a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.1.tar.gz">ccplot 1.5.1</a>
+                </td>
+            </tr>
             <tr>
                 <td>21 March 2015</td>
                 <td>
