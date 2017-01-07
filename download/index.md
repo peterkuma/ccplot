@@ -156,15 +156,15 @@ The following programs and libraries are required:
 Windows
 -------
 
-1. Install [python(x,y)](https://code.google.com/p/pythonxy/).
-   In addition to standard modules, select **cython** during installation.
+1. Install [Anaconda 32-bit (Python 2.7 version)](https://www.continuum.io/downloads)
 
-2. Install **basemap** from the [Additional plugins](https://code.google.com/p/pythonxy/wiki/AdditionalPlugins)
-page.
+2. Install the **basemap** package in the Windows Command Prompt:
 
-3. Install ccplot using the supplied installer.
+    conda install basemap
 
-You should be able to run ccplot from the Command Prompt, e.g.:
+3. Install ccplot using the supplied Windows installer.
+
+You should be able to run ccplot in the Command Prompt:
 
     ccplot -V
 
