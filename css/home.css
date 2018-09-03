@@ -1,13 +1,12 @@
 .abstract {
-    font-size: 110%;
-    color: #555753;
+    font-size: 120%;
+    line-height: 140%;
 }
 
 .download {
     padding: 0.2em 0;
     float: right;
     text-align: right;
-    margin-top: -5em;
 }
 
 .download .latest {

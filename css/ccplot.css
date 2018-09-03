@@ -1,4 +1,5 @@
 @import url(http://fonts.googleapis.com/css?family=Asap:400,700);
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,600i,700,700i');
 
 @import "header.css";
 @import "article.css";
@@ -7,15 +8,16 @@
 
 body {
     text-align: center;
-    font-family: helvetica, Arial, serif;
+    font-family: "Open Sans", "Nimbus Sans L", Helvetica, Arial, sans-serif;
     font-size: 16px;
+    line-height: 140%;
 }
 
 #main {
     position: relative;
     margin: 40pt auto;
     text-align: left;
-    width: 820px;
+    width: 850px;
 }
 
 a {
@@ -28,5 +30,4 @@ a img {
 }
 
 h1,h2 {
-    font-family: Asap, sans-serif;
 }

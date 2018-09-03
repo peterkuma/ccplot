@@ -134,8 +134,8 @@ document.getElementById('hidearchived').onclick = function() {
 };
 </script>
 
-Requirements
-------------
+Supported Operating Systems
+---------------------------
 
 ccplot works on unix-like operating systems and Windows.
 It has been tested on Debian GNU/Linux and Windows 10.

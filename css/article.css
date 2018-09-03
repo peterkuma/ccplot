@@ -3,25 +3,24 @@ article p {
 }
 
 article h1 {
-    font-weight: normal;
+    font-weight: bold;
     font-size: 180%;
-    margin-top: 1em;
-    margin-bottom: 0.5em;
+    margin-top: 1.4em;
+    margin-bottom: 0.8em;
 }
 
 article h2 {
     font-size: 130%;
-    color: #cc0000;
     font-weight: bold;
-    margin-top: 1.2em;
-    margin-bottom: 0.5em;
+    margin-top: 1.4em;
+    margin-bottom: 0.8em;
 }
 
 article h3 {
-    font-size: 100%;
+    font-size: 110%;
     font-weight: bold;
-    margin-top: 1em;
-    margin-bottom: 0.5em;
+    margin-top: 1.4em;
+    margin-bottom: 0.8em;
 }
 
 article blockquote {
@@ -41,7 +40,7 @@ article blockquote {
 }
 
 .table {
-    background: #dfedf8;
+    background: #f3f3f3;
     margin: 10pt 0;
     padding: 6pt;
 }
@@ -64,7 +63,6 @@ article blockquote {
 
 .caption {
     margin-bottom: 6pt;
-    font-family: Helvetica, Tahoma, sans-serif;
 }
 
 .footnote {
