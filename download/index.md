@@ -15,7 +15,7 @@ Download
             <tr>
                 <td>18 October 2015</td>
                 <td>
-                    <a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.2.tar.gz">ccplot 1.5.2 (Linux &amp; Mac OS X)</a>
+                    <a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.2.tar.gz">ccplot 1.5.2 (Linux &amp; macOS)</a>
                 </td>
             </tr>
             <tr>
@@ -138,20 +138,9 @@ Requirements
 ------------
 
 ccplot works on unix-like operating systems and Windows.
-It has been tested on Debian GNU/Linux, Ubuntu, Windows Vista and
-Windows 8.1. For the best experience, it is recommended to install
-ccplot on Linux.
-
-The following programs and libraries are required:
-
-* [Python](http://www.python.org) >= 2.5 and < 3.0, including development files
-* [numpy](http://www.numpy.org) >= 1.1
-* [matplotlib](http://matplotlib.org) >= 0.98.1
-* [basemap](http://matplotlib.org/basemap/) >= 0.99.4 and the GEOS library (shipped with basemap)
-* **ccplot < 1.5:** [PyNIO](http://www.pyngl.ucar.edu/Nio.shtml) >= 1.3.0b1
-* **ccplot >= 1.5:** [cython](http://cython.org)
-* **ccplot >= 1.5:** [libhdf4](http://www.hdfgroup.org/products/hdf4/)
-* **ccplot >= 1.5:** [libhdfeos2](http://hdfeos.org/software/library.php#HDF-EOS2)
+It has been tested on Debian GNU/Linux and Windows 10.
+Support for macOS is experimental.
+For best experience, it is recommended to install ccplot on Linux.
 
 Windows
 -------
@@ -171,24 +160,35 @@ You should be able to run ccplot in the Anaconda Prompt:
     ccplot -V
 
 Linux & Unix
------------------------------------
+------------
+
+The following programs and libraries are required:
+
+* [Python](http://www.python.org) >= 2.5 and < 3.0, including development files
+* [numpy](http://www.numpy.org) >= 1.1
+* [matplotlib](http://matplotlib.org) >= 0.98.1
+* [basemap](http://matplotlib.org/basemap/) >= 0.99.4 and the GEOS library (shipped with basemap)
+* **ccplot < 1.5:** [PyNIO](http://www.pyngl.ucar.edu/Nio.shtml) >= 1.3.0b1
+* **ccplot >= 1.5:** [cython](http://cython.org)
+* **ccplot >= 1.5:** [libhdf4](http://www.hdfgroup.org/products/hdf4/)
+* **ccplot >= 1.5:** [libhdfeos2](http://hdfeos.org/software/library.php#HDF-EOS2)
 
 1. Make sure you have all dependencies installed.
    On Debian and Ubuntu, you can install dependencies with:
 
-       # ccplot < 1.5
-       apt-get install python python-dev python-numpy python-matplotlib python-mpltoolkits.basemap
-
        # ccplot >= 1.5
        apt-get install --no-install-recommends cython libhdf4-dev libhdfeos-dev python-imaging python-numpy python-matplotlib python-mpltoolkits.basemap ttf-bitstream-vera
+
+       # ccplot < 1.5
+       apt-get install python python-dev python-numpy python-matplotlib python-mpltoolkits.basemap
 
    **ccplot < 1.5:** PyNIO needs to be installed independently
    (see instructions below).
 
 2. Build and install ccplot:
 
-       tar xzf ccplot-1.5-rc8.tar.gz
-       cd ccplot-1.5-rc8
+       tar xzf ccplot-1.5.2.tar.gz
+       cd ccplot-1.5.2
        python setup.py build
        sudo python setup.py install
 
@@ -196,8 +196,8 @@ You should be able to run ccplot from the terminal:
 
     ccplot -V
 
-Mac OS X
---------
+macOS
+-----
 
 1. Install [Xcode](https://developer.apple.com/xcode/)
    (or, alternatively [OSX GCC](https://github.com/kennethreitz/osx-gcc-installer/)).
@@ -232,9 +232,8 @@ terminal, append the following line to .bash_profile in your home directory:
 
     export PATH="$PATH:/opt/local/Library/Frameworks/Python.framework/Versions/2.7/bin"
 
-Installing PyNIO
-----------------
-**ccplot < 1.5**
+Installing PyNIO (ccplot < 1.5)
+-------------------------------
 
 PyNIO can be downloaded upon free registration from
 [EOS](http://www.earthsystemgrid.org/home.htm). However, to make your life
