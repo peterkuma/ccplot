@@ -156,7 +156,7 @@ The following programs and libraries are required:
 Windows
 -------
 
-1. Install [Anaconda 32-bit (Python 2.7 version)](https://www.anaconda.com/download/)
+1. Install [Anaconda 32-bit (Python 2.7 version)](https://www.anaconda.com/download/).
 
     **Note:** Anaconda 64-bit or Python 3 won't work.
 
