@@ -156,7 +156,9 @@ The following programs and libraries are required:
 Windows
 -------
 
-1. Install [Anaconda 32-bit (Python 2.7 version)](https://www.continuum.io/downloads)
+1. Install [Anaconda 32-bit (Python 2.7 version)](https://www.anaconda.com/download/)
+
+    **Note:** Anaconda 64-bit or Python 3 won't work.
 
 2. Install the **basemap** package in the Windows Command Prompt:
 
