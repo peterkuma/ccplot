@@ -38,3 +38,7 @@ footer {
     border-top: 7px solid #eee;
     font-size: 90%;
 }
+
+footer p {
+    margin: 0.7em 0;
+}
