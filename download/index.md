@@ -160,13 +160,13 @@ Windows
 
     **Note:** Anaconda 64-bit or Python 3 won't work.
 
-2. Install the **basemap** package in the Windows Command Prompt:
+2. Install the **basemap** package in the Anaconda Prompt:
 
-    conda install basemap
+        conda install basemap
 
 3. Install ccplot using the supplied Windows installer.
 
-You should be able to run ccplot in the Command Prompt:
+You should be able to run ccplot in the Anaconda Prompt:
 
     ccplot -V
 
