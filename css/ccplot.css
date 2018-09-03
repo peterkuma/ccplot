@@ -11,13 +11,16 @@ body {
     font-family: "Open Sans", "Nimbus Sans L", Helvetica, Arial, sans-serif;
     font-size: 16px;
     line-height: 140%;
+    background: #eee;
 }
 
 #main {
     position: relative;
-    margin: 40pt auto;
+    margin: 0 auto;
     text-align: left;
     width: 850px;
+    background: #fff;
+    padding: 30px 60px;
 }
 
 a {
