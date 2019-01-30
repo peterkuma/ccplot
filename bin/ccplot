@@ -132,7 +132,7 @@ DATASETS = {
         "datasets": ["Attenuated_Backscatter_1064"],
     },
     "calipso-cratio": {
-        "title": "Attenuated Color Ratio 1064nm/532nm",axesPatch
+        "title": "Attenuated Color Ratio 1064nm/532nm",
         "datasets": [
             "Total_Attenuated_Backscatter_532",
             "Attenuated_Backscatter_1064"
