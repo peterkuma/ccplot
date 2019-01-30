@@ -132,7 +132,7 @@ DATASETS = {
         "datasets": ["Attenuated_Backscatter_1064"],
     },
     "calipso-cratio": {
-        "title": "Attenuated Color Ratio 1064nm/532nm",
+        "title": "Attenuated Color Ratio 1064nm/532nm",axesPatch
         "datasets": [
             "Total_Attenuated_Backscatter_532",
             "Attenuated_Backscatter_1064"
@@ -1175,7 +1175,7 @@ def setup_lonlat_axes(fig, axes, lon, lat):
 
     llaxes = fig.add_axes(axes.get_position())
     llaxes.yaxis.set_visible(False)
-    llaxes.axesPatch.set_alpha(0.0)
+    llaxes.Axes.patch.set_alpha(0.0)
     llaxes.set_xlim(axes.get_xlim())
     llaxes.set_ylim(axes.get_ylim())
     llaxes.set_aspect(axes.get_aspect())
