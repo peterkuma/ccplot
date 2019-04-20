@@ -149,10 +149,16 @@ The following programs and libraries are required:
 * [numpy](http://www.numpy.org) >= 1.1
 * [matplotlib](http://matplotlib.org) >= 0.98.1
 * [basemap](http://matplotlib.org/basemap/) >= 0.99.4 and the GEOS library (shipped with basemap)
-* **ccplot >= 1.5:** [cython](http://cython.org)
-* **ccplot >= 1.5:** [libhdf4](http://www.hdfgroup.org/products/hdf4/)
-* **ccplot >= 1.5:** [libhdfeos2](http://hdfeos.org/software/library.php#HDF-EOS2)
-* **ccplot < 1.5:** [PyNIO](http://www.pyngl.ucar.edu/Nio.shtml) >= 1.3.0b1
+
+**ccplot >= 1.5:**
+
+* [cython](http://cython.org)
+* [libhdf4](http://www.hdfgroup.org/products/hdf4/)
+* [libhdfeos2](http://hdfeos.org/software/library.php#HDF-EOS2)
+
+**ccplot < 1.5:**
+
+* [PyNIO](http://www.pyngl.ucar.edu/Nio.shtml) >= 1.3.0b1
 
 To install the required libraries and ccplot:
 
@@ -172,7 +178,6 @@ To install the required libraries and ccplot:
 
        tar xzf ccplot-x.y.z.tar.gz
        cd ccplot-x.y.z
-       python setup.py build
        sudo python setup.py install
 
 You should now be able to run ccplot in the terminal:
@@ -207,11 +212,11 @@ macOS
 
 2. Install [MacPorts](https://www.macports.org).
 
-3. Install additional packages from MacPorts. In the macOS Terminal, enter:
+3. Install required MacPorts packages. In the macOS Terminal:
 
         sudo port install hdf4 hdfeos
 
-4. Build and install ccplot. In the Terminal, enter:
+4. Build and install ccplot.
 
        tar xzf ccplot-x.y.z.tar.gz
        cd ccplot-x.y.z
