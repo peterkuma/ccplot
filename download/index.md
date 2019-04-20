@@ -137,30 +137,11 @@ document.getElementById('hidearchived').onclick = function() {
 Supported Operating Systems
 ---------------------------
 
-ccplot works on unix-like operating systems and Windows.
-It has been tested on Debian GNU/Linux and Windows 10.
-Support for macOS is experimental.
+ccplot works on unix-like operating systems (Linux, macOS, ...) and Windows.
 For best experience, it is recommended to install ccplot on Linux.
 
-Windows
--------
-
-1. Install [Anaconda 32-bit (Python 2.7 version)](https://www.anaconda.com/download/).
-
-    **Note:** Anaconda 64-bit or Python 3 won't work.
-
-2. Install the **basemap** package in the Anaconda Prompt:
-
-        conda install basemap
-
-3. Install ccplot using the supplied Windows installer.
-
-You should be able to run ccplot in the Anaconda Prompt:
-
-    ccplot -V
-
-Linux & Unix
-------------
+Linux & Unix-like OS other than macOS
+-------------------------------------
 
 The following programs and libraries are required:
 
@@ -168,69 +149,77 @@ The following programs and libraries are required:
 * [numpy](http://www.numpy.org) >= 1.1
 * [matplotlib](http://matplotlib.org) >= 0.98.1
 * [basemap](http://matplotlib.org/basemap/) >= 0.99.4 and the GEOS library (shipped with basemap)
-* **ccplot < 1.5:** [PyNIO](http://www.pyngl.ucar.edu/Nio.shtml) >= 1.3.0b1
 * **ccplot >= 1.5:** [cython](http://cython.org)
 * **ccplot >= 1.5:** [libhdf4](http://www.hdfgroup.org/products/hdf4/)
 * **ccplot >= 1.5:** [libhdfeos2](http://hdfeos.org/software/library.php#HDF-EOS2)
+* **ccplot < 1.5:** [PyNIO](http://www.pyngl.ucar.edu/Nio.shtml) >= 1.3.0b1
+
+To install the required libraries and ccplot:
 
 1. Make sure you have all dependencies installed.
    On Debian and Ubuntu, you can install dependencies with:
 
        # ccplot >= 1.5
-       apt-get install --no-install-recommends cython libhdf4-dev libhdfeos-dev python-imaging python-numpy python-matplotlib python-mpltoolkits.basemap ttf-bitstream-vera
+       sudo apt-get install --no-install-recommends cython libhdf4-dev libhdfeos-dev python-imaging python-numpy python-matplotlib python-mpltoolkits.basemap ttf-bitstream-vera
 
        # ccplot < 1.5
-       apt-get install python python-dev python-numpy python-matplotlib python-mpltoolkits.basemap
+       sudo apt-get install python python-dev python-numpy python-matplotlib python-mpltoolkits.basemap
 
    **ccplot < 1.5:** PyNIO needs to be installed independently
    (see instructions below).
 
 2. Build and install ccplot:
 
-       tar xzf ccplot-1.5.2.tar.gz
-       cd ccplot-1.5.2
+       tar xzf ccplot-x.y.z.tar.gz
+       cd ccplot-x.y.z
        python setup.py build
        sudo python setup.py install
 
-You should be able to run ccplot from the terminal:
+You should now be able to run ccplot in the terminal:
+
+    ccplot -V
+
+Windows
+-------
+
+To install ccplot on Windows:
+
+1. Install [Anaconda 32-bit (Python 2.7 version)](https://www.anaconda.com/download/).
+
+    **Note:** Anaconda 64-bit or Python 3 will not work.
+
+2. Install the **basemap** package in the Anaconda Prompt (you can find the
+Anaconda Prompt in the Start Menu):
+
+        conda install basemap
+
+3. Install ccplot using the supplied Windows installer
+(ccplot-x.y.z.win32-py2.7.exe).
+
+You should now be able to run ccplot in the Anaconda Prompt:
 
     ccplot -V
 
 macOS
 -----
 
-1. Install [Xcode](https://developer.apple.com/xcode/)
-   (or, alternatively [OSX GCC](https://github.com/kennethreitz/osx-gcc-installer/)).
-   
-   **Note:** You will need to create an Apple developer account in order to
-   be able to download Xcode.
+1. Install [Anaconda 64-bit (Python 2.7 version)](https://www.anaconda.com/download/).
 
-2. Install [MacPorts](https://www.macports.org/install.php).
+2. Install [MacPorts](https://www.macports.org).
 
-    Set MacPorts python27 as the default python:
+3. Install additional packages from MacPorts. In the macOS Terminal, enter:
 
-        sudo port select --set python python27
+        sudo port install hdf4 hdfeos
 
-3. Install additional packages from MacPorts:
+4. Build and install ccplot. In the Terminal, enter:
 
-        sudo port install hdf4 hdfeos py27-cython py27-numpy py27-matplotlib py27-matplotlib-basemap
+       tar xzf ccplot-x.y.z.tar.gz
+       cd ccplot-x.y.z
+       python setup.py install
 
-5. Build and install ccplot:
-
-       tar xzf ccplot-1.5.1.tar.gz
-       cd ccplot-1.5.1
-       python setup.py build
-       sudo python setup.py install
-
-You should be able to run ccplot from the terminal:
+You should now be able to run ccplot:
 
     ccplot -V
-
-**Note:** Some python installations require the python bin directory to be
-added to the PATH environment variable. If you can't run ccplot from the
-terminal, append the following line to .bash_profile in your home directory:
-
-    export PATH="$PATH:/opt/local/Library/Frameworks/Python.framework/Versions/2.7/bin"
 
 Installing PyNIO (ccplot < 1.5)
 -------------------------------
