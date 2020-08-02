@@ -13,104 +13,110 @@ Download
         <thead><tr><th>Release Date</th><th>Download</th></tr></thead>
         <tbody>
             <tr>
-                <td>18 October 2015</td>
+                <td>2 August 2020</td>
                 <td>
-                    <a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.2.tar.gz">ccplot 1.5.2 (Linux &amp; macOS)</a>
+                    <a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.4.tar.gz">ccplot 1.5.4 (Linux &amp; macOS)</a>
                 </td>
             </tr>
             <tr>
                 <td>18 October 2015</td>
                 <td>
-                    <a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.2.win32-py2.7.exe">ccplot-1.5.2.win32-py2.7 (Windows)</a>
+                    <a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.2.win32-py2.7.exe">ccplot-1.5.2.win32-py2.7 (Windows)</a>
                 </td>
             </tr>
         </tbody>
         <tbody id="archive" style="display: none">
             <tr>
+                <td>18 October 2015</td>
+                <td>
+                    <a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.2.tar.gz">ccplot 1.5.2 (Linux &amp; macOS)</a>
+                </td>
+            </tr>
+            <tr>
                 <td>1 September 2015</td>
                 <td>
-                    <a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.1.tar.gz">ccplot 1.5.1</a>
+                    <a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.1.tar.gz">ccplot 1.5.1</a>
                 </td>
             </tr>
             <tr>
                 <td>21 March 2015</td>
                 <td>
-                    <a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.tar.gz">ccplot 1.5</a>
+                    <a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.tar.gz">ccplot 1.5</a>
                 </td>
             </tr>
             <tr>
                 <td>21 March 2015</td>
                 <td>
-                    <a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.win32-py2.7.exe">ccplot 1.5.win32-py2.7</a>
+                    <a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.win32-py2.7.exe">ccplot 1.5.win32-py2.7</a>
                 </td>
             </tr>
             <tr>
                 <td>1 December 2013</td>
                 <td>
-                    <a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5-rc8.tar.gz">ccplot 1.5-rc8</a>
+                    <a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5-rc8.tar.gz">ccplot 1.5-rc8</a>
                 </td>
             </tr>
             <tr>
                 <td>20 November 2013</td>
                 <td>
-                    <a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5-rc7.win32-py2.7.exe">ccplot 1.5-rc7.win32-py2.7</a>
+                    <a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5-rc7.win32-py2.7.exe">ccplot 1.5-rc7.win32-py2.7</a>
                 </td>
             </tr>
             <tr>
                 <td>16 June 2013</td>
-                <td><a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.4.7.tar.gz">ccplot 1.4.7</a></td>
+                <td><a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.4.7.tar.gz">ccplot 1.4.7</a></td>
             </tr>
             <tr>
                 <td>4 June 2013</td>
-                <td><a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.4.6.tar.gz">ccplot 1.4.6</a></td>
+                <td><a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.4.6.tar.gz">ccplot 1.4.6</a></td>
             </tr>
             <tr>
                 <td>31 May 2013</td>
-                <td><a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.4.5.tar.gz">ccplot 1.4.5</a></td>
+                <td><a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.4.5.tar.gz">ccplot 1.4.5</a></td>
             </tr>
             <tr>
                 <td>2 September 2010</td>
-                <td><a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.44.tar.gz">ccplot 1.44</a></td>
+                <td><a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.44.tar.gz">ccplot 1.44</a></td>
             </tr>
             <tr>
                 <td>18 August 2010</td>
-                <td><a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.43.tar.gz">ccplot 1.43</a></td>
+                <td><a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.43.tar.gz">ccplot 1.43</a></td>
             </tr>
             <tr>
                 <td>11 June 2010</td>
-                <td><a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.42.tar.gz">ccplot 1.42</a></td>
+                <td><a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.42.tar.gz">ccplot 1.42</a></td>
             </tr>
             <tr>
                 <td>13 May 2010</td>
-                <td><a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.41.tar.gz">ccplot 1.41</a></td>
+                <td><a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.41.tar.gz">ccplot 1.41</a></td>
             </tr>
             <tr>
                 <td>7 May 2010</td>
-                <td><a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.4.tar.gz">ccplot 1.4</a></td>
+                <td><a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.4.tar.gz">ccplot 1.4</a></td>
             </tr>
             <tr>
                 <td>21 September 2009</td>
-                <td><a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.31.tar.gz">ccplot 1.31</a></td>
+                <td><a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.31.tar.gz">ccplot 1.31</a></td>
             </tr>
             <tr>
                 <td>20 September 2009</td>
-                <td><a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.3.tar.gz">ccplot 1.3</a></td>
+                <td><a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.3.tar.gz">ccplot 1.3</a></td>
             </tr>
             <tr>
                 <td>20 August 2009</td>
-                <td><a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.21.tar.gz">ccplot 1.21</a></td>
+                <td><a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.21.tar.gz">ccplot 1.21</a></td>
             </tr>
             <tr>
                 <td>19 August 2009</td>
-                <td><a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.2.tar.gz">ccplot 1.2</a></td>
+                <td><a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.2.tar.gz">ccplot 1.2</a></td>
             </tr>
             <tr>
                 <td>18 August 2009</td>
-                <td><a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.1.tar.gz">ccplot 1.1</a></td>
+                <td><a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.1.tar.gz">ccplot 1.1</a></td>
             </tr>
             <tr>
                 <td>10 August 2009</td>
-                <td><a href="http://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.0.tar.gz">ccplot 1.0</a></td>
+                <td><a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.0.tar.gz">ccplot 1.0</a></td>
             </tr>
         </tbody>
      </table>
@@ -145,15 +151,17 @@ Linux & Unix-like OS other than macOS
 
 The following programs and libraries are required:
 
-* [Python](http://www.python.org) >= 2.5 and < 3.0, including development files
+* [Python](http://www.python.org) >= 2.5, including development files
 * [numpy](http://www.numpy.org) >= 1.1
 * [matplotlib](http://matplotlib.org) >= 0.98.1
 * [basemap](http://matplotlib.org/basemap/) >= 0.99.4 and the GEOS library (shipped with basemap)
-* **ccplot >= 1.5:**
+
+**ccplot >= 1.5:**
 * [cython](http://cython.org)
 * [libhdf4](http://www.hdfgroup.org/products/hdf4/)
 * [libhdfeos2](http://hdfeos.org/software/library.php#HDF-EOS2)
-* **ccplot < 1.5:**
+
+**ccplot < 1.5:**
 * [PyNIO](http://www.pyngl.ucar.edu/Nio.shtml) >= 1.3.0b1
 
 To install the required libraries and ccplot:
@@ -161,10 +169,13 @@ To install the required libraries and ccplot:
 1. Make sure you have all dependencies installed.
    On Debian and Ubuntu, you can install dependencies with:
 
-       # ccplot >= 1.5
-       sudo apt-get install --no-install-recommends cython libhdf4-dev libhdfeos-dev python-imaging python-numpy python-matplotlib python-mpltoolkits.basemap ttf-bitstream-vera
+       # Python 3, ccplot >= 1.5.4
+       sudo apt-get install --no-install-recommends cython3 libhdf4-dev libhdfeos-dev python3-pil python3-numpy python3-matplotlib python3-mpltoolkits.basemap ttf-bitstream-vera
 
-       # ccplot < 1.5
+       # Python 2, ccplot >= 1.5
+       sudo apt-get install --no-install-recommends cython libhdf4-dev libhdfeos-dev python-pil python-numpy python-matplotlib python-mpltoolkits.basemap ttf-bitstream-vera
+
+       # Python 2, ccplot < 1.5
        sudo apt-get install python python-dev python-numpy python-matplotlib python-mpltoolkits.basemap
 
    **ccplot < 1.5:** PyNIO needs to be installed independently
@@ -204,7 +215,7 @@ You should now be able to run ccplot in the Anaconda Prompt:
 macOS
 -----
 
-1. Install [Anaconda 64-bit (Python 2.7 version)](https://www.anaconda.com/download/).
+1. Install [Anaconda 64-bit](https://www.anaconda.com/download/).
 
 2. Install [MacPorts](https://www.macports.org).
 
@@ -238,7 +249,7 @@ To install PyNIO from a binary distribution on Ubuntu/Debian, do:
 
     mkdir pynio
     tar -C pynio -xzf PyNIO-1.4.0.linux-debian-x86_64-gcc432-py265-numpy141-nodap.tar.gz
-    
+
     sudo cp -r pynio/lib/python2.6/site-packages/* /usr/local/lib/python2.6/dist-packages/
 
 On other systems:
