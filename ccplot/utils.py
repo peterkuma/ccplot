@@ -137,9 +137,9 @@ def cmap(filename):
                     if len(rgba) == 3:
                         rgba.append(255)
                     special.append(rgba)
-    except IOError, e:
+    except IOError as e:
         raise e
-    except ValueError, e:
+    except ValueError as e:
         raise ValueError("Error reading `%s' on line %d: %s" %
                          (filename, n+1, e))
 

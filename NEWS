@@ -1,32 +1,37 @@
 CCPLOT NEWS
 
+New in 1.5.3 (2020-08-02):
+
+    * Support for Python 3.
+    * Support for new versions of matplotlib.
+
 New in 1.5.2 (2015-10-18):
 
-  * Fix inverted layer products.
-  * Fix type casting error arising in recent versions of numpy.
-  * Fix MODIS swath dimension mapping
-    (values on the 180th meridian are misplaced).
-  * Fix matplotlib image interpolation.
+    * Fix inverted layer products.
+    * Fix type casting error arising in recent versions of numpy.
+    * Fix MODIS swath dimension mapping
+      (values on the 180th meridian are misplaced).
+    * Fix matplotlib image interpolation.
 
 New in 1.5.1 (2015-09-01):
 
-   * Switched to interp2d_12 interpolation.
-   * Fixed compilation on new Ubuntu/Debian releases.
+    * Switched to interp2d_12 interpolation.
+    * Fixed compilation on new Ubuntu/Debian releases.
 
 New in 1.5 (2015-03-21):
 
-   * Added support for arbitrary dataset plotting (experimental).
-   * Added ccplot API functions (experimental).
-   * Removed dependency on PyNIO. ccplot now uses its own HDF reading module,
-     interfacing with libhdf4 and libhdfeos.
-   * Support for Windows.
-   * Support for Mac OS X.
-   * CALIPSO LIDAR altitudes are now read from the product file instead of being
-     hard-coded in ccplot.
-   * Automatic unit testing performed by Travis CI.
-   * ccplot now looks for colormaps in a directory relative to the executable.
-     This fixes installation in non-standard paths.
-   * New man page in ronn.
+    * Added support for arbitrary dataset plotting (experimental).
+    * Added ccplot API functions (experimental).
+    * Removed dependency on PyNIO. ccplot now uses its own HDF reading module,
+      interfacing with libhdf4 and libhdfeos.
+    * Support for Windows.
+    * Support for Mac OS X.
+    * CALIPSO LIDAR altitudes are now read from the product file instead of being
+      hard-coded in ccplot.
+    * Automatic unit testing performed by Travis CI.
+    * ccplot now looks for colormaps in a directory relative to the executable.
+      This fixes installation in non-standard paths.
+    * New man page in ronn.
 
 New in 1.4.5 (2013-05-31):
 
@@ -97,25 +102,25 @@ New in 1.3 (2009-09-20):
 
 New in 1.2.1 (2009-08-20):
 
-	* Fixed layer products precision error.
+    * Fixed layer products precision error.
 
 New in 1.2 (2009-08-19):
 
-	* Fixed colormaps: calipso-cratio.cmap, calipso-dratio.cmap
-	  and calipso-temperature.cmap.
+    * Fixed colormaps: calipso-cratio.cmap, calipso-dratio.cmap
+      and calipso-temperature.cmap.
 
 New in 1.1 (2009-08-18):
 
-	* Interpolation method was changed from quadratic to nearest
-	  for all products.
-	* Support for older versions of matplotlib (at least 0.98.1) was added.
-	* Layer products performance improvements (re-implementation of data
-	  processing C).
-	* Fixed singular matrix bug with CloudSat profile products.
-	* Traceback no longer reported when trying to plot a product
-	  that is not contained within a data file.
+    * Interpolation method was changed from quadratic to nearest
+      for all products.
+    * Support for older versions of matplotlib (at least 0.98.1) was added.
+    * Layer products performance improvements (re-implementation of data
+      processing C).
+    * Fixed singular matrix bug with CloudSat profile products.
+    * Traceback no longer reported when trying to plot a product
+      that is not contained within a data file.
 
 New in 1.0 (2009-08-10):
 
-	* Initial release.
+    * Initial release.
 

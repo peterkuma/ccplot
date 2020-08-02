@@ -1,8 +1,17 @@
 cimport cython
 cimport numpy as np
+import sys
 import numpy as np
-import hdf
-from UserDict import DictMixin
+from ccplot import hdf
+if sys.version_info[0] == 2:
+    from UserDict import DictMixin as DictMixin
+else:
+    from collections.abc import Mapping
+    class DictMixin(Mapping):
+        def __iter__(self):
+            yield from self.keys()
+        def __len__(self):
+            return len(self.keys())
 
 cdef extern from "errno.h":
     cdef extern int errno
@@ -230,12 +239,12 @@ class HDFEOS(DictMixin):
         with SW(self, swath) as sw:
             res = SWinqmaps(sw, <char *>tmp.data, <int32 *>offset.data, <int32 *> increment.data)
 
-        dimmap = bytearray(tmp).decode('ascii').rstrip('\0')
+        dimmap = bytes(bytearray(tmp)).rstrip(b'\0')
 
         n = 0
         maps = {}
-        for dm in dimmap.split(','):
-            pair = dm.split('/')
+        for dm in dimmap.split(b','):
+            pair = dm.split(b'/')
             if len(pair) != 2 or not n < H4_MAX_VAR_DIMS: continue
             geofield, datafield = pair
             maps[(geofield, datafield)] = (offset[n], increment[n])
@@ -257,12 +266,12 @@ class HDFEOS(DictMixin):
             if res == FAIL:
                 raise IOError(EIO, 'SWinqattrs failed', self.filename)
 
-        attrlist = bytearray(tmp).decode('ascii').rstrip('\0')
-        if attrlist == '': return []
-        attrlist = attrlist.split(',')
+        attrlist = bytes(bytearray(tmp)).rstrip(b'\0')
+        if attrlist == b'': return []
+        attrlist = attrlist.split(b',')
 
         if dataset is None:
-            return [attr for attr in attrlist if '.' not in attr]
+            return [attr for attr in attrlist if b'.' not in attr]
         else:
             attrs = []
             for attr in attrlist:
@@ -285,8 +294,8 @@ class HDFEOS(DictMixin):
         except KeyError: raise NotImplementedError('%s: %s: Data type %s not implemented'
                                               % (self.filename, name, data_type))
 
-        dimlist = bytearray(tmp).decode('ascii').rstrip('\0')
-        dimlist = dimlist.split(',') if dimlist != "" else []
+        dimlist = bytes(bytearray(tmp)).rstrip(b'\0')
+        dimlist = dimlist.split(b',') if dimlist != b'' else []
 
         return {
             'shape': dims[:rank],
@@ -330,7 +339,7 @@ class HDFEOS(DictMixin):
     
     def _readattr(self, swath, dataset, name):
         cdef int32 data_type, count
-        attrname = name if dataset is None else '%s.%s' % (dataset, name)
+        attrname = name if dataset is None else b'%s.%s' % (dataset, name)
 
         with SW(self, swath) as sw:
             res = SWattrinfo(sw, attrname, &data_type, &count)
@@ -350,6 +359,6 @@ class HDFEOS(DictMixin):
                           self.filename)
 
         if data_type == DFNT_CHAR:
-            return bytearray(data).decode('ascii').rstrip('\0')
+            return bytes(bytearray(data)).rstrip(b'\0')
 
         return data[0] if count == 1 else data

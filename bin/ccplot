@@ -3,7 +3,7 @@
 # ccplot
 # This file is a part of ccplot: CloudSat and CALIPSO plotting tool.
 #
-# Copyright (c) 2009-2015 Peter Kuma
+# Copyright (c) 2009-2020 Peter Kuma
 #
 # This software is provided under the terms of a 2-clause BSD licence:
 #
@@ -65,15 +65,23 @@ import ccplot.utils
 
 # Early global variables.
 program_name = os.path.basename(sys.argv[0])
-__version__ = "1.5.2"
+__version__ = "1.5.3"
 CCPLOT_CMAP_PATH = os.path.join(ccplot.config.sharepath, 'cmap') \
                  + ":/usr/share/ccplot/cmap:/usr/local/share/ccplot/cmap"
 
 # Early functions.
 def fail(s):
     global program_name
-    print >> sys.stderr, "%s: %s" % (program_name, s)
+    sys.stderr.write("%s: %s" % (program_name, s))
     sys.exit(1)
+
+def fsencode(x):
+    return x if (sys.version_info[0] == 2 or type(x) is not str) \
+        else os.fsencode(x)
+
+def sdecode(x):
+    return x if (sys.version_info[0] == 2 or type(x) is not bytes) \
+        else x.decode('utf-8')
 
 # Version checking.
 if mpl.__version__ < "0.98.1":
@@ -114,60 +122,60 @@ MODIS_WAVELENGTHS[0:36] = (645,858.500,469,555,1240,1640,2130,412.5,443,488,531,
 # Explicitly supported datasets.
 DATASETS = {
     "cloudsat-reflec": {
-        "datasets": ["Radar_Reflectivity"],
+        "datasets": [b"Radar_Reflectivity"],
     },
     "calipso532": {
         "title": "Total Attenuated Backscatter 532nm",
         "units": "km$^{-1}$ sr$^{-1}$",
-        "datasets": ["Total_Attenuated_Backscatter_532"],
+        "datasets": [b"Total_Attenuated_Backscatter_532"],
     },
     "calipso532p": {
         "title": "Perpendicular Attenuated Backscatter 532nm",
         "units": "km$^{-1}$ sr$^{-1}$",
-        "datasets": ["Perpendicular_Attenuated_Backscatter_532"],
+        "datasets": [b"Perpendicular_Attenuated_Backscatter_532"],
     },
     "calipso1064": {
         "title": "Attenuated Backscatter 1064nm",
         "units": "km$^{-1}$ sr$^{-1}$",
-        "datasets": ["Attenuated_Backscatter_1064"],
+        "datasets": [b"Attenuated_Backscatter_1064"],
     },
     "calipso-cratio": {
         "title": "Attenuated Color Ratio 1064nm/532nm",
         "datasets": [
-            "Total_Attenuated_Backscatter_532",
-            "Attenuated_Backscatter_1064"
+            b"Total_Attenuated_Backscatter_532",
+            b"Attenuated_Backscatter_1064"
         ],
     },
     "calipso-dratio": {
         "title": "Depolarization Ratio",
         "datasets": [
-            "Total_Attenuated_Backscatter_532",
-            "Perpendicular_Attenuated_Backscatter_532"
+            b"Total_Attenuated_Backscatter_532",
+            b"Perpendicular_Attenuated_Backscatter_532"
         ],
     },
     "calipso532-layer": {
         "title": "Integrated Attenuated Backscatter 532nm",
         "units": "sr$^{-1}$",
-        "datasets": ["Integrated_Attenuated_Backscatter_532"],
+        "datasets": [b"Integrated_Attenuated_Backscatter_532"],
     },
     "calipso1064-layer": {
         "title": "Integrated Attenuated Backscatter 1064nm",
         "units": "sr$^{-1}$",
-        "datasets": ["Integrated_Attenuated_Backscatter_1064"],
+        "datasets": [b"Integrated_Attenuated_Backscatter_1064"],
     },
     "calipso-cratio-layer": {
         "title": "Integrated Attenuated Total Color Ratio 1064nm/532nm",
-        "datasets": ["Integrated_Attenuated_Total_Color_Ratio"],
+        "datasets": [b"Integrated_Attenuated_Total_Color_Ratio"],
     },
     "calipso-dratio-layer": {
         "title": "Integrated Volume Depolarization Ratio",
-        "datasets": ["Integrated_Volume_Depolarization_Ratio"],
+        "datasets": [b"Integrated_Volume_Depolarization_Ratio"],
     },
     "calipso-temperature-layer": {
         "title": "Midlayer Temperature",
         "units": "K",
         "offset": -273.15,
-        "datasets": ["Midlayer_Temperature"],
+        "datasets": [b"Midlayer_Temperature"],
     },
 }
 
@@ -190,7 +198,7 @@ class Swath(object):
 
 
 class AutoOpts(object):
-    def setint(self, o, v, a=-sys.maxint-1, b=sys.maxint):
+    def setint(self, o, v, a=-sys.maxsize-1, b=sys.maxsize):
         i = int(v)
         if i < a or i > b:
             raise ValueError("%s expected between %d and %d" % (o, a, b))
@@ -202,7 +210,7 @@ class AutoOpts(object):
             raise ValueError("%s expected between %f and %f" % (o, a, b))
         return f
         
-    def setstr(self, o, v, maxlen=sys.maxint):
+    def setstr(self, o, v, maxlen=sys.maxsize):
         if len(v) > maxlen:
             raise ValueError("%s can be at most %d characters long" % (o, maxlen))
         return v
@@ -470,18 +478,18 @@ class Options(object):
 def report_memory():
     pid = os.getpid()
     a2 = os.popen("ps -p %d -o rss,vsz,%%mem" % pid).readlines()
-    print "MEMORY:", a2[1],
+    print(("MEMORY:", a2[1]))
     return int(a2[1].split()[1])
 
 
 def warn(s):
     global program_name
-    print >> sys.stderr, "%s: Warning: %s" % (program_name, s)    
+    sys.stderr.write("%s: Warning: %s" % (program_name, s))
 
 
 def info(s):
     global verbose
-    if verbose: print s
+    if verbose: print(s)
 
 
 def autodetect(product):
@@ -494,31 +502,31 @@ def autodetect(product):
         modis-swath-l1b         MODIS L1B Swath
     """
     # Try CALIPSO.
-    if "Longitude" in product and "Latitude" in product:
+    if b"Longitude" in product and b"Latitude" in product:
         try:
-            product["Layer_Base_Altitude"]
-            product["Layer_Top_Altitude"]
-            product["Number_Layers_Found"]
+            product[b"Layer_Base_Altitude"]
+            product[b"Layer_Top_Altitude"]
+            product[b"Number_Layers_Found"]
             return "calipso-layer"
         except:
             pass
         try:
-            product["metadata"]["Lidar_Data_Altitudes"]
+            product[b"metadata"][b"Lidar_Data_Altitudes"]
             return "calipso-profile"
         except KeyError:
             pass
 
     # Try CloudSat.
-    if "2B-GEOPROF" in product:
-        datasets = ("Profile_time", "Latitude", "Longitude", "Height")
-        if all(ds in product["2B-GEOPROF"] for ds in datasets):
+    if b"2B-GEOPROF" in product:
+        datasets = (b"Profile_time", b"Latitude", b"Longitude", b"Height")
+        if all(ds in product[b"2B-GEOPROF"] for ds in datasets):
             return "cloudsat-2b-geoprof"
 
     # Try MODIS.
-    if "MODIS_SWATH_Type_L1B" in product:
+    if b"MODIS_SWATH_Type_L1B" in product:
         try:
-            product["MODIS_SWATH_Type_L1B"]["Latitude"]
-            product["MODIS_SWATH_Type_L1B"]["Longitude"]
+            product[b"MODIS_SWATH_Type_L1B"][b"Latitude"]
+            product[b"MODIS_SWATH_Type_L1B"][b"Longitude"]
             return "modis-swath-l1b"
         except:
             pass
@@ -552,7 +560,7 @@ def radiance2temp(L, lamb):
 def version():
     """Prints version information and exits with 0."""
     global __version__
-    print """\
+    print("""\
 ccplot {version}
 
 Third-party libraries:
@@ -565,17 +573,17 @@ This software is provided under the terms of a 2-clause BSD licence.\
         version=__version__,
         mpl_version=mpl.__version__,
         basemap_version=basemap.__version__
-    )
+    ))
     sys.exit(0)
 
 
 def usage():
     """Prints usage information and exits the program with return value of 1."""
     global program_name
-    print >> sys.stderr, "Usage: %s [OPTION]... TYPE FILE..." % program_name
-    print >> sys.stderr, "       %s -i FILE" % program_name
-    print >> sys.stderr, "       %s -V" % program_name
-    print >> sys.stderr, "Try `%s -h' for more information." % program_name
+    sys.stderr.write("Usage: %s [OPTION]... TYPE FILE..." % program_name)
+    sys.stderr.write("       %s -i FILE" % program_name)
+    sys.stderr.write("       %s -V" % program_name)
+    sys.stderr.write("Try `%s -h' for more information." % program_name)
     sys.exit(1)
 
 
@@ -583,7 +591,7 @@ def help_and_exit():
     """Prints help and exits the program with return value of 0."""
     global program_name
 
-    print >> sys.stderr, "\
+    sys.stderr.write("\
 %s: [OPTION]... TYPE FILE...\n\
 %s: -i FILE\n\
 %s: -V\n\
@@ -644,13 +652,13 @@ TYPE is one of:\n\
 FILE is a CloudSat or Aqua MODIS HDF-EOS2 file, or a CALIPSO HDF4 file.\n\
 \n\
 Report bugs to <ccplot-general@lists.sourceforge.net>." % \
-    (program_name, program_name, program_name, program_name)
+    (program_name, program_name, program_name, program_name))
     
     sys.exit(0)
 
 
 def help_options():
-    print "\
+    print("\
 cbspacing\n\
 coastlinescolor\n\
 coastlineslw\n\
@@ -686,12 +694,12 @@ title\n\
 trajlws\n\
 trajnminorticks\n\
 trajticks\n\
-watercolor"
+watercolor")
     sys.exit(0)
 
 
 def help_projections():
-    print "\
+    print("\
 aeqd 		Azimuthal Equidistant\n\
 poly 		Polyconic\n\
 gnom 		Gnomonic\n\
@@ -717,7 +725,7 @@ spaeqd 		South-Polar Azimuthal Equidistant\n\
 ortho 		Orthographic\n\
 cass 		Cassini-Soldner\n\
 splaea 		South-Polar Lambert Azimuthal\n\
-robin 		Robinson"
+robin 		Robinson")
     sys.exit(0)
 
 
@@ -785,7 +793,7 @@ def parse_extent(text):
             seconds = int(gs[k+2]) if gs[k+2] != None else 0
             if hours > 23 or minutes > 59 or seconds > 59:
                 raise ValueError
-            e.absolute_time[k/3] = dt.time(hours, minutes, seconds)
+            e.absolute_time[int(k/3)] = dt.time(hours, minutes, seconds)
 
     elif m3 != None: # Match relative time.
         gs = m3.groups()
@@ -905,7 +913,7 @@ def parse_options(argv):
                 for p in parts:
                     opt,s,val = p.partition("=")
                     opts.plot_opts.setopt(opt, val)
-        except ValueError, err:
+        except ValueError as err:
             if err != None:
                 fail("Invalid argument passed to %s: %s" % (o, err))
             else:
@@ -970,12 +978,12 @@ def loadcolormap(filename, name):
        filename.startswith("../"):
         try:
             fp = open(filename, "r")
-        except IOError, err: fail(err)
+        except IOError as err: fail(err)
     else:
         for path in CCPLOT_CMAP_PATH.split(":"):
             try:
                 fp = open(os.path.join(path, filename), "r")
-            except IOError, err: continue
+            except IOError as err: continue
             break
     if fp == None: fail("%s: File not found" % filename)
 
@@ -1005,9 +1013,9 @@ def loadcolormap(filename, name):
                 if len(rgba) == 3: rgba.append(1)
                 specials.append(rgba)
 
-    except IOError, err:
+    except IOError as err:
         fail(err)
-    except ValueError, err:
+    except ValueError as err:
         fail("Error reading `%s' on line %d: %s" % (filename, n+1, err))
    
     if (len(rgbarray) > 0):
@@ -1045,62 +1053,62 @@ def print_info(product):
     if filetype == "cloudsat-2b-geoprof":
         name = "CloudSat"
         subtype = "2B-GEOPROF"
-        group = product["2B-GEOPROF"]
-        time = group["Profile_time"]
-        lat = group["Latitude"][:]
-        lon = group["Longitude"][:]
-        height = group["Height"][0][::-1]
-        st = group.attributes["start_time"]
-        start_time = dt.datetime.strptime(st, "%Y%m%d%H%M%S")
+        group = product[b"2B-GEOPROF"]
+        time = group[b"Profile_time"]
+        lat = group[b"Latitude"][:]
+        lon = group[b"Longitude"][:]
+        height = group[b"Height"][0][::-1]
+        st = group.attributes[b"start_time"]
+        start_time = dt.datetime.strptime(sdecode(st), "%Y%m%d%H%M%S")
         time2dt = lambda t: cloudsat_time2dt(t, start_time)
         nray = time.shape[0]
         nbin = height.shape[0]
     # CALIPSO common.
     elif filetype in ("calipso-profile", "calipso-layer"):
         name = "CALIPSO"
-        lat = product["Latitude"][:, 0]
-        lon = product["Longitude"][:, 0]
-        time = product["Profile_UTC_Time"][:, 0]
+        lat = product[b"Latitude"][:, 0]
+        lon = product[b"Longitude"][:, 0]
+        time = product[b"Profile_UTC_Time"][:, 0]
         time2dt = calipso_time2dt
         nray = len(time)
         # CALIPSO profile.
         if filetype == "calipso-profile":
             subtype = "profile"
-            height = product["metadata"]["Lidar_Data_Altitudes"][::-1]*1000
+            height = product[b"metadata"][b"Lidar_Data_Altitudes"][::-1]*1000
             nbin = len(height)
         # CALIPSO layer.
         if filetype == "calipso-layer":
             subtype = "layer"
-            nlayers = product["Number_Layers_Found"][:].max()
+            nlayers = product[b"Number_Layers_Found"][:].max()
     # MODIS.
     elif filetype == "modis-swath-l1b":
         name = "MODIS"
         subtype = "Swath L1B"
-        lon = product["MODIS_SWATH_Type_L1B"]["Longitude"][:, 0]
-        lat = product["MODIS_SWATH_Type_L1B"]["Latitude"][:, 0]
+        lon = product[b"MODIS_SWATH_Type_L1B"][b"Longitude"][:, 0]
+        lat = product[b"MODIS_SWATH_Type_L1B"][b"Latitude"][:, 0]
     else:
         fail("Unsupported product file")
 
     # Print information.
     if name is not None:
-        print "Type: %s" % name
+        print("Type: %s" % name)
     if subtype is not None:
-        print "Subtype: %s" % subtype
+        print("Subtype: %s" % subtype)
     if time is not None:
         t1 = time2dt(time[0]).strftime("%Y-%m-%d %H:%M:%S")
         t2 = time2dt(time[-1]).strftime("%Y-%m-%d %H:%M:%S")
-        print "Time: %s, %s" % (t1, t2)
+        print("Time: %s, %s" % (t1, t2))
     if height is not None:
-        print "Height: %dm, %dm" % (height[0], height[-1])
+        print("Height: %dm, %dm" % (height[0], height[-1]))
     if nray is not None:
-        print "nray: %d" % nray
+        print("nray: %d" % nray)
     if nbin is not None:
-        print "nbin: %d" % nbin
+        print("nbin: %d" % nbin)
     if nlayers is not None:
-        print "nlayers: %d" % nlayers
+        print("nlayers: %d" % nlayers)
     if lon is not None and lat is not None:
-        print "Longitude: %s, %s" % (lon2str(np.min(lon)), lon2str(np.max(lon)))
-        print "Latitude: %s, %s" % (lat2str(np.min(lat)), lat2str(np.max(lat)))
+        print("Longitude: %s, %s" % (lon2str(np.min(lon)), lon2str(np.max(lon))))
+        print("Latitude: %s, %s" % (lat2str(np.min(lat)), lat2str(np.max(lat))))
 
 
 def calipso_time2dt(time, start_time=None):
@@ -1168,28 +1176,26 @@ def lat2str(latf, degree=""):
 def setup_lonlat_axes(fig, axes, lon, lat):
     @mpl.ticker.FuncFormatter
     def lonlat_formatter(x, pos=None):
-        i = long(x)
+        i = int(x)
         if x < 0 or x >= len(lon): return ""
         return "%s\n%s" % (lon2str(lon[i], "$\degree$"), \
                            lat2str(lat[i], "$\degree$"))
 
-    llaxes = fig.add_axes(axes.get_position())
-    llaxes.yaxis.set_visible(False)
-    llaxes.axesPatch.set_alpha(0.0)
+    llaxes = axes.twiny()
     llaxes.set_xlim(axes.get_xlim())
-    llaxes.set_ylim(axes.get_ylim())
-    llaxes.set_aspect(axes.get_aspect())
     llaxes.xaxis.set_major_locator(CopyLocator(axes.xaxis))
 
     for tick in llaxes.xaxis.get_major_ticks():
-        tick.tick1On = tick.label1On = False
-        tick.tick2On = tick.label2On = True
+        tick.tick1line.set_visible(False)
+        tick.label1.set_visible(False)
+        tick.tick2line.set_visible(True)
+        tick.label2.set_visible(True)
 
     for line in llaxes.xaxis.get_ticklines():
         line.set_marker(mpl.lines.TICKUP)
 
     for label in llaxes.xaxis.get_ticklabels():
-        label.set_y(label.get_position()[1] + 0.01)
+        label.set_y(label.get_position()[1] + 0.005)
 
     llaxes.xaxis.set_major_formatter(lonlat_formatter)
 
@@ -1260,7 +1266,7 @@ def time2ray(t, time, time2dt):
     # Simple binary search.
     # TODO: Search by taking differentials would be much faster.
     while a < b: 
-        i = (a + b)/2
+        i = int((a + b)/2)
         dti = time2dt(time[i])
         if ref_dt < dti:
             b = i
@@ -1327,18 +1333,19 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
     product_name = None
     units = None
     title = None
+    name = None
     elevation = None
 
     # CloudSat.
     if filetype == "cloudsat-2b-geoprof":
         product_name = "CloudSat Profile"
         try:
-            group = product["2B-GEOPROF"]
-            start_time = group.attributes["start_time"]
-            time = group["Profile_time"]
-            lat = group["Latitude"]
-            lon = group["Longitude"]
-            height = group["Height"]
+            group = product[b"2B-GEOPROF"]
+            start_time = group.attributes[b"start_time"]
+            time = group[b"Profile_time"]
+            lat = group[b"Latitude"]
+            lon = group[b"Longitude"]
+            height = group[b"Height"]
             datasets = [group[name] for name in info["datasets"]]
         except KeyError as e:
             fail("Field \"%s\" not found" % e.args)
@@ -1346,16 +1353,16 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
         nbin = height.shape[1]
         # If we have single dataset, adopt its title and units.
         if len(datasets) == 1:
-            title = datasets[0].attributes.get("long_name")
-            units = datasets[0].attributes.get("units")
+            title = sdecode(datasets[0].attributes.get(b"long_name"))
+            units = sdecode(datasets[0].attributes.get(b"units"))
         for (key, ds) in enumerate(datasets):
             data = ds[::].astype('float32')
-            if "_FillValue" in ds.attributes:
-                data = np.ma.masked_equal(data, ds.attributes["_FillValue"])
-            if "missing" in ds.attributes:
-                data = np.ma.masked_equal(data, ds.attributes["missing"])
-            factor = ds.attributes.get("factor", 1)
-            offset = ds.attributes.get("offset", 0)
+            if b"_FillValue" in ds.attributes:
+                data = np.ma.masked_equal(data, ds.attributes[b"_FillValue"])
+            if b"missing" in ds.attributes:
+                data = np.ma.masked_equal(data, ds.attributes[b"missing"])
+            factor = ds.attributes.get(b"factor", 1)
+            offset = ds.attributes.get(b"offset", 0)
             data -= offset
             data *= 1.0/factor
             datasets[key] = data
@@ -1363,9 +1370,9 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
     # CALIPSO.
     if filetype in ("calipso-profile", "calipso-layer"):
         try:
-            time = product["Profile_UTC_Time"][:, 0]
-            lat = product["Latitude"][:, 0]
-            lon = product["Longitude"][:, 0]
+            time = product[b"Profile_UTC_Time"][:, 0]
+            lat = product[b"Latitude"][:, 0]
+            lon = product[b"Longitude"][:, 0]
             datasets = [product[name] for name in info["datasets"]]
         except KeyError as e:
             fail("Field \"%s\" not found" % e.args)
@@ -1373,24 +1380,24 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
         nray = time.shape[0]
         # If we have single dataset, adopt its title and units.
         if len(datasets) == 1:
-            title = info["datasets"][0].replace("_", " ")
-            units = datasets[0].attributes.get("units")
+            title = sdecode(info["datasets"][0]).replace("_", " ")
+            units = datasets[0].attributes.get(b"units")
         for (key, ds) in enumerate(datasets):
             data = ds[::]
             data = np.ma.masked_equal(data, -9999)
-            if "fillvalue" in ds.attributes:
-                data = np.ma.masked_equal(data, ds.attributes["fillvalue"])
+            if b"fillvalue" in ds.attributes:
+                data = np.ma.masked_equal(data, ds.attributes[b"fillvalue"])
             datasets[key] = data
 
     # CALIPSO profile.
     if filetype == "calipso-profile":
         product_name = "CALIPSO Profile"
         try:
-            height = product["metadata"]["Lidar_Data_Altitudes"]*1000
+            height = product[b"metadata"][b"Lidar_Data_Altitudes"]*1000
         except KeyError as e:
             fail("Field \"%s\" not found" % e.args)
         try:
-            elevation = product["Surface_Elevation"]
+            elevation = product[b"Surface_Elevation"]
         except KeyError as e:
             elevation = None
         nbin = len(height)
@@ -1399,18 +1406,18 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
     if filetype == "calipso-layer":
         product_name = "CALIPSO Layer"
         try:
-            topalt = product["Layer_Top_Altitude"]
-            basealt = product["Layer_Base_Altitude"]
-            nlayer = product["Number_Layers_Found"]
+            topalt = product[b"Layer_Top_Altitude"]
+            basealt = product[b"Layer_Base_Altitude"]
+            nlayer = product[b"Number_Layers_Found"]
         except KeyError as e:
             fail("Field \"%s\" not found" % e.args)
         topalt = np.ma.masked_equal(topalt[::], -9999)
         basealt = np.ma.masked_equal(basealt[::], -9999)
         try:
-            valid_range = nlayer.attributes["valid_range"]
+            valid_range = nlayer.attributes[b"valid_range"]
             try:
-                nbin = int(valid_range.split("...")[1])
-            except IndexError, ValueError:
+                nbin = int(valid_range.split(b"...")[1])
+            except IndexError as ValueError:
                 warn("Invalid valid_range attribute \"%s\", assuming maximum number of layers 10" % valid_range)
                 nbin = 10  # Fall back to 10.
         except KeyError:
@@ -1446,7 +1453,7 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
     # Determine what time conversion function to apply. We need this now
     # in order to convert time extent (if set) to extent in rays.
     if what.startswith("cloudsat"):
-        start_time_dt = dt.datetime.strptime(start_time, "%Y%m%d%H%M%S")
+        start_time_dt = dt.datetime.strptime(sdecode(start_time), "%Y%m%d%H%M%S")
         time2dt = lambda t: cloudsat_time2dt(t, start_time_dt)
     else: time2dt = calipso_time2dt
 
@@ -1564,7 +1571,6 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
             e1, e2, e2 - e1,
             ve2, ve1, resolution
         )
-
     # Plot data.
     data = np.ma.masked_invalid(data)
     im = axes.imshow(data.T,
@@ -1600,7 +1606,7 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
         line.set_marker(mpl.lines.TICKDOWN)
 
     for label in axes.xaxis.get_ticklabels():
-        label.set_y(-0.1/figh)
+        label.set_y(-0.05/figh)
 
     # Height axis.
     axes.set_ylabel("Altitude (km)")
@@ -1613,7 +1619,7 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
     axes.yaxis.set_major_locator(mpl.ticker.MultipleLocator(majorticksbases[i]))
 
     for label in axes.yaxis.get_ticklabels():
-        label.set_x(-0.1/figw)
+        label.set_x(-0.05/figw)
 
     for line in axes.yaxis.get_ticklines()+axes.yaxis.get_minorticklines():
         line.set_marker(mpl.lines.TICKLEFT)
@@ -1623,8 +1629,10 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
                 axes.yaxis.get_major_ticks() + \
                 axes.xaxis.get_minor_ticks() + \
                 axes.yaxis.get_minor_ticks():
-        tick.tick1On = tick.label1On = True
-        tick.tick2On = tick.label2On = False
+        tick.tick1line.set_visible(True)
+        tick.label1.set_visible(True)
+        tick.tick2line.set_visible(False)
+        tick.label2.set_visible(False)
 
     # Colorbar.
     cbaxes = fit_colorbar(fig, axes, space=opts.cbspacing, padding=opts.padding)
@@ -1633,6 +1641,7 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
                       format=SciFormatter())
         
     cb.set_label(name)
+    cb.ax.tick_params(direction="in")
 
     for label in cb.ax.get_yticklabels():
         label.set_fontsize(opts.cbfontsize)
@@ -1690,7 +1699,7 @@ def plot_orbit(fnames, products, fig, axes,
     modis_swath = None
     for fname, product in zip(fnames, products):
         info("Attempting to read MODIS swath from %s" % fname)
-        if product.has_key("MODIS_SWATH_Type_L1B"):
+        if b"MODIS_SWATH_Type_L1B" in product:
             modis_swath = read_modis_swath(product, band, band_mode,
                                            along_track_ext, across_track_ext)
             break
@@ -1860,23 +1869,23 @@ def plot_orbit(fnames, products, fig, axes,
     # Plot trajectories.
     j = 0
     for product in products:
-        if product.has_key("MODIS_SWATH_Type_L1B"): continue
+        if b"MODIS_SWATH_Type_L1B" in product: continue
         hit = False
         try: # Try CALIPSO names.
-            time = product["Profile_UTC_Time"][:, 0]
-            lon = product["Longitude"][:, 0]
-            lat = product["Latitude"][:, 0]
+            time = product[b"Profile_UTC_Time"][:, 0]
+            lon = product[b"Longitude"][:, 0]
+            lat = product[b"Latitude"][:, 0]
             time2dt = calipso_time2dt
             satellite = "CALIPSO"
             hit = True
         except (KeyError, IndexError): pass
         try: # Try CloudSat names.
-            sw = product["2B-GEOPROF"]
-            time = sw["Profile_time"][:]
-            lon = sw["Longitude"][:]
-            lat = sw["Latitude"][:]
-            start_time = sw.attributes["start_time"]
-            start_time_dt = dt.datetime.strptime(start_time, "%Y%m%d%H%M%S")
+            sw = product[b"2B-GEOPROF"]
+            time = sw[b"Profile_time"][:]
+            lon = sw[b"Longitude"][:]
+            lat = sw[b"Latitude"][:]
+            start_time = sw.attributes[b"start_time"]
+            start_time_dt = dt.datetime.strptime(sdecode(start_time), "%Y%m%d%H%M%S")
             time2dt = lambda t: cloudsat_time2dt(t, start_time_dt)
             satellite = "CloudSat"
             hit = True
@@ -1893,7 +1902,7 @@ def plot_orbit(fnames, products, fig, axes,
                 if mask[i]:
                     time_min = time2dt(time[i])
                     break
-            for i in reversed(range(0, len(mask))):
+            for i in reversed(list(range(0, len(mask)))):
                 if mask[i]:
                     time_max = time2dt(time[i])
                     break
@@ -1990,14 +1999,14 @@ def plot_trajectory(fig, axes, m, lon, lat, time, time2dt,
 
     # Plot trajectory ticks.
     ratio = 1.0*nray/time_delta if time_delta != 0 else 0
-    offset = long(ratio*(-time_from.microsecond/1000.0-time_from.second*1000+100))
+    offset = int(ratio*(-time_from.microsecond/1000.0-time_from.second*1000+100))
     if offset == 0: offset = -1 # For safety reasons.
     minorticks = np.empty(0, np.long)
     majorticks = np.empty(0, np.long)
     if minorticks_base > 0:
-        minorticks = np.arange(offset,nray-1,ratio*minorticks_base).astype(long)
+        minorticks = np.arange(offset,nray-1,ratio*minorticks_base).astype(int)
     if majorticks_base > 0:
-        majorticks = np.arange(offset,nray-1,ratio*majorticks_base).astype(long)
+        majorticks = np.arange(offset,nray-1,ratio*majorticks_base).astype(int)
 
     # We need to fix the aspect ratio before drawing ticks.
     axes.apply_aspect()
@@ -2027,37 +2036,37 @@ def plot_trajectory(fig, axes, m, lon, lat, time, time2dt,
 def read_modis_swath(product, band, band_mode,
                      along_track_ext=(0,-1), across_track_ext=(0,-1)):
 
-    sw = product["MODIS_SWATH_Type_L1B"]
+    sw = product[b"MODIS_SWATH_Type_L1B"]
 
     try:
-        lon = sw["Longitude"]
-        lat = sw["Latitude"]
-    except KeyError, err: 
+        lon = sw[b"Longitude"]
+        lat = sw[b"Latitude"]
+    except KeyError as err: 
         return None
 
     data = None
     if band in (1, 2):
-        data = sw.get("EV_250_RefSB", data)
-        data = sw.get("EV_250_Aggr500_RefSB", data)
-        data = sw.get("EV_250_Aggr1km_RefSB", data)
+        data = sw.get(b"EV_250_RefSB", data)
+        data = sw.get(b"EV_250_Aggr500_RefSB", data)
+        data = sw.get(b"EV_250_Aggr1km_RefSB", data)
         band_offset = -1
     elif band in (3, 4, 5, 6, 7):
-        data = sw.get("EV_500_RefSB", data)
-        data = sw.get("EV_500_Aggr1km", data)
+        data = sw.get(b"EV_500_RefSB", data)
+        data = sw.get(b"EV_500_Aggr1km", data)
         band_offset = -3
     elif band in range(8, 20) or band in (13.5, 14.5):
-        data = sw.get("EV_1KM_RefSB", data)
+        data = sw.get(b"EV_1KM_RefSB", data)
         if band <= 13: band_offset = -8
         elif band == 13.5: band_offset = -7
         elif band == 14.0: band_offset = -7
         else: band_offset = -6
     elif band in range(20, 26):
-        data = sw.get("EV_1KM_Emissive", data)
+        data = sw.get(b"EV_1KM_Emissive", data)
         band_offset = -20
     # TODO: Add support for band 26.
     elif band == 26: fail("Band 26 is not supported")
     elif band in range(27, 37):
-        data = sw.get("EV_1KM_Emissive", data)
+        data = sw.get(b"EV_1KM_Emissive", data)
         band_offset = -21
 
     band_index = band + band_offset
@@ -2073,13 +2082,13 @@ def read_modis_swath(product, band, band_mode,
 
     if band_mode == BAND_MODE_REFLECTANCE:
         try:
-            si_scale = data.attributes["reflectance_scales"][band_index]
-            si_offset = data.attributes["reflectance_offsets"][band_index]
+            si_scale = data.attributes[b"reflectance_scales"][band_index]
+            si_offset = data.attributes[b"reflectance_offsets"][band_index]
         except KeyError: fail("Reflectance parameters not present")
     elif band_mode == BAND_MODE_RADIANCE:
         try:
-            si_scale = data.attributes["radiance_scales"][band_index]
-            si_offset = data.attributes["radiance_offsets"][band_index]
+            si_scale = data.attributes[b"radiance_scales"][band_index]
+            si_offset = data.attributes[b"radiance_offsets"][band_index]
         except KeyError: fail("Radiance parameters not present")
     else: fail("Assertion error: Invalid ref/rad switch")
 
@@ -2171,6 +2180,7 @@ def plot_swath(swath, m, fig, axes, colormap=None, norm=None, ticks=None,
     cb = fig.colorbar(im, ax=axes, cax=cbaxes, orientation="vertical",
                       extend="both", norm=norm, ticks=ticks)
     cb.set_label(swath.name)
+    cb.ax.tick_params(direction="in")
 
     for label in cb.ax.get_yticklabels():
         label.set_fontsize(opts.cbfontsize)
@@ -2188,16 +2198,16 @@ def main(argv):
     # Open each file as HDF and HDF-EOS if possible.
     products = []
     for fname in opts.fnames:
-        try: product = HDF(fname)
+        try: product = HDF(fsencode(fname))
         except IOError as e: fail("%s: %s" % (fname, e.strerror))
 
-        try: hdfeosversion = product.attributes['HDFEOSVersion']
+        try: hdfeosversion = product.attributes[b'HDFEOSVersion']
         except KeyError: hdfeosversion = None
 
         if hdfeosversion is not None:
             # Reopen with HDFEOS.
             product.close()
-            try: product = HDFEOS(fname)
+            try: product = HDFEOS(fsencode(fname))
             except IOError as e: fail("%s: %s" % (fname, e.strerror))
 
         products.append(product)
@@ -2301,7 +2311,7 @@ def main(argv):
     info("Saving plot")
 
     try: plt.savefig(opts.outfname, dpi=opts.dpi)
-    except IOError, err: fail("Write error: %s" % err)
+    except IOError as err: fail("Write error: %s" % err)
 
     #report_memory()
     
@@ -2311,5 +2321,5 @@ if __name__ == "__main__":
         main(sys.argv)
     except MemoryError:
         fail("Insufficient memory")
-    except np.linalg.linalg.LinAlgError, err:
+    except np.linalg.linalg.LinAlgError as err:
         fail("Linear algebra error: %s" % err)

@@ -1,7 +1,17 @@
 cimport cython
 cimport numpy as np
+import sys
+import os
 import numpy as np
-from UserDict import DictMixin
+if sys.version_info[0] == 2:
+    from UserDict import DictMixin as DictMixin
+else:
+    from collections.abc import Mapping
+    class DictMixin(Mapping):
+        def __iter__(self):
+            yield from self.keys()
+        def __len__(self):
+            return len(self.keys())
 
 cdef extern from "errno.h":
     cdef extern int errno
@@ -250,7 +260,7 @@ class HDF(DictMixin):
             sds = SDselect(self.sd, i)
             res = SDgetinfo(sds, <char *>tmp.data, &rank, <int32 *>dims.data, &data_type, &num_attrs)
             if res == FAIL: self._error('HDF: SDgetinfo failed')
-            sds_name = bytearray(tmp).decode('ascii').rstrip('\0')
+            sds_name = bytes(bytearray(tmp)).rstrip(b'\0')
             datasets.append(sds_name)
         return datasets
 
@@ -310,7 +320,7 @@ class HDF(DictMixin):
             tmp = np.zeros(FIELDNAMELENMAX, dtype=np.byte)
             res = SDattrinfo(obj_id, i, <char *>tmp.data, &data_type, &count)
             if res == FAIL: self._error('HDF: SDattrinfo failed')
-            attr_name = bytearray(tmp).decode('ascii').rstrip('\0')
+            attr_name = bytes(bytearray(tmp)).rstrip(b'\0')
             attrs.append(attr_name)
         return attrs
    
@@ -393,7 +403,7 @@ class HDF(DictMixin):
             self._error('HDF: SDreadattr of "%s" failed' % name)
         
         if data_type == DFNT_CHAR:
-            return bytearray(data).decode('ascii').rstrip('\0')
+            return bytes(bytearray(data)).rstrip(b'\0')
 
         return data[0] if count == 1 else data
 
@@ -434,7 +444,7 @@ class HDF(DictMixin):
                 )
 
             if data_type == DFNT_CHAR:
-                return bytearray(data).decode('ascii').rstrip('\0')
+                return bytes(bytearray(data)).rstrip('\0')
             else:
                 return data.view(dtype=dtype)
 

@@ -1,7 +1,7 @@
 /* cctkmodule.c
  * This file is a part of ccplot: a CloudSat and CALIPSO plotting tool.
  *
- * Copyright (c) 2009 Peter Kuma
+ * Copyright (c) 2009-2020 Peter Kuma
  *
  * This software is provided under the terms of a 2-clause BSD licence:
  *
@@ -86,10 +86,10 @@ float modulus)
 			br4 = fmodf(*b4 - *b1, modulus);
 			
 			*outbin = *b1 + (
-			    br1 * (1-dk)*(1-dl) +
-			    br2 * (1-dk)* dl +
-			    br3 *    dk *(1-dl) +
-			    br4 *    dk * dl);
+				br1 * (1-dk)*(1-dl) +
+				br2 * (1-dk)* dl +
+				br3 *	dk *(1-dl) +
+				br4 *	dk * dl);
 		}
 	}
 }
@@ -107,7 +107,7 @@ cctk_dimmap2d(PyObject *self, PyObject *args)
 	npy_intp outdims[2] = { 0, 0 };
 
 	if (!PyArg_ParseTuple(args, "Oiiiif", &arg1, &off1, &inc1, &off2,
-	    &inc2, &modulus) ) {
+		&inc2, &modulus) ) {
 		return NULL;
 	}
 
@@ -150,8 +150,8 @@ fail:
 
 static PyObject *
 interpolate2d(PyObject *data, PyObject *xin2d, PyObject *yin2d, PyObject *out,
-    float xout1, float xout2, float yout1, float yout2,
-    float fill, int radiusx, int radiusy)
+	float xout1, float xout2, float yout1, float yout2,
+	float fill, int radiusx, int radiusy)
 {
 	npy_intp i, j, k, l, kp, lq;
 	int p, q;
@@ -196,13 +196,13 @@ interpolate2d(PyObject *data, PyObject *xin2d, PyObject *yin2d, PyObject *out,
 				for (q = -radiusy; q <= radiusy; q++) {
 					kp = k+p, lq = l+q;
 					if (kp < 0 || lq < 0 ||
-					    kp >= xoutn || lq >= youtn)
+						kp >= xoutn || lq >= youtn)
 						continue;
 					outbin = PyArray_GETPTR2(out,kp,lq);
 					coefbin= PyArray_GETPTR2(coefa,kp,lq);
 					/*
 					coef = 1.f /
-					    ((kp-kf)*(kp-kf)+(lq-lf)*(lq-lf));
+						((kp-kf)*(kp-kf)+(lq-lf)*(lq-lf));
 					coef = pow(10, -((kp-kf)*(kp-kf)+(lq-lf)*(lq-lf)));
 					*outbin += (*bin)*coef;
 					*coefbin += coef;
@@ -247,8 +247,8 @@ cctk_interpolate2d(PyObject *self, PyObject *args)
 	npy_intp outdims[2] = { 0, 0 };
 
 	if (!PyArg_ParseTuple(args, "OOO(ffi)(ffi)fii", &arg1, &arg2, &arg3,
-	    &xout1, &xout2, &xoutn, &yout1, &yout2, &youtn, &fill,
-	    &radiusx, &radiusy)) {
+		&xout1, &xout2, &xoutn, &yout1, &yout2, &youtn, &fill,
+		&radiusx, &radiusy)) {
 		return NULL;
 	}
 
@@ -262,7 +262,7 @@ cctk_interpolate2d(PyObject *self, PyObject *args)
 	if (yin2d == NULL) goto fail;
 
 	if (PyArray_NDIM(data) != 2 || PyArray_NDIM(xin2d) != 2 ||
-	    PyArray_NDIM(yin2d) != 2) {
+		PyArray_NDIM(yin2d) != 2) {
 		PyErr_SetString(PyExc_ValueError, "Incorrect dimensions.");
 		goto fail;
 	}
@@ -272,7 +272,7 @@ cctk_interpolate2d(PyObject *self, PyObject *args)
 	dims3 = PyArray_DIMS(yin2d);
 
 	if (dims2[0] != dims1[0] || dims2[1] != dims1[1] ||
-	    dims3[0] != dims1[0] || dims3[1] != dims1[1]) {
+		dims3[0] != dims1[0] || dims3[1] != dims1[1]) {
 		PyErr_SetString(PyExc_ValueError, "Dimensions do not match");
 		goto fail;
 	}
@@ -290,7 +290,7 @@ cctk_interpolate2d(PyObject *self, PyObject *args)
 	
 	/* Core function call. */
 	out = interpolate2d(data, xin2d, yin2d, out, xout1, xout2, yout1, yout2,
-	    fill, radiusx, radiusy);
+		fill, radiusx, radiusy);
 
 	Py_DECREF(data);
 	Py_DECREF(xin2d);
@@ -325,7 +325,7 @@ fail:
  */
 static PyObject *
 layermap(PyObject *data, PyObject *nlayer, PyObject *basealt,
-    PyObject *topalt, PyObject *out, float y0, float ym, float fill)
+	PyObject *topalt, PyObject *out, float y0, float ym, float fill)
 {
 	npy_intp i, j, k;
 	npy_intp n, m, nlayer_max;
@@ -389,7 +389,7 @@ cctk_layermap(PyObject *self, PyObject *args)
 	npy_intp outdims[2] = { 0, 0 };
 
 	if (!PyArg_ParseTuple(args, "OOOO(ffi)f", &arg1, &arg2, &arg3, &arg4,
-	    &yout1, &yout2, &youtn, &fill)) {
+		&yout1, &yout2, &youtn, &fill)) {
 		return NULL;
 	}
 
@@ -406,7 +406,7 @@ cctk_layermap(PyObject *self, PyObject *args)
 	if (topalt == NULL) goto fail;
 
 	if (PyArray_NDIM(data) != 2 || PyArray_NDIM(nlayer) != 1 ||
-	    PyArray_NDIM(basealt) != 2 || PyArray_NDIM(topalt) != 2) {
+		PyArray_NDIM(basealt) != 2 || PyArray_NDIM(topalt) != 2) {
 		PyErr_SetString(PyExc_ValueError, "Incorrect dimensions.");
 		goto fail;
 	}
@@ -417,8 +417,8 @@ cctk_layermap(PyObject *self, PyObject *args)
 	dims4 = PyArray_DIMS(topalt);
 
 	if (dims3[0] != dims1[0] || dims3[1] != dims1[1] ||
-	    dims4[0] != dims1[0] || dims4[1] != dims1[1] ||
-	    dims2[0] != dims1[0]) {
+		dims4[0] != dims1[0] || dims4[1] != dims1[1] ||
+		dims2[0] != dims1[0]) {
 		PyErr_SetString(PyExc_ValueError, "Dimensions do not match");
 		goto fail;
 	}
@@ -451,21 +451,55 @@ fail:
 	return NULL;
 }
 
-static PyMethodDef CCTKMethods[] = {
+static PyMethodDef cctk_methods[] = {
 	{ "interpolate2d", cctk_interpolate2d, METH_VARARGS,
-	    "Linearly interpolate values of a 2D array on a regular grid."},
+		"Linearly interpolate values of a 2D array on a regular grid."},
 	{ "dimmap2d", cctk_dimmap2d, METH_VARARGS,
-	    "Map dimensions by linear interpolation." },
+		"Map dimensions by linear interpolation." },
 	{ "layermap", cctk_layermap, METH_VARARGS,
-	    "Map a layer product onto a two-dimensional regular grid." },
-	{ NULL, NULL, 0, NULL }
+		"Map a layer product onto a two-dimensional regular grid." },
+	{NULL, NULL}
 };
 
+#if PY_MAJOR_VERSION >= 3
+
+static struct PyModuleDef moduledef = {
+	PyModuleDef_HEAD_INIT,
+	"cctk",
+	NULL,
+	0,
+	cctk_methods,
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
+#define INITERROR return NULL
+
 PyMODINIT_FUNC
+PyInit_cctk(void)
+
+#else
+#define INITERROR return
+
+void
 initcctk(void)
+#endif
 {
-	(void) Py_InitModule("cctk", CCTKMethods);
+#if PY_MAJOR_VERSION >= 3
+	PyObject *module = PyModule_Create(&moduledef);
+#else
+	PyObject *module = Py_InitModule("cctk", cctk_methods);
+#endif
+
+	if (module == NULL) {
+		INITERROR;
+	}
+
 	import_array();
 
+#if PY_MAJOR_VERSION >= 3
+	return module;
+#endif
 }
-
