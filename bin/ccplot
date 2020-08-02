@@ -72,7 +72,7 @@ CCPLOT_CMAP_PATH = os.path.join(ccplot.config.sharepath, 'cmap') \
 # Early functions.
 def fail(s):
     global program_name
-    sys.stderr.write("%s: %s" % (program_name, s))
+    sys.stderr.write("%s: %s\n" % (program_name, s))
     sys.exit(1)
 
 def fsencode(x):
@@ -484,7 +484,7 @@ def report_memory():
 
 def warn(s):
     global program_name
-    sys.stderr.write("%s: Warning: %s" % (program_name, s))
+    sys.stderr.write("%s: Warning: %s\n" % (program_name, s))
 
 
 def info(s):
@@ -580,10 +580,10 @@ This software is provided under the terms of a 2-clause BSD licence.\
 def usage():
     """Prints usage information and exits the program with return value of 1."""
     global program_name
-    sys.stderr.write("Usage: %s [OPTION]... TYPE FILE..." % program_name)
-    sys.stderr.write("       %s -i FILE" % program_name)
-    sys.stderr.write("       %s -V" % program_name)
-    sys.stderr.write("Try `%s -h' for more information." % program_name)
+    sys.stderr.write("Usage: %s [OPTION]... TYPE FILE...\n" % program_name)
+    sys.stderr.write("       %s -i FILE\n" % program_name)
+    sys.stderr.write("       %s -V\n" % program_name)
+    sys.stderr.write("Try `%s -h' for more information.\n" % program_name)
     sys.exit(1)
 
 
@@ -651,7 +651,7 @@ TYPE is one of:\n\
 \n\
 FILE is a CloudSat or Aqua MODIS HDF-EOS2 file, or a CALIPSO HDF4 file.\n\
 \n\
-Report bugs to <ccplot-general@lists.sourceforge.net>." % \
+Report bugs to <ccplot-general@lists.sourceforge.net>.\n" % \
     (program_name, program_name, program_name, program_name))
 
     sys.exit(0)
