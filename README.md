@@ -12,7 +12,7 @@ Requirements
 
 Make sure you have the following programs and libraries installed:
 
-  * [Python](http://www.python.org/) >= 2.6 and < 3.0,
+  * [Python](http://www.python.org/) >= 2.6
     including development files
   * [cython](http://cython.org/)
   * [numpy](http://www.numpy.org/)
@@ -23,13 +23,22 @@ Make sure you have the following programs and libraries installed:
 
 **Note:** On Debian and Ubuntu, install dependencies with:
 
-    apt-get install --no-install-recommends cython python-numpy python-imaging python-matplotlib python-mpltoolkits.basemap ttf-bitstream-vera libhdf4-dev libhdfeos-dev
-
+    # Python 3
+    apt-get install --no-install-recommends cython3 python3-numpy python3-pil python3-matplotlib python3-mpltoolkits.basemap ttf-bitstream-vera libhdf4-dev libhdfeos-dev
+    
+    # Python 2
+    apt-get install --no-install-recommends cython python-numpy python-pil python-matplotlib python-mpltoolkits.basemap ttf-bitstream-vera libhdf4-dev libhdfeos-dev
+    
 Installation
 ------------
 
 Go to the source distribution directory and perform the following commands:
 
+    # Python 3
+    python3 setup.py build
+    sudo python3 setup.py install
+
+    # Python 2
     python setup.py build
     sudo python setup.py install
 
