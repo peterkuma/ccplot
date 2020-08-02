@@ -209,7 +209,7 @@ class AutoOpts(object):
         if f < a or f > b:
             raise ValueError("%s expected between %f and %f" % (o, a, b))
         return f
-        
+
     def setstr(self, o, v, maxlen=sys.maxsize):
         if len(v) > maxlen:
             raise ValueError("%s can be at most %d characters long" % (o, maxlen))
@@ -232,21 +232,21 @@ class AutoOpts(object):
         if v == "1": return True
         elif v == "0": return False
         else: raise ValueError("%s must be 1 or 0" % o)
-        
+
     def setlon(self, o, v):
         if v.endswith("W"): lon -float(v[0:-1])
         elif v.endswith("E"): lon = float(v[0:-1])
         else: raise ValueError("%s must end with W or E" % o)
         if lon < -180 or lon > 180: raise ValueError("%s out of range" % o)
         return lon
-    
+
     def setlat(self, o, v):
         if v.endswith("S"): lat = -float(v[0:-1])
         elif v.endswith("N"): lat = float(v[0:-1])
         else: raise ValueError("%s must end with S or N" % o)
         if lat < -90 or lat > 90: raise ValueError("%s out of range" % o)
         return lat
-        
+
 
 class PlotOpts(AutoOpts):
     cbfontsize = 8
@@ -342,17 +342,17 @@ class ProjOpts(AutoOpts):
     lon_0 = None
     lon_1 = None
     lon_2 = None
-    
+
     def setopt(self, o, v):
         if   o == "boundinglat": q = self.setlat(o, v)
         elif o == "lon_0": q = self.setlon(o, v)
         elif o == "lon_1": q = self.setlon(o, v)
-        elif o == "lon_2": q = self.setlon(o, v)        
+        elif o == "lon_2": q = self.setlon(o, v)
         elif o == "lat_0": q = self.setlat(o, v)
         elif o == "lat_1": q = self.setlat(o, v)
         elif o == "lat_2": q = self.setlat(o, v)
         elif o == "lat_ts": q = self.setlat(o, v)
-        
+
         else: raise ValueError
         setattr(self, o, q)
 
@@ -405,7 +405,7 @@ class TimeMinorLocator(mpl.ticker.Locator):
         else:
             return []
 
-        
+
 class TimeFormatter(mpl.ticker.Formatter):
     def __init__(self, time, time2dt):
         self.time = time
@@ -420,7 +420,7 @@ class TimeFormatter(mpl.ticker.Formatter):
 class CopyLocator(mpl.ticker.Locator):
     def __init__(self, axis):
         self.model_axis = axis
-    
+
     def __call__(self):
         return self.model_axis.get_majorticklocs()
 
@@ -440,9 +440,9 @@ class HorizontalExtent(object):
     TYPE_ABSOLUTE_TIME = 3
     TYPE_RELATIVE_TIME = 4
     TYPE_LON_LAT = 5
-    
+
     extent_type = TYPE_NONE
-    
+
     along_track = [0, -1]
     across_track = [0, -1]
     absolute_time = [None, None] # [dt.time(), dt.time()]
@@ -545,7 +545,7 @@ def modis_band_wavelength(band):
 
 def radiance2temp(L, lamb):
     """Converts radiace to temperature by inverse Planck's law.
-    
+
     Arguments:
         L       -- radiance in W m^-2 m^-1
         lamb    -- wavelength in m
@@ -653,7 +653,7 @@ FILE is a CloudSat or Aqua MODIS HDF-EOS2 file, or a CALIPSO HDF4 file.\n\
 \n\
 Report bugs to <ccplot-general@lists.sourceforge.net>." % \
     (program_name, program_name, program_name, program_name))
-    
+
     sys.exit(0)
 
 
@@ -741,33 +741,33 @@ def parse_extent(text):
         Instance of HorizontalExtent.
     """
     e = HorizontalExtent()
-    
+
     # Match longitude/latitude in the form
     # lon{E|W}..lon{E|W},lat{S|N}..lat{S|N}
     r1 = re.compile(r"^(\d+(?:\.\d+)?)(E|W)\.\.(\d+(?:\.\d+)?)(E|W),(\d+(?:\.\d+)?)(S|N)\.\.(\d+(?:\.\d+)?)(S|N)$")
     m1 = r1.match(text)
-    
+
     # Match longitude/latitude in the form
     # lat{S|N}..lat{S|N},lon{E|W}..lon{E|W}
     r1_rev = re.compile(r"^(\d+(?:\.\d+)?)(S|N)\.\.(\d+(?:\.\d+)?)(S|N),(\d+(?:\.\d+)?)(E|W)\.\.(\d+(?:\.\d+)?)(E|W)$")
     m1_rev = r1_rev.match(text)
-    
+
     # Match absolute time in format hour:min[:sec]..hour:min[:sec].
     r2 = re.compile(r"^(\d?\d):(\d\d)(?::(\d\d))?\.\.(\d?\d):(\d\d)(?::(\d\d))?$")
     m2 = r2.match(text)
-    
+
     # Match relative time in format +/-[hour:]min:sec..+/-[hour:]min:sec.
     r3 = re.compile(r"^(\+|-)(?:(\d+):)?(\d?\d):(\d\d)\.\.(\+|-)(?:(\d+):)?(\d?\d):(\d\d)$")
     m3 = r3.match(text)
-    
+
     # Match along_track,across_track, i.e NUM..NUM,NUM..NUM.
     r4 = re.compile(r"^((?:\+|-)?\d+)\.\.((?:\+|-)?\d+),((?:\+|-)?\d+)\.\.((?:\+|-)?\d+)$")
     m4 = r4.match(text)
-    
+
     # Match along_track, i.e NUM..NUM.
     r5 = re.compile(r"^((?:\+|-)?\d+)\.\.((?:\+|-)?\d+)$")
     m5 = r5.match(text)
-    
+
     if m1 != None: # Match longitude,latitude.
         gs = m1.groups()
         e.extent_type = HorizontalExtent.TYPE_LON_LAT
@@ -805,34 +805,34 @@ def parse_extent(text):
             seconds = int(gs[k+3]) if gs[k+3] != None else 0
             if minutes > 59 or seconds > 59: raise ValueError
             e.relative_time[k/4] = sign*dt.timedelta(0, seconds,
-                                                     0, 0, minutes, hours)        
-    
+                                                     0, 0, minutes, hours)
+
     elif m4 != None: # Match along_track,across_track.
         gs = m4.groups()
         e.extent_type = HorizontalExtent.TYPE_ALONG_TRACK_ACROSS_TRACK
         e.along_track = [int(gs[0]), int(gs[1])]
         e.across_track = [int(gs[2]), int(gs[3])]
-        
+
     elif m5 != None: # Match along_track.
         gs = m5.groups()
         e.extent_type = HorizontalExtent.TYPE_ALONG_TRACK
         e.along_track = [int(gs[0]), int(gs[1])]
-    
+
     else:
         raise ValueError
-    
+
     if e.lon[0] < -180.0: e.lon[0] = -180.0
     if e.lon[0] > 180.0: e.lon[0] = 180.0
 
     if e.lon[1] < -180.0: e.lon[1] = -180.0
     if e.lon[1] > 180.0: e.lon[1] = 180.0
-    
+
     if e.lat[0] < -90.0: e.lat[0] = -90.0
     if e.lat[0] > 90.0: e.lat[0] = 90.0
 
     if e.lat[1] < -90.0: e.lat[1] = -90.0
     if e.lat[1] > 90.0: e.lat[1] = 90.0
-    
+
     if e.lon[0] >= e.lon[1]: e.lon.reverse()
     if e.lat[0] >= e.lat[1]: e.lat.reverse()
 
@@ -841,10 +841,10 @@ def parse_extent(text):
 
 def parse_options(argv):
     """Parses command-line arguments.
-    
+
     Arguments:
         argv -- array of command-line arguments
-    
+
     Returns:
         instance of Options
     """
@@ -853,15 +853,15 @@ def parse_options(argv):
     if len(argv) < 2: usage()
     if argv[1] == "-h" and len(argv) == 2: help_and_exit()
     if argv[1] == "-V" and len(argv) == 2: version()
-    
+
     if argv[1] == "-i" and len(argv) > 2:
         opts.fnames = argv[2:]
         opts.print_info_only = True
         return opts
-    
+
     try: cmdopts, args = getopt.getopt(argv[1:], "a:c:d:m:o:p:r:vx:y:z:")
     except getopt.error: usage()
-  
+
     for o, a in cmdopts:
         try:
             if o == "-a":
@@ -884,7 +884,7 @@ def parse_options(argv):
             elif o == "-o": opts.outfname = a
             elif o == "-p":
                 if a == "help": help_projections()
-                
+
                 opts.projection,s,opts_str  = a.partition(":")
 
                 parts = opts_str.split(",")
@@ -926,31 +926,31 @@ def parse_options(argv):
     opts.fnames = args[1:]
 
     return opts
-    
+
 
 def loadcolormap(filename, name):
     """"Returns a tuple of matplotlib colormap, matplotlib norm,
     and a list of ticks loaded from the file filename in format:
-    
+
     BOUNDS
     from1 to1 step1
     from2 to2 step2
     ...
-    
+
     TICKS
     from1 to1 step1
     from2 to2 step2
-    
+
     COLORS
     r1 g1 b1
     r2 g2 b2
     ...
-    
+
     UNDER_OVER_BAD_COLORS
     ro go bo
     ru gu bu
     rb gb bb
-    
+
     Where fromn, ton, stepn are floating point numbers as would be supplied
     to numpy.arange, and rn, gn, bn are the color components the n-th color
     stripe. Components are expected to be in base10 format (0-255).
@@ -965,13 +965,13 @@ def loadcolormap(filename, name):
         A tuple of: instance of ListedColormap, instance of BoundaryNorm, ticks.
     """
     global CCPLOT_CMAP_PATH
-    
+
     bounds = []
     ticks = []
     rgbarray = []
     specials = []
     mode = "COLORS"
-    
+
     fp = None
     if filename.startswith("/") or \
        filename.startswith("./") or \
@@ -1017,7 +1017,7 @@ def loadcolormap(filename, name):
         fail(err)
     except ValueError as err:
         fail("Error reading `%s' on line %d: %s" % (filename, n+1, err))
-   
+
     if (len(rgbarray) > 0):
         colormap = mpl.colors.ListedColormap(rgbarray, name)
         try:
@@ -1027,7 +1027,7 @@ def loadcolormap(filename, name):
         except IndexError: pass
     else:
         colormap = None
-        
+
     if len(bounds) == 0:
         norm = None
     else:
@@ -1114,11 +1114,11 @@ def print_info(product):
 def calipso_time2dt(time, start_time=None):
     """Converts a float in format yymmdd.ffffffff to a instance of python
     datetime class.
-    
+
     Arguments:
         time        -- float in format yymmdd.ffffffff
-        start_time  -- ignored 
-    
+        start_time  -- ignored
+
     Returns:
         An instance of datetime.
     """
@@ -1130,20 +1130,20 @@ def calipso_time2dt(time, start_time=None):
 
 def cloudsat_time2dt(time, start_time):
     """Converts time in seconds to a instance of python datetime class.
-    
+
     Arguments:
         time        -- seconds from start_time
         start_time  -- python datetime
-    
+
     Returns:
         An instance of datetime.
     """
     return start_time + dt.timedelta(0, float(time))
-    
-    
+
+
 def fit_colorbar(fig, axes, aspect=0.03, space=0.4, padding=0.0):
     """Creates new axes for a colorbar at the expense of main axes.
-    
+
     Arguments:
         fig     -- an instance of mpl.Figure
         axes    -- an instance of mpl.Axes
@@ -1155,7 +1155,7 @@ def fit_colorbar(fig, axes, aspect=0.03, space=0.4, padding=0.0):
     x, y, width, height = get_axes_bounds(fig, axes)
     return new_axes(fig, x + width + space, y, aspect*height, height,
                     padding=padding)
-    
+
 
 def stripstr(s1, s2):
     i = s1.rfind(s2)
@@ -1223,18 +1223,18 @@ def resize_figure(fig, figw, figh):
 def expand_axes(fig, axes, width, height, padding):
     figw_old, figh_old = fig.get_size_inches()
     x, y, w, h = get_axes_bounds(fig, axes)
-    
+
     figw = max(figw_old, x + width + padding)
     figh = max(figh_old, y + height + padding)
-    
+
     resize_figure(fig, figw, figh)
     x, y, w, h = get_axes_bounds(fig, axes)
     axes.set_position([x/figw, 1-(y+height)/figh, width/figw, height/figh])
-        
+
 
 def new_axes(fig, x, y, width, height, padding=1.0):
     figw_old, figh_old = fig.get_size_inches()
-    
+
     figw = max(figw_old, x + width + padding)
     figh = max(figh_old, y + height + padding)
 
@@ -1247,25 +1247,25 @@ def time2ray(t, time, time2dt):
     time2dt(time[i]) best matches dt.time instance t. Returns -1 if time
     is empty.
     """
-    
+
     a = 0
     b = time.shape[0]-1
     i = 0
-    
+
     if time.shape[0] == 0: return -1
 
     if isinstance(t, dt.timedelta):
         if t < dt.timedelta(0): ref_dt = time2dt(time[-1]) + t
         else: ref_dt = time2dt(time[0]) + t
-    else: # dt.time expected.    
+    else: # dt.time expected.
         date0 = time2dt(time[0]).date()
         time0 = time2dt(time[0]).time()
         if t < time0: ref_dt = dt.datetime.combine(date0 + dt.timedelta(1), t)
         else: ref_dt = dt.datetime.combine(date0, t)
-    
+
     # Simple binary search.
     # TODO: Search by taking differentials would be much faster.
-    while a < b: 
+    while a < b:
         i = int((a + b)/2)
         dti = time2dt(time[i])
         if ref_dt < dti:
@@ -1282,9 +1282,9 @@ def time2ray(t, time, time2dt):
 def lonlat2ray(lonextent, latextent, lon, lat):
     mask = (lon > lonextent[0]) & (lon < lonextent[1]) & \
            (lat > latextent[0]) & (lat < latextent[1])
-    
+
     e1 = e2 = 0
-    
+
     i = 0
     n = len(mask)
     while i < n and not mask[i]:
@@ -1585,8 +1585,8 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
         line = mpl.lines.Line2D(np.arange(0, e2-e1), elevation,
                                 color=opts.elevcolor, lw=opts.elevlw)
         axes.add_line(line)
-    
-    
+
+
     td = time2dt(time[-1]) - time2dt(time[0])
     nseconds = td.days*86400 + td.seconds
     if nseconds == 0: return
@@ -1595,13 +1595,13 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
     expand_axes(fig, axes, width, height, padding=opts.padding)
     figw, figh = fig.get_size_inches()
     #nlocs = int(width*1.5)
-    
+
     # Time axis.
     axes.set_xlabel("Time (UTC)")
     axes.xaxis.set_minor_locator(TimeMinorLocator())
     axes.xaxis.set_major_locator(TimeLocator(width/(opts.fontsize/72.0*5), time, time2dt))
     axes.xaxis.set_major_formatter(TimeFormatter(time, time2dt))
-    
+
     for line in axes.xaxis.get_ticklines() + axes.xaxis.get_minorticklines():
         line.set_marker(mpl.lines.TICKDOWN)
 
@@ -1610,7 +1610,7 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
 
     # Height axis.
     axes.set_ylabel("Altitude (km)")
-    
+
     majorticksbases = np.array([0.5,   1,   2, 5])
     minorticksbases = np.array([0.1, 0.2, 0.5, 1])
     height_per_tick = (ve2-ve1)*0.001/(height/(opts.fontsize*2/72.0))
@@ -1639,7 +1639,7 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
     cb = fig.colorbar(im, ax=axes, cax=cbaxes, orientation="vertical",
                       extend="both", ticks=ticks, norm=norm,
                       format=SciFormatter())
-        
+
     cb.set_label(name)
     cb.ax.tick_params(direction="in")
 
@@ -1663,7 +1663,7 @@ def plot_orbit(fnames, products, fig, axes,
     colormap=None, norm=None,
     ticks=None, radius=None, opts=PlotOpts()):
     """Draws a map plot of a CloudSat and CALIPSO trajectories and MODIS swath.
-    
+
     Arguments:
         products    -- a list of products
         fig         -- matplotlib Figure instance
@@ -1677,11 +1677,11 @@ def plot_orbit(fnames, products, fig, axes,
         norm        -- matplotlib Normalize instance
         ticks       -- a list of ticks to be drawn on colorbar
     """
-    
+
     info("Plotting orbit")
-    
+
     titlea = []
-    
+
     along_track_ext = (0, -1)
     across_track_ext = (0, -1)
     if hextent.extent_type == HorizontalExtent.TYPE_ALONG_TRACK:
@@ -1694,7 +1694,7 @@ def plot_orbit(fnames, products, fig, axes,
     elif hextent.extent_type == HorizontalExtent.TYPE_NONE:
         pass
     else: fail("Extent type not supported by swath plots")
-    
+
     # Search for a MODIS data file.
     modis_swath = None
     for fname, product in zip(fnames, products):
@@ -1715,7 +1715,7 @@ def plot_orbit(fnames, products, fig, axes,
         lat_0 = np.average(modis_swath.lat) # Central latitude.
         lon_min, lat_min = modis_swath.lon.min(), modis_swath.lat.min()
         lon_max, lat_max = modis_swath.lon.max(), modis_swath.lat.max()
-        
+
     else:
         minorticks_base = 60000
         majorticks_base = 300000
@@ -1780,7 +1780,7 @@ def plot_orbit(fnames, products, fig, axes,
 
     if opts.trajticks > 0:
         majorticks_base = opts.trajticks * 1000
-    
+
     if opts.trajnminorticks == 0:
         minorticks_base = 0
     elif opts.trajnminorticks > 0:
@@ -1799,10 +1799,10 @@ def plot_orbit(fnames, products, fig, axes,
 
     if proj_opts.boundinglat != None:
         boundinglat = proj_opts.boundinglat
-    
+
     if proj_opts.lon_0 != None:
         lon_0 = proj_opts.lon_0
-    
+
     if proj_opts.lat_0 != None:
         lat_0 = proj_opts.lat_0
 
@@ -1856,7 +1856,7 @@ def plot_orbit(fnames, products, fig, axes,
                         linewidth=opts.majormeridianslw,
                         color=opts.majormeridianscolor,
                         labels=[0, 0, 0, 1])
-    
+
     # Plot swath.
     if modis_swath != None:
         info("Plotting swath")
@@ -1890,7 +1890,7 @@ def plot_orbit(fnames, products, fig, axes,
             satellite = "CloudSat"
             hit = True
         except (AttributeError, KeyError, IndexError): pass
-        
+
         if hit:
             lw = opts.trajlws[j % len(opts.trajlws)]
             color = opts.trajcolors[j % len(opts.trajcolors)]
@@ -1917,7 +1917,7 @@ def plot_orbit(fnames, products, fig, axes,
     # Plot title.
     title = ", ".join(titlea)
     figure_title(fig, opts, title)
-    
+
 
 def plot_trajectory(fig, axes, m, lon, lat, time, time2dt,
     minorticks_base, majorticks_base, lw=1.0, color="#000000"):
@@ -1939,7 +1939,7 @@ def plot_trajectory(fig, axes, m, lon, lat, time, time2dt,
             dx, dy = t(X[i], Y[i-1]) - t(X[i], Y[i-1])
         else:
             dx, dy = t(X[i+1], Y[i+1]) - t(X[i-1], Y[i-1])
-        
+
         l = sqrt(dx**2 + dy**2)
         if (l == 0): v = np.array((ticksize_in, 0))
         else: v = np.array((dy, -dx))/l
@@ -1948,7 +1948,7 @@ def plot_trajectory(fig, axes, m, lon, lat, time, time2dt,
 
         trans = mpl.transforms.Affine2D().scale(1.0/w_in, 1.0/h_in) + \
             fig.transFigure
-            
+
         line = mpl.lines.Line2D((x, x + v[0]*ticksize_in),
                                 (y, y + v[1]*ticksize_in), transform=trans,
                                 color="black", lw=tickwidth)
@@ -1960,7 +1960,7 @@ def plot_trajectory(fig, axes, m, lon, lat, time, time2dt,
             if dotx < -0.3: halign = "right"
             elif dotx > 0.3: halign = "left"
             else: halign = "center"
-            
+
             if doty < -0.3: valign = "top"
             elif doty > 0.3: valign = "bottom"
             else: valign = "center"
@@ -1972,7 +1972,7 @@ def plot_trajectory(fig, axes, m, lon, lat, time, time2dt,
                       verticalalignment=valign,
                       transform=trans,
                       clip_on=True)
-    
+
     nray = time.shape[0]
     time_from = time2dt(time[0])
     time_to = time2dt(time[-1])
@@ -1985,7 +1985,7 @@ def plot_trajectory(fig, axes, m, lon, lat, time, time2dt,
     xmin = min(m.llcrnrx, m.urcrnrx)
     xmax = max(m.llcrnrx, m.urcrnrx)
     ymin = min(m.llcrnry, m.urcrnry)
-    ymax = max(m.llcrnry, m.urcrnry)    
+    ymax = max(m.llcrnry, m.urcrnry)
     mask = (X > xmin) & (X < xmax) & (Y > ymin) & (Y < ymax)
 
     # WORKAROUND: This is a pretty nasty workaround. Because basemap
@@ -2022,9 +2022,9 @@ def plot_trajectory(fig, axes, m, lon, lat, time, time2dt,
 
     trajectory = mpl.lines.Line2D(X[mask], Y[mask], color=color, lw=lw)
     axes.add_line(trajectory)
-    
+
     return mask
-    
+
 #    indices = np.flatnonzero(abs(X-np.roll(X, -1)) + \
 #              abs(Y-np.roll(Y, -1)) > 1) + 1
 #    Xsplit = np.array_split(X, indices)
@@ -2041,7 +2041,7 @@ def read_modis_swath(product, band, band_mode,
     try:
         lon = sw[b"Longitude"]
         lat = sw[b"Latitude"]
-    except KeyError as err: 
+    except KeyError as err:
         return None
 
     data = None
@@ -2096,7 +2096,7 @@ def read_modis_swath(product, band, band_mode,
     nfram_nsam = data.shape[2]
 
     e1, e2 = along_track_ext
-    e3, e4 = across_track_ext     
+    e3, e4 = across_track_ext
 
     e1 = norm_index(e1, 0, nscan_ndet)
     e2 = norm_index(e2, 0, nscan_ndet)
@@ -2137,7 +2137,7 @@ def read_modis_swath(product, band, band_mode,
     swath.data = data
     swath.name = name
     return swath
-    
+
 
 def plot_swath(swath, m, fig, axes, colormap=None, norm=None, ticks=None,
                radius=None, name=None, opts=PlotOpts()):
@@ -2159,7 +2159,7 @@ def plot_swath(swath, m, fig, axes, colormap=None, norm=None, ticks=None,
             yfactor = 10018754.17/90.0
         else:
             xfactor = yfactor = 1.0
-                   
+
         radius_x = int(EV_DATAPOINT_SIZE/((m.urcrnrx-m.llcrnrx)*xfactor)*nx+0.5)
         radius_y = int(EV_DATAPOINT_SIZE/((m.urcrnry-m.llcrnry)*yfactor)*ny+0.5)
         info("Interpolation radius: rx=%d, ry=%d" % (radius_x, radius_y))
@@ -2190,7 +2190,7 @@ def plot_swath(swath, m, fig, axes, colormap=None, norm=None, ticks=None,
 # The program starts here.
 #
 def main(argv):
-    global CCPLOT_CMAP_PATH    
+    global CCPLOT_CMAP_PATH
     CCPLOT_CMAP_PATH = os.getenv("CCPLOT_CMAP_PATH", CCPLOT_CMAP_PATH)
 
     opts = parse_options(argv)
@@ -2211,7 +2211,7 @@ def main(argv):
             except IOError as e: fail("%s: %s" % (fname, e.strerror))
 
         products.append(product)
-    
+
     if opts.print_info_only:
         # Print information about the file and exit.
         print_info(products[0])
@@ -2225,7 +2225,7 @@ def main(argv):
                          0,
                          opts.plot_opts.plotheight,
                          padding=opts.plot_opts.padding)
-   
+
     # Determine colormap, norm and ticks.
     colormap = mpl.cm.Greys
     colormap.set_bad("k", 0.0)
@@ -2241,7 +2241,7 @@ def main(argv):
 
     #
     # Main switch.
-    
+
     # Profile products.
     if filetype in ("cloudsat-2b-geoprof", "calipso-profile"):
         if len(products) > 1:
@@ -2314,8 +2314,8 @@ def main(argv):
     except IOError as err: fail("Write error: %s" % err)
 
     #report_memory()
-    
-    
+
+
 if __name__ == "__main__":
     try:
         main(sys.argv)
