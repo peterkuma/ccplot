@@ -21,14 +21,15 @@ Make sure you have the following programs and libraries installed:
   * [libhdf4](http://www.hdfgroup.org/products/hdf4/)
   * [libhdfeos2](http://hdfeos.org/software/library.php#HDF-EOS2)
 
-**Note:** On Debian and Ubuntu, install dependencies with:
+**Note:** On Debian-based distributions (Ubuntu, Devuan, ...) install
+dependencies with:
 
     # Python 3
-    apt-get install --no-install-recommends cython3 python3-numpy python3-pil python3-matplotlib python3-mpltoolkits.basemap ttf-bitstream-vera libhdf4-dev libhdfeos-dev
-    
+    apt-get install --no-install-recommends python3 python3-dev gcc python3-distutils cython3 libhdf4-dev libhdfeos-dev python3-pil python3-numpy python3-matplotlib python3-mpltoolkits.basemap ttf-bitstream-vera
+
     # Python 2
-    apt-get install --no-install-recommends cython python-numpy python-pil python-matplotlib python-mpltoolkits.basemap ttf-bitstream-vera libhdf4-dev libhdfeos-dev
-    
+    apt-get install --no-install-recommends python python-dev gcc cython libhdf4-dev libhdfeos-dev python-pil python-numpy python-matplotlib python-mpltoolkits.basemap ttf-bitstream-vera
+
 Installation
 ------------
 
