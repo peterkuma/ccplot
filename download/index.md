@@ -178,6 +178,25 @@ To install the required libraries and ccplot:
        # Python 2, ccplot < 1.5
        sudo apt-get install python python-dev python-numpy python-matplotlib python-mpltoolkits.basemap
 
+   On Fedora, download `szip-2.1.1.tar.gz` and `HDF-EOS2.20v1.00.tar.Z` from
+   [Earthdata Wiki](https://wiki.earthdata.nasa.gov/display/DAS/Toolkit+Downloads),
+   and install dependencies with:
+
+       # Python 3, ccplot >= 1.5.4
+       sudo yum install g++ make python3-devel python3-Cython python3-numpy python3-matplotlib python3-basemap hdf-devel zlib-devel
+       tar xf szip-2.1.1.tar.gz
+       cd szip-2.1.1
+       configure --prefix=/usr/local
+       make
+       sudo make install
+       cd ..
+       tar xf HDF-EOS2.20v1.00.tar.Z
+       cd hdfeos
+       ./configure CFLAGS=-I/usr/include/hdf --prefix=/usr/local --enable-install-include --with-pic
+       make
+       sudo make install
+       cd ..
+
    **ccplot < 1.5:** PyNIO needs to be installed independently
    (see instructions below).
 
