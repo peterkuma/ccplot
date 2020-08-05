@@ -204,6 +204,9 @@ To install the required libraries and ccplot:
 
        tar xzf ccplot-x.y.z.tar.gz
        cd ccplot-x.y.z
+       # Python 3, ccplot >= 1.5.4:
+       sudo python3 setup.py install
+       # Python 2:
        sudo python setup.py install
 
 You should now be able to run ccplot in the terminal:
