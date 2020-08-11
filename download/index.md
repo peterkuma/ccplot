@@ -218,7 +218,7 @@ Windows
 
 To install ccplot on Windows:
 
-1. Install [Anaconda 32-bit (Python 2.7 version)](https://repo.anaconda.com/archive/).
+1. Install [Anaconda 32-bit (Python 2.7 version)](https://repo.anaconda.com/archive/) (`Anaconda2-<version>-Windows-x86.exe`)
 
     **Note:** Anaconda 64-bit or Python 3 will not work.
 
