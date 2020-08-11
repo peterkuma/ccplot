@@ -226,7 +226,7 @@ To install ccplot on Windows:
 it in the Start Menu):
 
         conda install basemap
-	conda install basemap-data-hires
+        conda install basemap-data-hires
 
     You might have to run the above command twice. The first time it fails
     to find compatible versions of packages and the second time it succeeds.
