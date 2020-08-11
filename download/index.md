@@ -222,15 +222,21 @@ To install ccplot on Windows:
 
     **Note:** Anaconda 64-bit or Python 3 will not work.
 
-2. Install the **basemap** package in the Anaconda Prompt (you can find the
-Anaconda Prompt in the Start Menu):
+2. Install the **basemap** package in the `Anaconda Prompt (Anaconda2)` (you can
+it in the Start Menu):
 
         conda install basemap
+
+    You might have to run the above command twice. The first time it fails
+    to find compatible versions of packages and the second time it succeeds.
+
+    If you chose to install Anaconda for all users, you should run the Anaconda
+    2 Prompt as Administrator to be allowed to install basemap.
 
 3. Install ccplot using the supplied Windows installer
 (ccplot-x.y.z.win32-py2.7.exe).
 
-You should now be able to run ccplot in the Anaconda Prompt:
+You should now be able to run ccplot in the Anaconda Prompt (Anaconda2):
 
     ccplot -V
 
