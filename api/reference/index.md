@@ -53,7 +53,7 @@ This instance is turned into a numpy array on index subsetting:
 
 {% highlight python %}
 type(lat)
---> <class 'hdf.Dataset'>
+--> <class 'ccplot.hdf.Dataset'>
 type(lat[::])
 --> <type 'numpy.ndarray'>
 {% endhighlight %}
@@ -63,7 +63,7 @@ type(lat[::])
 A list of datasets can retrieved with **HDF.keys()**:
 
 {% highlight python %}
-print(b'\n'.join(product.keys()))
+print((b'\n'.join(product.keys())).decode('ascii'))
 --> Profile_Time
     Profile_UTC_Time
     Profile_ID
@@ -80,7 +80,7 @@ The returned keys of type `bytes` in Python 3.
 Attributes are available as **HDF.attributes** and **Dataset.attributes**:
 
 {% highlight python %}
-print(lat.attributes)
+print(dict(lat.attributes))
 --> {b'units': b'degrees', b'valid_range': b'-90.0 ... 90.0', b'fillvalue': -9999.0, b'format': b'Float_32'}
 print(product.attributes.keys())
 --> [b'coremetadata', b'archivemetadata']
@@ -133,7 +133,7 @@ sw = product[b'2B-GEOPROF']
 Datasets are available as dictionary items of a swath:
 
 {% highlight python %}
-lat = sw[b'lat']
+lat = sw[b'Latitude']
 print(lat[0])
 --> -64.9139
 {% endhighlight %}
@@ -145,7 +145,7 @@ This instance is turned into a numpy array on index subsetting:
 
 {% highlight python %}
 type(lat)
---> <class 'hdfeos.Dataset'>
+--> <class 'ccplot.hdfeos.Dataset'>
 type(lat[::])
 --> <type 'numpy.ndarray'>
 {% endhighlight %}
@@ -159,9 +159,9 @@ Attributes are available as **HDFEOS.attributes**,
 print(product.attributes.keys())
 --> [b'HDFEOSVersion', b'StructMetadata.0']
 print(sw.attributes[b'start_time'])
---> 20130429203541
+--> b'20130429203541'
 print(sw[b'Radar_Reflectivity'].attributes[b'long_name'])
---> Radar Reflectivity Factor
+--> b'Radar Reflectivity Factor'
 {% endhighlight %}
 
 The keys of type `bytes` in Python 3.
