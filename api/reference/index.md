@@ -17,18 +17,19 @@ of:
 * attributes
 * VData
 
-The constructor accepts the filename as its argument:
+The constructor accepts the filename (of type `bytes` in Python 3) as its
+argument:
 
 {% highlight python %}
 from ccplot.hdf import HDF
-product = HDF('CAL_LID_L1-ValStage1-V3-02.2013-01-01T11-55-23ZN.hdf')
+product = HDF(b'CAL_LID_L1-ValStage1-V3-02.2013-01-01T11-55-23ZN.hdf')
 {% endhighlight %}
 
 The file can be closed with **HDF.close()**, but the class also provides
 Context Manager interface:
 
 {% highlight python %}
-with HDF('CAL_LID_L1-ValStage1-V3-02.2013-01-01T11-55-23ZN.hdf') as product:
+with HDF(b'CAL_LID_L1-ValStage1-V3-02.2013-01-01T11-55-23ZN.hdf') as product:
     # Work with product.
 {% endhighlight %}
 
@@ -37,13 +38,15 @@ with HDF('CAL_LID_L1-ValStage1-V3-02.2013-01-01T11-55-23ZN.hdf') as product:
 Datasets and Vdata are available as dictionary items of the class instance:
 
 {% highlight python %}
-lat = product['Latitude']
-print lat[0]
+lat = product[b'Latitude']
+print(lat[0])
 --> [ 72.14601898]
-metadata = product['metadata']
-print metadata['Product_ID']
+metadata = product[b'metadata']
+print(metadata[b'Product_ID'])
 --> L1_LIDAR_Science
 {% endhighlight %}
+
+The keys of type `bytes` in Python 3.
 
 When accessing datasets, an instance of **Dataset** class is returned.
 This instance is turned into a numpy array on index subsetting:
@@ -60,7 +63,7 @@ type(lat[::])
 A list of datasets can retrieved with **HDF.keys()**:
 
 {% highlight python %}
-print "\n".join(product.keys())
+print(b'\n'.join(product.keys()))
 --> Profile_Time
     Profile_UTC_Time
     Profile_ID
@@ -70,22 +73,26 @@ print "\n".join(product.keys())
     metadata
 {% endhighlight %}
 
+The returned keys of type `bytes` in Python 3.
+
 #### Attributes
 
 Attributes are available as **HDF.attributes** and **Dataset.attributes**:
 
 {% highlight python %}
-print lat.attributes
---> {u'units': u'degrees', u'valid_range': u'-90.0 ... 90.0', u'fillvalue': -9999.0, u'format': u'Float_32'}
-print product.attributes.keys()
---> [u'coremetadata', u'archivemetadata']
-print product.attributes['coremetadata']
+print(lat.attributes)
+--> {b'units': b'degrees', b'valid_range': b'-90.0 ... 90.0', b'fillvalue': -9999.0, b'format': b'Float_32'}
+print(product.attributes.keys())
+--> [b'coremetadata', b'archivemetadata']
+print(product.attributes[b'coremetadata'])
 --> GROUP                  = INVENTORYMETADATA
     [...]
     END_GROUP              = INVENTORYMETADATA
 
     END
 {% endhighlight %}
+
+The keys of type `bytes` in Python 3.
 
 ccplot.hdfeos
 -------------
@@ -99,18 +106,19 @@ of:
 * datasets
 * attributes
 
-The constructor accepts the filename as its argument:
+The constructor accepts the filename (of type `bytes` in Python 3) as its
+argument:
 
 {% highlight python %}
 from ccplot.hdfeos import HDFEOS
-product = HDFEOS('2013119200420_37263_CS_2B-GEOPROF_GRANULE_P_R04_E06.hdf')
+product = HDFEOS(b'2013119200420_37263_CS_2B-GEOPROF_GRANULE_P_R04_E06.hdf')
 {% endhighlight %}
 
 The file can be closed with **HDFEOS.close()**, but the class also provides
 Context Manager interface:
 
 {% highlight python %}
-with HDFEOS('2013119200420_37263_CS_2B-GEOPROF_GRANULE_P_R04_E06.hdf') as product:
+with HDFEOS(b'2013119200420_37263_CS_2B-GEOPROF_GRANULE_P_R04_E06.hdf') as product:
     # Work with product.
 {% endhighlight %}
 
@@ -119,16 +127,18 @@ with HDFEOS('2013119200420_37263_CS_2B-GEOPROF_GRANULE_P_R04_E06.hdf') as produc
 Swaths are available as dictionary items of the HDFEOS instance:
 
 {% highlight python %}
-sw = product['2B-GEOPROF']
+sw = product[b'2B-GEOPROF']
 {% endhighlight %}
 
 Datasets are available as dictionary items of a swath:
 
 {% highlight python %}
-lat = sw['lat']
-print lat[0]
+lat = sw[b'lat']
+print(lat[0])
 --> -64.9139
 {% endhighlight %}
+
+The keys of type `bytes` in Python 3.
 
 When accessing datasets, an instance of **Dataset** class is returned.
 This instance is turned into a numpy array on index subsetting:
@@ -146,13 +156,15 @@ Attributes are available as **HDFEOS.attributes**,
 **Swath.attributes** and **Dataset.attributes**:
 
 {% highlight python %}
-print product.attributes.keys()
---> [u'HDFEOSVersion', u'StructMetadata.0']
-print sw.attributes['start_time']
+print(product.attributes.keys())
+--> [b'HDFEOSVersion', b'StructMetadata.0']
+print(sw.attributes[b'start_time'])
 --> 20130429203541
-print sw['Radar_Reflectivity'].attributes['long_name']
+print(sw[b'Radar_Reflectivity'].attributes[b'long_name'])
 --> Radar Reflectivity Factor
 {% endhighlight %}
+
+The keys of type `bytes` in Python 3.
 
 ccplot.algorithms
 -----------------
