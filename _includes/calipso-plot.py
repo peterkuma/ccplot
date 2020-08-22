@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import numpy as np
 import matplotlib as mpl
@@ -7,10 +7,10 @@ from ccplot.hdf import HDF
 from ccplot.algorithms import interp2d_12
 import ccplot.utils
 
-filename = 'CAL_LID_L1-ValStage1-V3-01.2007-06-12T03-42-18ZN.hdf'
-name = 'Total_Attenuated_Backscatter_532'
+filename = b'CAL_LID_L1-ValStage1-V3-01.2007-06-12T03-42-18ZN.hdf'
+name = b'Total_Attenuated_Backscatter_532'
 label = 'Total Attenuated Backscatter 532nm (km$^{-1}$ sr$^{-1}$)'
-colormap = '/usr/local/share/ccplot/cmap/calipso-backscatter.cmap'
+colormap = b'/usr/local/share/ccplot/cmap/calipso-backscatter.cmap'
 x1 = 0
 x2 = 1000
 h1 = 0  # km
@@ -20,8 +20,8 @@ nz = 500  # Number of pixels in the vertical.
 if __name__ == '__main__':
     with HDF(filename) as product:
         # Import datasets.
-        time = product['Profile_UTC_Time'][x1:x2, 0]
-        height = product['metadata']['Lidar_Data_Altitudes']
+        time = product[b'Profile_UTC_Time'][x1:x2, 0]
+        height = product[b'metadata'][b'Lidar_Data_Altitudes']
         dataset = product[name][x1:x2]
 
         # Convert time to datetime.
