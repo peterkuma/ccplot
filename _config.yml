@@ -1,2 +1,2 @@
 name: ccplot
-pygments: true
+highlighter: rouge
