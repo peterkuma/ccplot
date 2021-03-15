@@ -192,9 +192,9 @@ verbose = False
 
 class Swath(object):
     name = ""
-    lon = np.empty(0, dtype=np.float)
-    lat = np.empty(0, dtype=np.float)
-    data = np.empty(0, dtype=np.float)
+    lon = np.empty(0, dtype=np.float64)
+    lat = np.empty(0, dtype=np.float64)
+    data = np.empty(0, dtype=np.float64)
 
 
 class AutoOpts(object):
@@ -364,8 +364,8 @@ class TimeLocator(mpl.ticker.Locator):
         self.n = int(n)
         self.time = time
         self.time2dt = time2dt
-        self.steps = np.array(steps, np.float)
-        self.minorsteps = np.array(minorsteps, np.float)
+        self.steps = np.array(steps, np.float64)
+        self.minorsteps = np.array(minorsteps, np.float64)
         self.minorlocs = []
 
     def __call__(self):
@@ -455,7 +455,7 @@ class Options(object):
     """This class holds command-line options."""
     hextent = HorizontalExtent()
     fnames = []
-    vextent = np.array((float("-infinity"), float("infinity")), dtype=np.float)
+    vextent = np.array((float("-infinity"), float("infinity")), dtype=np.float64)
     resolution = None
     aspect = 14.0
     dpi = 300
