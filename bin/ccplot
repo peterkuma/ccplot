@@ -1638,8 +1638,7 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
     # Colorbar.
     cbaxes = fit_colorbar(fig, axes, space=opts.cbspacing, padding=opts.padding)
     cb = fig.colorbar(im, ax=axes, cax=cbaxes, orientation="vertical",
-                      extend="both", ticks=ticks, norm=norm,
-                      format=SciFormatter())
+                      extend="both", ticks=ticks, format=SciFormatter())
 
     cb.set_label(name)
     cb.ax.tick_params(direction="in")
@@ -2179,7 +2178,7 @@ def plot_swath(swath, m, fig, axes, colormap=None, norm=None, ticks=None,
 
     cbaxes = fit_colorbar(fig, axes, space=opts.cbspacing, padding=opts.padding)
     cb = fig.colorbar(im, ax=axes, cax=cbaxes, orientation="vertical",
-                      extend="both", norm=norm, ticks=ticks)
+                      extend="both", ticks=ticks)
     cb.set_label(swath.name)
     cb.ax.tick_params(direction="in")
 
