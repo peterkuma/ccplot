@@ -2001,8 +2001,8 @@ def plot_trajectory(fig, axes, m, lon, lat, time, time2dt,
     ratio = 1.0*nray/time_delta if time_delta != 0 else 0
     offset = int(ratio*(-time_from.microsecond/1000.0-time_from.second*1000+100))
     if offset == 0: offset = -1 # For safety reasons.
-    minorticks = np.empty(0, np.long)
-    majorticks = np.empty(0, np.long)
+    minorticks = np.empty(0, np.int64)
+    majorticks = np.empty(0, np.int64)
     if minorticks_base > 0:
         minorticks = np.arange(offset,nray-1,ratio*minorticks_base).astype(int)
     if majorticks_base > 0:
