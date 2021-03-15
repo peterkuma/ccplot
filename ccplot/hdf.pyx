@@ -108,7 +108,7 @@ class Attributes(DictMixin):
     def __init__(self, hdf, dataset=None):
         self.hdf = hdf
         self.dataset = dataset
-    
+
     def __getitem__(self, key):
         return self.hdf._readattr(self.dataset, key)
 
@@ -124,14 +124,14 @@ class Dataset(object):
         self.shape = info['shape']
         self.rank = len(self.shape)
         self.attributes = Attributes(self.hdf, name)
-        
+
     def __getitem__(self, key):
         starta = np.zeros(self.rank, dtype=np.int32)
         edgesa = self.shape.copy()
-        
+
         if type(key) != tuple:
             key = (key,)
-        
+
         if len(key) > self.rank:
             raise IndexError('too many indices')
 
@@ -155,7 +155,7 @@ class Dataset(object):
                 stop = min(n, max(0, stop))
                 starta[i] = start
                 edgesa[i] = max(0, stop - start)
-        
+
         data = self.hdf._read(self.name, starta, edgesa)
         shape = []
         for n, d in zip(data.shape, dims):
@@ -310,7 +310,7 @@ class HDF(DictMixin):
             info = self._getinfo(dataset)
             with SDS(self, dataset) as sds:
                 return self._attributes2(sds, info['num_attrs'])
-    
+
     def _attributes2(self, obj_id, n):
         cdef np.ndarray[char, ndim=1] tmp
         cdef int32 data_type, count
@@ -323,7 +323,7 @@ class HDF(DictMixin):
             attr_name = bytes(bytearray(tmp)).rstrip(b'\0')
             attrs.append(attr_name)
         return attrs
-   
+
     def _getinfo(self, name):
         cdef int32 rank, data_type, num_attrs
         cdef np.ndarray[int32, ndim=1] dims
@@ -339,7 +339,7 @@ class HDF(DictMixin):
             'dtype': dtype,
             'num_attrs': num_attrs,
         }
-    
+
     def _normalize(self, index, dims, default=0, incl=False):
         if len(index) > len(dims):
             raise IndexError('too many indices')
@@ -352,19 +352,19 @@ class HDF(DictMixin):
                (newindex[i] == dims[i] and not incl):
                 raise IndexError('index out of bounds')
         return newindex
-    
+
     def _read(self, name, start, edges):
         info = self._getinfo(name)
         shape = info['shape']
         dtype = info['dtype']
-        
+
         if len(start) != len(shape) or len(edges) != len(shape):
             raise IndexError('invalid number of indices')
-        
+
         if np.any(np.logical_or(start < 0, start >= shape)) or\
            np.any(np.logical_or(edges < 0, edges - start > shape)):
             raise IndexError('index out of bounds')
-        
+
         cdef np.ndarray[int32, ndim=1] cstart = np.array(start, dtype=np.int32)
         cdef np.ndarray[int32, ndim=1] cedges = np.array(edges, dtype=np.int32)
         data = np.zeros(edges, dtype=dtype)
@@ -373,14 +373,14 @@ class HDF(DictMixin):
             res = SDreaddata(sds, <int32 *>cstart.data, NULL, <int32 *>cedges.data, <void *>buf.data);
         data = buf.view(dtype=dtype).reshape(edges)
         return data
-    
+
     def _readattr(self, dataset, name):
         if dataset is not None:
             with SDS(self, dataset) as sds:
                 return self._readattr2(sds, name)
         else:
             return self._readattr2(self.sd, name)
-    
+
     def _readattr2(self, obj_id, name):
         cdef int32 data_type, count
         index = SDfindattr(obj_id, name)
@@ -390,18 +390,18 @@ class HDF(DictMixin):
         res = SDattrinfo(obj_id, index, <char *>tmp.data, &data_type, &count)
         if res == FAIL:
             self._error('HDF: SDattrinfo of "%s" failed' % name)
-        
+
         try: dtype = DTYPE[data_type]
         except KeyError: raise NotImplementedError(
             '%s: %s: Data type %s not implemented' %\
             (self.filename, name, data_type))
-        
+
         data = np.zeros(count, dtype=dtype)
         cdef np.ndarray[char, ndim=1] buf = data.view(dtype=np.int8).ravel()
         res = SDreadattr(obj_id, index, <void *>buf.data);
         if res == FAIL:
             self._error('HDF: SDreadattr of "%s" failed' % name)
-        
+
         if data_type == DFNT_CHAR:
             return bytes(bytearray(data)).rstrip(b'\0')
 

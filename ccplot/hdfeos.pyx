@@ -15,13 +15,13 @@ else:
 
 cdef extern from "errno.h":
     cdef extern int errno
-    
+
     cdef enum:
         EIO = 5
 
 cdef extern from "string.h":
     char *strerror(int)
-    
+
 cdef extern from "hntdefs.h":
     cdef enum:
         DFNT_UCHAR = 3
@@ -44,13 +44,13 @@ cdef extern from "hdf.h":
         H4_MAX_VAR_DIMS = 32
         FIELDNAMELENMAX = 128
         DFACC_RDONLY = 1
-    
+
     ctypedef np.npy_int16 int16
     ctypedef np.npy_int32 int32
     ctypedef int intn
     ctypedef int hdf_err_code_t
     ctypedef void * VOIDP
-    
+
     int32 SDstart(char *, int32)
     int32 SDnametoindex(int32, char *)
     int32 SDselect(int32, int32)
@@ -63,7 +63,7 @@ cdef extern from "hdf.h":
     int32 SDfindattr(int32, char *)
     int16 HEvalue(int32)
     char *HEstring(hdf_err_code_t)
-    
+
 cdef extern from "HdfEosDef.h":
     int32 SWopen(char *, intn)
     int32 SWattach(int32, char *)
@@ -98,7 +98,7 @@ class Attributes(DictMixin):
         self.hdfeos = hdfeos
         self.swath = swath
         self.dataset = dataset
-    
+
     def __getitem__(self, key):
         if self.swath is None:
             return self.hdfeos.hdf.attributes[key]
@@ -115,7 +115,7 @@ class Attributes(DictMixin):
     def keys(self):
         if self.swath is None:
             return self.hdfeos.hdf.attributes.keys()
-        
+
         attrs = self.hdfeos._attributes(self.swath, self.dataset)
         if self.dataset is not None:
             try: attrs += self.hdfeos.hdf[self.dataset].attributes.keys()
@@ -133,14 +133,14 @@ class Dataset(object):
         self.rank = len(self.shape)
         self.dims = info['dimlist']
         self.attributes = Attributes(self.hdfeos, swath, name)
-        
+
     def __getitem__(self, key):
         starta = np.zeros(self.rank, dtype=np.int32)
         edgesa = self.shape.copy()
-        
+
         if type(key) != tuple:
             key = (key,)
-        
+
         if len(key) > self.rank:
             raise IndexError('too many indices')
 
@@ -164,7 +164,7 @@ class Dataset(object):
                 stop = min(n, max(0, stop))
                 starta[i] = start
                 edgesa[i] = max(0, stop - start)
-        
+
         data = self.hdfeos._read(self.swath, self.name, starta, edgesa)
         shape = []
         for n, d in zip(data.shape, dims):
@@ -179,7 +179,7 @@ class Swath(DictMixin):
         self.name = name
         self.attributes = Attributes(self.hdfeos, self.name)
         self.maps = self.hdfeos._maps(self.name)
-        
+
     def __getitem__(self, key):
         return Dataset(self.hdfeos, self.name, key)
 
@@ -210,10 +210,10 @@ class HDFEOS(DictMixin):
         if self.id == -1:
             raise IOError(EIO, 'Cannot open file', self.filename)
         self.attributes = Attributes(self)
-    
+
     def __enter__(self):
         return self
-    
+
     def __exit__(self, exc_type, exc_value, traceback):
         self.hdf.close()
         self.close()
@@ -249,7 +249,7 @@ class HDFEOS(DictMixin):
             geofield, datafield = pair
             maps[(geofield, datafield)] = (offset[n], increment[n])
             n = n + 1
-        
+
         return maps
 
     def _attributes(self, swath=None, dataset=None):
@@ -302,7 +302,7 @@ class HDFEOS(DictMixin):
             'dtype': dtype,
             'dimlist': dimlist,
         }
-    
+
     def _normalize(self, index, dims, default=0, incl=False):
         if len(index) > len(dims):
             raise IndexError('too many indices')
@@ -315,19 +315,19 @@ class HDFEOS(DictMixin):
                (newindex[i] == dims[i] and not incl):
                 raise IndexError('index out of bounds')
         return newindex
-    
+
     def _read(self, swath, name, start, edges):
         info = self._getinfo(swath, name)
         shape = info['shape']
         dtype = info['dtype']
-        
+
         if len(start) != len(shape) or len(edges) != len(shape):
             raise IndexError('invalid number of indices')
-        
+
         if np.any(np.logical_or(start < 0, start >= shape)) or\
            np.any(np.logical_or(edges < 0, edges - start > shape)):
             raise IndexError('index out of bounds')
-        
+
         cdef np.ndarray[int32, ndim=1] cstart = np.array(start, dtype=np.int32)
         cdef np.ndarray[int32, ndim=1] cedges = np.array(edges, dtype=np.int32)
         data = np.zeros(edges, dtype=dtype)
@@ -336,7 +336,7 @@ class HDFEOS(DictMixin):
             res = SWreadfield(sw, name, <int32 *>cstart.data, NULL, <int32 *>cedges.data, <void *>buf.data)
         data = buf.view(dtype=dtype).reshape(edges)
         return data
-    
+
     def _readattr(self, swath, dataset, name):
         cdef int32 data_type, count
         attrname = name if dataset is None else b'%s.%s' % (dataset, name)
