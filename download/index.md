@@ -197,6 +197,14 @@ To install the required libraries and ccplot:
        sudo make install
        cd ..
 
+   On Ubuntu 20.10, the system basemap library version (1.2.1) is incompatible
+   with the system matplotlib library version. Install basemap from the
+   upstream repository instead:
+
+       apt purge python3-mpltoolkits.basemap
+       apt install python3-pip git libgeos-dev
+       pip3 install --user git+https://github.com/matplotlib/basemap.git
+
    **ccplot < 1.5:** PyNIO needs to be installed independently
    (see instructions below).
 
