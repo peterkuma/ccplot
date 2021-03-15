@@ -143,8 +143,8 @@ class Dataset(object):
         
         if len(key) > self.rank:
             raise IndexError('too many indices')
-        
-        dims = np.ones(self.rank, dtype=np.bool)
+
+        dims = np.ones(self.rank, dtype=bool)
         for i, s, n in zip(range(self.rank), key, self.shape):
             if type(s) != slice:
                 if s < 0: s += n
