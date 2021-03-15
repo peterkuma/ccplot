@@ -44,6 +44,7 @@ from math import *
 import getopt
 import datetime as dt
 import re
+import copy
 
 # Other includes.
 import numpy as np
@@ -2227,7 +2228,7 @@ def main(argv):
                          padding=opts.plot_opts.padding)
 
     # Determine colormap, norm and ticks.
-    colormap = mpl.cm.Greys
+    colormap = copy.copy(mpl.cm.Greys)
     colormap.set_bad("k", 0.0)
     norm = None
     ticks = None
