@@ -1,8 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Compare two images by PSNR. Return 0 if they are matching or 1 if they are
 not matching.
 """
+from __future__ import print_function
+
 import sys
 import getopt
 from PIL import Image
@@ -41,14 +43,14 @@ def compare(filename1, filename2):
 
 
 def usage():
-    print >> sys.stderr, '''\
+    print('''\
 Usage: {program_name} FILE1 FILE2
 Try `{program_name} --help' for more information.\
-'''.format(program_name=program_name)
+'''.format(program_name=program_name), file=sys.stderr)
 
 
 def help():
-    print '''\
+    print('''\
 Usage: {program_name} [-p] [-t THRESHOLD] FILE1 FILE2
 
 Comapare image FILE1 to image FILE2 by PSNR.
@@ -56,7 +58,7 @@ Comapare image FILE1 to image FILE2 by PSNR.
 Optional arguments:
   -t THRESHOLD          PSNR threshold (default: 20)
   -p                    print PSNR\
-'''.format(program_name=program_name)
+'''.format(program_name=program_name))
 
 
 if __name__ == '__main__':
@@ -76,7 +78,7 @@ if __name__ == '__main__':
             try:
                 threshold = int(arg)
             except ValueError:
-                print >>sys.stderr, 'Invalid value for %s: %s' % (opt, arg)
+                print('Invalid value for %s: %s' % (opt, arg), file=sys.stderr)
                 sys.exit(2)
         if opt == '-p':
             print_psnr = True
@@ -95,8 +97,8 @@ if __name__ == '__main__':
         psnr = compare(filename1, filename2)
         result = psnr >= threshold
         if print_psnr:
-            print psnr
+            print(psnr)
         sys.exit(0 if result else 1)
     except IOError as e:
-        print >> sys.stderr, '%s: %s' % (e.filename, e.strerror)
+        print('%s: %s' % (e.filename, e.strerror), file=sys.stderr)
         sys.exit(2)
