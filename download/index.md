@@ -332,6 +332,18 @@ commercial products without restrictions.
 Known Issues
 ------------
 
+### 16 March 2021
+
+basemap version 1.2.1 is incompatible with recent versions of matplotlib.
+You might get this error message:
+
+```
+ImportError: cannot import name 'dedent' from 'matplotlib.cbook'
+```
+
+Please follow the instructions above for Ubuntu 20.10 for installing
+the latest basemap version from GitHub.
+
 ### 10 October 2015
 
 A bug in matplotlib 1.4.3 causes a warning to be printed:
