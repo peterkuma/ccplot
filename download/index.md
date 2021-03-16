@@ -313,6 +313,7 @@ If you have any difficulty with the installation, or if you find a bug,
 please write to the mailing list at
 [ccplot-general@lists.sourceforge.net](mailto:ccplot-general@lists.sourceforge.net)
 or submit an issue on [GitHub](https://github.com/peterkuma/ccplot).
+Please also check the [known issues](#known-issues) below.
 
 Tutorial
 --------
