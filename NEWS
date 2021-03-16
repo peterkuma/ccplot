@@ -1,5 +1,12 @@
 CCPLOT NEWS
 
+New in 1.5.5 (2021-03-16):
+
+    * Fixed deprecation warnings in recent versions of numpy and matplotlib.
+	* Fixed colormaps arising in recent versions of matplotlib.
+	* Fixed bytes vs. str handling in Python 3.
+	* Support for Python 3 in tests.
+
 New in 1.5.4 (2020-08-02):
 
     * Support for Python 3.
