@@ -15,7 +15,6 @@ download() {
 
 PRODUCTS='http://downloads.sourceforge.net/project/ccplot/products'
 IMG="http://ccplot.org/img"
-IMG_TEST="http://downloads.sourceforge.net/project/ccplot/test"
 
 download "$PRODUCTS/2009037050924_14779_CS_2B-GEOPROF_GRANULE_P_R04_E02.hdf"
 download "$IMG/cloudsat-reflec.png" "cloudsat-reflec-ccplot.org.ref.png"
@@ -30,7 +29,7 @@ download "$PRODUCTS/MYD021KM.A2007163.0415.005.2009290181256.hdf"
 download "$IMG/orbit-modis_x31+calipso_spstere.png" "orbit-modis_x31+calipso_spstere-ccplot.org.ref.png"
 
 download "$PRODUCTS/CAL_LID_L2_01kmCLay-Prov-V1-20.2007-06-12T03-42-18ZN.hdf"
-download "$IMG_TEST/calipso532-layer.png" "calipso532-layer.ref.png"
+download "$IMG/calipso532-layer.png" "calipso532-layer.ref.png"
 
 testing "print version information"
 check ccplot -V
