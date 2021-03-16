@@ -13,9 +13,9 @@ Download
         <thead><tr><th>Release Date</th><th>Download</th></tr></thead>
         <tbody>
             <tr>
-                <td>2 August 2020</td>
+                <td>16 March 2021</td>
                 <td>
-                    <a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.4.tar.gz">ccplot 1.5.4 (Linux &amp; macOS)</a>
+                    <a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.5.tar.gz">ccplot 1.5.5 (Linux &amp; macOS)</a>
                 </td>
             </tr>
             <tr>
@@ -27,9 +27,15 @@ Download
         </tbody>
         <tbody id="archive" style="display: none">
             <tr>
+                <td>2 August 2020</td>
+                <td>
+                    <a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.4.tar.gz">ccplot 1.5.4</a>
+                </td>
+            </tr>
+            <tr>
                 <td>18 October 2015</td>
                 <td>
-                    <a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.2.tar.gz">ccplot 1.5.2 (Linux &amp; macOS)</a>
+                    <a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.2.tar.gz">ccplot 1.5.2</a>
                 </td>
             </tr>
             <tr>
