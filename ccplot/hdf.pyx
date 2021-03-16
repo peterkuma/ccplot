@@ -444,7 +444,7 @@ class HDF(DictMixin):
                 )
 
             if data_type == DFNT_CHAR:
-                return bytes(bytearray(data)).rstrip('\0')
+                return bytes(bytearray(data)).rstrip(b'\0')
             else:
                 return data.view(dtype=dtype)
 

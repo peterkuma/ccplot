@@ -1328,7 +1328,7 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
     global ATRAIN_SPEED, PROFILE_BINHEIGHT
 
     info = DATASETS.get(what, {
-        "datasets": [what],
+        "datasets": [what.encode('utf-8')],
     })
     filetype = autodetect(product)
     product_name = None
