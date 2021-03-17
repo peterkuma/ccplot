@@ -176,13 +176,13 @@ To install the required libraries and ccplot:
    On Debian-based distributions (Ubuntu, Devuan, ...) you can install dependencies with:
 
        # Python 3, ccplot >= 1.5.4
-       sudo apt-get install --no-install-recommends python3 python3-dev gcc python3-distutils cython3 libhdf4-dev libhdfeos-dev python3-pil python3-numpy python3-matplotlib python3-mpltoolkits.basemap ttf-bitstream-vera
+       sudo apt install --no-install-recommends python3 python3-dev gcc python3-distutils cython3 libhdf4-dev libhdfeos-dev python3-pil python3-numpy python3-matplotlib python3-mpltoolkits.basemap ttf-bitstream-vera
 
        # Python 2, ccplot >= 1.5
-       sudo apt-get install --no-install-recommends python python-dev gcc cython libhdf4-dev libhdfeos-dev python-pil python-numpy python-matplotlib python-mpltoolkits.basemap ttf-bitstream-vera
+       sudo apt install --no-install-recommends python python-dev gcc cython libhdf4-dev libhdfeos-dev python-pil python-numpy python-matplotlib python-mpltoolkits.basemap ttf-bitstream-vera
 
        # Python 2, ccplot < 1.5
-       sudo apt-get install python python-dev python-numpy python-matplotlib python-mpltoolkits.basemap
+       sudo apt install python python-dev python-numpy python-matplotlib python-mpltoolkits.basemap
 
    On Fedora, download `szip-2.1.1.tar.gz` and `HDF-EOS2.20v1.00.tar.Z` from
    [Earthdata Wiki](https://wiki.earthdata.nasa.gov/display/DAS/Toolkit+Downloads),
