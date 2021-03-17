@@ -207,9 +207,9 @@ To install the required libraries and ccplot:
    with the system matplotlib library version. Install basemap from the
    upstream repository instead:
 
-       apt purge python3-mpltoolkits.basemap
-       apt install python3-pip git libgeos-dev
-       pip3 install --user git+https://github.com/matplotlib/basemap.git
+       sudo apt purge python3-mpltoolkits.basemap
+       sudo apt install python3-pip git libgeos-dev
+       sudo pip3 install git+https://github.com/matplotlib/basemap.git
 
    **ccplot < 1.5:** PyNIO needs to be installed independently
    (see instructions below).
