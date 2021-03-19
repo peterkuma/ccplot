@@ -46,7 +46,7 @@ print(metadata[b'Product_ID'])
 --> L1_LIDAR_Science
 {% endhighlight %}
 
-The keys of type `bytes` in Python 3.
+The keys are of type `bytes` in Python 3.
 
 When accessing datasets, an instance of **Dataset** class is returned.
 This instance is turned into a numpy array on index subsetting:
@@ -92,7 +92,7 @@ print(product.attributes[b'coremetadata'])
     END
 {% endhighlight %}
 
-The keys of type `bytes` in Python 3.
+The keys are of type `bytes` in Python 3.
 
 ccplot.hdfeos
 -------------
@@ -138,7 +138,7 @@ print(lat[0])
 --> -64.9139
 {% endhighlight %}
 
-The keys of type `bytes` in Python 3.
+The keys are of type `bytes` in Python 3.
 
 When accessing datasets, an instance of **Dataset** class is returned.
 This instance is turned into a numpy array on index subsetting:
@@ -164,7 +164,7 @@ print(sw[b'Radar_Reflectivity'].attributes[b'long_name'])
 --> b'Radar Reflectivity Factor'
 {% endhighlight %}
 
-The keys of type `bytes` in Python 3.
+The keys are of type `bytes` in Python 3.
 
 ccplot.algorithms
 -----------------
