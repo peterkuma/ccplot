@@ -35,7 +35,7 @@ Download
             <tr>
                 <td>18 October 2015</td>
                 <td>
-                    <a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.2.win32-py2.7.exe">ccplot-1.5.2.win32-py2.7 (Windows)</a>
+                    <a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.2.win32-py2.7.exe">ccplot-1.5.2.win32-py2.7</a>
                 </td>
             </tr>
             <tr>
