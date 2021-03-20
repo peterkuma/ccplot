@@ -15,13 +15,7 @@ Download
             <tr>
                 <td>16 March 2021</td>
                 <td>
-                    <a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.5.tar.gz">ccplot 1.5.5 (Linux &amp; macOS)</a>
-                </td>
-            </tr>
-            <tr>
-                <td>18 October 2015</td>
-                <td>
-                    <a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.2.win32-py2.7.exe">ccplot-1.5.2.win32-py2.7 (Windows)</a>
+                    <a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.5.tar.gz">ccplot 1.5.5</a>
                 </td>
             </tr>
         </tbody>
@@ -36,6 +30,12 @@ Download
                 <td>18 October 2015</td>
                 <td>
                     <a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.2.tar.gz">ccplot 1.5.2</a>
+                </td>
+            </tr>
+            <tr>
+                <td>18 October 2015</td>
+                <td>
+                    <a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.2.win32-py2.7.exe">ccplot-1.5.2.win32-py2.7 (Windows)</a>
                 </td>
             </tr>
             <tr>
@@ -203,7 +203,8 @@ To install the required libraries and ccplot:
        sudo make install
        cd ..
 
-   On Ubuntu 20.10, the system basemap library version (1.2.1) is incompatible
+   On Ubuntu 20.10 (use `lsb_release -a` to find the version number if unsure),
+   the system basemap library version (1.2.1) is incompatible
    with the system matplotlib library version. Install basemap from the
    upstream repository instead:
 
@@ -229,6 +230,34 @@ You should now be able to run ccplot in the terminal:
 
 Windows
 -------
+
+On Windows, it is recommended to install ccplot under the "Windows Subsystem
+for Linux", which is a full-featured Linux distribution running on Windows:
+
+1. Install the "Windows Subsystem for Linux" (found under Settings → Optional
+features → More Windows features).
+
+2. Open Microsoft Store and install "Ubuntu".
+
+3. Open "Ubuntu" in the Start Menu.
+
+4. In the console, type:
+
+       sudo apt update
+       sudo apt upgrade
+
+   and then follow the instructions above for installing ccplot on Ubuntu Linux.
+   Use `cd /mnt/c/Users/<user>` to change the current directory to the Windows
+   user's home directory, where `<user>` is the name of your Windows user
+   account, and `ls` to list the content of a directory.
+
+Windows (native)
+----------------
+
+**Note:** This type of installation is no longer supported. It might still work
+with a sufficiently old version of Anaconda and Python packages. Installation
+under the "Windows Subsystem for Linux" (described above) is recommended
+instead.
 
 To install ccplot on Windows:
 
