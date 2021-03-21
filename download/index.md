@@ -299,7 +299,7 @@ macOS
 
        tar xzf ccplot-x.y.z.tar.gz
        cd ccplot-x.y.z
-       python setup.py install
+       sudo python3 setup.py install
 
 You should now be able to run ccplot in the macOS Terminal:
 
