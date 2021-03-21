@@ -287,6 +287,8 @@ You should now be able to run ccplot in the Anaconda Prompt (Anaconda2):
 macOS
 -----
 
+This installation has been tested on macOS Catalania.
+
 1. Install [Anaconda 64-bit](https://www.anaconda.com/download/).
 
 2. Install [MacPorts](https://www.macports.org).
