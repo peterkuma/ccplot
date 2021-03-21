@@ -293,13 +293,17 @@ macOS
 
 3. Install required MacPorts packages. In the macOS Terminal:
 
-        sudo port install hdf4 hdfeos
+        sudo port install jpeg hdf4 hdfeos geos
 
-4. Build and install ccplot:
+4. Install basemap:
+
+       pip3 install git+https://github.com/matplotlib/basemap.git
+
+5. Build and install ccplot:
 
        tar xzf ccplot-x.y.z.tar.gz
        cd ccplot-x.y.z
-       sudo python3 setup.py install
+       python3 setup.py install
 
 You should now be able to run ccplot in the macOS Terminal:
 
