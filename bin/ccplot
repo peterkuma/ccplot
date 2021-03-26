@@ -794,7 +794,7 @@ def parse_extent(text):
             seconds = int(gs[k+2]) if gs[k+2] != None else 0
             if hours > 23 or minutes > 59 or seconds > 59:
                 raise ValueError
-            e.absolute_time[int(k/3)] = dt.time(hours, minutes, seconds)
+            e.absolute_time[int(k//3)] = dt.time(hours, minutes, seconds)
 
     elif m3 != None: # Match relative time.
         gs = m3.groups()
@@ -805,7 +805,7 @@ def parse_extent(text):
             minutes = int(gs[k+2]) if gs[k+2] != None else 0
             seconds = int(gs[k+3]) if gs[k+3] != None else 0
             if minutes > 59 or seconds > 59: raise ValueError
-            e.relative_time[k/4] = sign*dt.timedelta(0, seconds,
+            e.relative_time[k//4] = sign*dt.timedelta(0, seconds,
                                                      0, 0, minutes, hours)
 
     elif m4 != None: # Match along_track,across_track.
