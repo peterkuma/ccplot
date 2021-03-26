@@ -13,13 +13,19 @@ Download
         <thead><tr><th>Release Date</th><th>Download</th></tr></thead>
         <tbody>
             <tr>
+                <td>26 March 2021</td>
+                <td>
+                    <a href="https://github.com/peterkuma/ccplot/archive/refs/tags/v1.5.6.tar.gz">ccplot 1.5.6</a>
+                </td>
+            </tr>
+        </tbody>
+        <tbody id="archive" style="display: none">
+            <tr>
                 <td>16 March 2021</td>
                 <td>
                     <a href="https://sourceforge.net/projects/ccplot/files/ccplot/ccplot-1.5.5.tar.gz">ccplot 1.5.5</a>
                 </td>
             </tr>
-        </tbody>
-        <tbody id="archive" style="display: none">
             <tr>
                 <td>2 August 2020</td>
                 <td>
