@@ -158,8 +158,8 @@ Supported Operating Systems
 ccplot works on unix-like operating systems (Linux, macOS, ...) and Windows.
 For best experience, it is recommended to install ccplot on Linux.
 
-Linux & Unix-like OS other than macOS
--------------------------------------
+Linux with native Python
+------------------------
 
 The following programs and libraries are required:
 
@@ -179,7 +179,9 @@ The following programs and libraries are required:
 To install the required libraries and ccplot:
 
 1. Make sure you have all dependencies installed.
-   On Debian-based distributions (Ubuntu, Devuan, ...) you can install dependencies with:
+
+   On Debian-based distributions (Ubuntu, Devuan, ...) you can install
+   dependencies with:
 
        # Python 3, ccplot >= 1.5.4
        sudo apt install --no-install-recommends python3 python3-dev gcc python3-distutils cython3 libhdf4-dev libhdfeos-dev python3-pil python3-numpy python3-matplotlib python3-mpltoolkits.basemap ttf-bitstream-vera
@@ -229,6 +231,54 @@ To install the required libraries and ccplot:
        sudo python3 setup.py install
        # Python 2:
        sudo python setup.py install
+
+You should now be able to run ccplot in the terminal:
+
+    ccplot -V
+
+Linux with Anaconda 3
+---------------------
+
+ccplot can also be installed under the [Anaconda 3](https://anaconda.org)
+Python distribution instead of the native Python distribution of a Linux
+distribution. The instructions below are for ccplot >= 1.5.4. It is assumed
+that you have already installed Anaconda 3 and actived the Anaconda environment
+(the command `python` starts the Anaconda 3 version of Python).
+
+1. Make sure you have all dependencies installed.
+
+   On Debian-based Linux distributions (Ubuntu, Devuan, ...) you can install
+   dependencies with:
+
+       sudo apt install --no-install-recommends gcc libhdf4-dev libhdfeos-dev ttf-bitstream-vera git libgeos-dev
+
+   On Fedora, download `szip-2.1.1.tar.gz` and `HDF-EOS2.20v1.00.tar.Z` from
+   [Earthdata Wiki](https://wiki.earthdata.nasa.gov/display/DAS/Toolkit+Downloads),
+   and install dependencies with:
+
+       sudo yum install g++ make python3-devel python3-Cython python3-numpy python3-matplotlib python3-basemap hdf-devel zlib-devel
+       tar xf szip-2.1.1.tar.gz
+       cd szip-2.1.1
+       configure --prefix=/usr/local
+       make
+       sudo make install
+       cd ..
+       tar xf HDF-EOS2.20v1.00.tar.Z
+       cd hdfeos
+       ./configure CFLAGS=-I/usr/include/hdf --prefix=/usr/local --enable-install-include --with-pic
+       make
+       sudo make install
+       cd ..
+
+2. Install basemap from the upstream repository:
+
+       pip install git+https://github.com/matplotlib/basemap.git
+
+3. Build and install ccplot:
+
+       tar xzf ccplot-x.y.z.tar.gz
+       cd ccplot-x.y.z
+       python setup.py install
 
 You should now be able to run ccplot in the terminal:
 
