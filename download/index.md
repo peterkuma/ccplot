@@ -242,7 +242,7 @@ Linux with Anaconda 3
 ccplot can also be installed under the [Anaconda 3](https://anaconda.org)
 Python distribution instead of the native Python distribution of a Linux
 distribution. The instructions below are for ccplot >= 1.5.4. It is assumed
-that you have already installed Anaconda 3 and actived the Anaconda environment
+that you have already installed Anaconda 3 and activated the Anaconda environment
 (the command `python` starts the Anaconda 3 version of Python).
 
 1. Make sure you have all dependencies installed.
