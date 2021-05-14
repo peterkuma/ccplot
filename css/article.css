@@ -28,10 +28,14 @@ article blockquote {
     margin: 1.5em 2em;
 }
 
+article img {
+    max-width: 100%;
+}
+
 .note {
     padding: 4pt;
     margin: 2pt 0;
-    background: #cbcbff;   
+    background: #cbcbff;
 }
 
 .box {
@@ -44,6 +48,8 @@ article blockquote {
     background: #f3f3f3;
     margin: 10pt 0;
     padding: 6pt;
+    max-width: 100%;
+    overflow: auto;
 }
 
 .table table {
@@ -96,11 +102,19 @@ pre code {
     white-space: pre-wrap;
     padding: 0.5em;
     margin: 0.7em 0;
+    max-width: 100%;
+    overflow: auto;
 }
 
 div.code {
     padding: 0.5em;
     margin: 0.7em 0;
+    max-width: 100%;
+    overflow: auto;
+}
+
+figure {
+    margin: 0;
 }
 
 .col1 {

@@ -18,9 +18,15 @@ body {
     position: relative;
     margin: 0 auto;
     text-align: left;
-    width: 850px;
+    max-width: 850px;
     background: #fff;
     padding: 25px 50px;
+}
+
+@media (max-width: 950px) {
+    #main {
+        padding: 25px 20px;
+    }
 }
 
 a {
