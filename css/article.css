@@ -117,12 +117,19 @@ figure {
     margin: 0;
 }
 
-.col1 {
-    width: 45%;
-    float: left;
+.wrapped-blocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 2em;
 }
 
-.col2 {
+.wrapped-blocks div {
     width: 45%;
-    float: right;
+    min-width: 15em;
+}
+
+@media (max-width: 950px) {
+    .wrapped-blocks div {
+        width: inherit;
+    }
 }
