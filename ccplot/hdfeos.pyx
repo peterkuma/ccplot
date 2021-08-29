@@ -76,6 +76,10 @@ cdef extern from "HdfEosDef.h":
     intn SWclose(int32)
     int32 SWinqmaps(int32, char *, int32 [], int32 [])
     int32 SWinqattrs(int32, char *, int32 *)
+    int32 SWinqswath(char *, char *, int32 *)
+    int32 SWnentries(int32, int32, int32 *)
+    int32 SWinqgeofields(int32, char *, int32 [], int32 [])
+    int32 SWinqdatafields(int32, char *, int32 [], int32 [])
 
 DTYPE = {
     DFNT_UCHAR: np.ubyte,
@@ -183,6 +187,9 @@ class Swath(DictMixin):
     def __getitem__(self, key):
         return Dataset(self.hdfeos, self.name, key)
 
+    def keys(self):
+        return self.hdfeos._list_geofields(self.name) + \
+            self.hdfeos._list_datafields(self.name)
 
 class SW(object):
     def __init__(self, hdfeos, name):
@@ -226,7 +233,49 @@ class HDFEOS(DictMixin):
         with SW(self, key) as sw: pass
         return Swath(self, key)
 
+    def _list_swaths(self):
+        cdef int32 strbufsize
+        res = SWinqswath(self.filename, NULL, &strbufsize)
+        if res == FAIL:
+            raise IOError(EIO, 'SWinqswath failed', self.filename)
+        cdef np.ndarray[char, ndim=1] tmp
+        tmp = np.zeros(strbufsize + 1, dtype=np.byte)
+        res = SWinqswath(self.filename, <char *>tmp.data, &strbufsize)
+        if res == FAIL:
+            raise IOError(EIO, 'SWinqswath failed', self.filename)
+        swaths = bytes(bytearray(tmp)).rstrip(b'\0')
+        return swaths.split(b',')
+
+    def _list_geofields(self, swath):
+        cdef int32 strbufsize
+        cdef np.ndarray[char, ndim=1] tmp
+        with SW(self, swath) as sw:
+            res = SWnentries(sw, 3, &strbufsize)
+            if res == FAIL:
+                raise IOError(EIO, 'SWnentries failed', self.filename)
+            tmp = np.zeros(strbufsize + 2, dtype=np.byte)
+            res = SWinqgeofields(sw, <char *>tmp.data, NULL, NULL)
+            if res == FAIL:
+                raise IOError(EIO, 'SWinqgeofields failed', self.filename)
+        geofields = bytes(bytearray(tmp)).rstrip(b'\0')
+        return geofields.split(b',')
+
+    def _list_datafields(self, swath):
+        cdef int32 strbufsize
+        cdef np.ndarray[char, ndim=1] tmp
+        with SW(self, swath) as sw:
+            res = SWnentries(sw, 4, &strbufsize)
+            if res == FAIL:
+                raise IOError(EIO, 'SWnentries failed', self.filename)
+            tmp = np.zeros(strbufsize + 2, dtype=np.byte)
+            res = SWinqdatafields(sw, <char *>tmp.data, NULL, NULL)
+            if res == FAIL:
+                raise IOError(EIO, 'SWinqdatafields failed', self.filename)
+        datafields = bytes(bytearray(tmp)).rstrip(b'\0')
+        return datafields.split(b',')
+
     def _maps(self, swath):
+        cdef int32 strbufsize
         cdef np.ndarray[int32, ndim=1] offset
         cdef np.ndarray[int32, ndim=1] increment
 
@@ -234,10 +283,15 @@ class HDFEOS(DictMixin):
         increment = np.zeros(H4_MAX_VAR_DIMS, dtype=np.int32)
 
         cdef np.ndarray[char, ndim=1] tmp
-        tmp = np.zeros(FIELDNAMELENMAX*(H4_MAX_VAR_DIMS+2)*2, dtype=np.byte)
 
         with SW(self, swath) as sw:
+            res = SWnentries(sw, 3, &strbufsize)
+            if res == FAIL:
+                raise IOError(EIO, 'SWnentries failed', self.filename)
+            tmp = np.zeros(strbufsize + 2, dtype=np.byte)
             res = SWinqmaps(sw, <char *>tmp.data, <int32 *>offset.data, <int32 *> increment.data)
+            if res == FAIL:
+                raise IOError(EIO, 'SWinqmaps failed', self.filename)
 
         dimmap = bytes(bytearray(tmp)).rstrip(b'\0')
 
@@ -362,3 +416,6 @@ class HDFEOS(DictMixin):
             return bytes(bytearray(data)).rstrip(b'\0')
 
         return data[0] if count == 1 else data
+
+    def keys(self):
+        return self._list_swaths()
