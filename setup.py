@@ -1,23 +1,34 @@
+import setuptools
 from distutils.core import setup, Extension
 from Cython.Distutils import build_ext
 from glob import glob
+import shutil
 import sys
 import os
 import numpy
 
 # Windows build: modify to point to HDF4 and HDF-EOS2 libraries.
-WIN_HDF_PATH=r'C:\Program Files (x86)\HDF_Group\HDF\4.2.9'
-WIN_HDFEOS_PATH=r'C:\Program Files (x86)\hdfeos2.18'
+WIN_HDF_DIR=r'C:\Program Files\HDF_Group\HDF\4.2.15'
+WIN_HDFEOS_DIR=r'C:\Program Files\hdf-eos2-3.0'
 
 
 if sys.platform == 'win32':
+    HDF_DIR = os.environ.get('HDF_DIR', WIN_HDF_DIR)
+    HDFEOS_DIR = os.environ.get('HDFEOS_DIR', WIN_HDFEOS_DIR)
     scripts = ['bin/ccplot', 'bin/ccplot.bat']
     hdf_libraries = ['hdf', 'mfhdf', 'libjpeg', 'libzlib', 'libszip', 'xdr', 'Ws2_32']
-    hdf_include_dirs = [os.path.join(WIN_HDF_PATH, 'include')]
-    hdf_library_dirs = [os.path.join(WIN_HDF_PATH, 'lib')]
-    hdfeos_libraries = ['hdfeos']
-    hdfeos_include_dirs = [os.path.join(WIN_HDFEOS_PATH, r'hdfeos\include')]
-    hdfeos_library_dirs = [os.path.join(WIN_HDFEOS_PATH, r'hdfeos_dev\hdfeos\Release')]
+    hdf_include_dirs = [os.path.join(HDF_DIR, 'include')]
+    hdf_library_dirs = [os.path.join(HDF_DIR, 'lib')]
+    hdfeos_libraries = ['hdf-eos2']
+    hdfeos_include_dirs = [os.path.join(HDFEOS_DIR, r'include')]
+    hdfeos_library_dirs = [os.path.join(HDFEOS_DIR, r'vs2019\HDF-EOS2\x64\Release')]
+    dlls = [
+        os.path.join(HDF_DIR, 'bin', x)
+        for x in ['hdf.dll', 'mfhdf.dll', 'xdr.dll']
+    ]
+    for filename in dlls:
+        shutil.copy(filename, '.')
+    package_data = {'ccplot': ['hdf.dll', 'mfhdf.dll', 'xdr.dll']}
 else:
     scripts = ['bin/ccplot']
     hdf_libraries = ['mfhdf', 'df', 'jpeg', 'z']
@@ -31,6 +42,7 @@ else:
     hdfeos_libraries = ['hdfeos']
     hdfeos_include_dirs = []
     hdfeos_library_dirs = []
+    package_data = {}
 
 if sys.platform == 'darwin':
     hdfeos_libraries += ['Gctp']
@@ -75,6 +87,8 @@ setup(
     data_files=[('share/doc/ccplot', ['NEWS']),
                 ('share/ccplot/cmap', glob('cmap/*')),
                 ('man/man1', ['man/ccplot.1'])],
+    include_package_data=True,
+    package_data=package_data,
     cmdclass={
         'build_ext': build_ext,
     },
