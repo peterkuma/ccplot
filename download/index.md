@@ -284,11 +284,38 @@ You should now be able to run ccplot in the terminal:
 
     ccplot -V
 
-Windows
--------
+Windows (native)
+----------------
 
-On Windows, it is recommended to install ccplot under the "Windows Subsystem
-for Linux", which is a full-featured Linux distribution running on Windows:
+ccplot can be installed from a binary distribution (Python wheel) in the
+Python distribution Anaconda 3.8.
+
+To install ccplot on Windows:
+
+1. Install [Anaconda Python 3.8](https://www.anaconda.com) (later versions are
+currently not supported).
+
+2. Open the `Anaconda Prompt` from the Windows Start Menu.
+   Install basemap:
+
+       pip install https://github.com/peterkuma/basemap/releases/download/v1.2.2%2Bdev.1/basemap-1.2.2dev-cp38-cp38-win_amd64.whl
+
+   Install ccplot:
+
+       pip install ccplot
+
+You should now be able to run ccplot in the terminal:
+
+    ccplot -V
+
+Windows (Windows Subsystem for Linux)
+-------------------------------------
+
+On Windows, it is possiblle to install ccplot under the "Windows Subsystem
+for Linux" (WSL), which is a full-featured Linux distribution running on
+Windows. Unlike the native installation described above, ccplot can only be run
+in the WSL environment, and the ccplot API is only available in Python programs
+run within this environemnt.
 
 1. Install the "Windows Subsystem for Linux" (found under Settings → Optional
 features → More Windows features).
@@ -307,36 +334,64 @@ features → More Windows features).
    user's home directory, where `<user>` is the name of your Windows user
    account, and `ls` to list the content of a directory.
 
-Windows (native)
-----------------
+You should now be able to run ccplot in the Anaconda Prompt:
 
-**Note:** This type of installation is no longer supported. It might still work
-with a sufficiently old version of Anaconda and Python packages. Installation
-under the "Windows Subsystem for Linux" (described above) is recommended
-instead.
+    ccplot -V
 
-To install ccplot on Windows:
+Windows (building from source code)
+-----------------------------------
 
-1. Install [Anaconda 32-bit (Python 2.7 version)](https://repo.anaconda.com/archive/) (`Anaconda2-<version>-Windows-x86.exe`)
+Follow these instructions if you want to build ccplot and the dependent
+libraries from source code. This is the most difficult installation method,
+but it can theoretically work with future versions of Python.
 
-    **Note:** Anaconda 64-bit or Python 3 will not work.
+1. Install:
+   - [Anaconda 3](https://www.anaconda.com)
+   - [Visual Studio 2019](https://visualstudio.microsoft.com/downloads/)
+   - [cmake](https://cmake.org)
+   - [HDF4](https://portal.hdfgroup.org/display/HDF4/HDF4) binary distribution
+     for Windows (`hdf-4.2.15-win10_64-vs15.zip` or later)
+   - [7-zip](https://www.7-zip.org)
 
-2. Install the **basemap** package in the `Anaconda Prompt (Anaconda2)` (you can
-it in the Start Menu):
+5. Download and unpack:
+   - [HDF-EOS2](https://wiki.earthdata.nasa.gov/display/DAS/Toolkit+Downloads) source code (`hdf-eos2-3.0-src.tar.gz`)
+   - [GEOS](https://trac.osgeo.org/geos/) (`geos-3.9.1.tar.bz2` or later) source code
+   - [basemap](https://github.com/peterkuma/basemap/) source code
+     (fixed to support building on Windows)
+   - [ccplot](https://github.com/peterkuma/ccplot/) source code
 
-        conda install basemap
-        conda install basemap-data-hires
+7. Open the `Developer Command Prompt for VS 2019` from the Windows Start Menu
+   and run:
 
-    You might have to run the above command twice. The first time it fails
-    to find compatible versions of packages and the second time it succeeds.
+       cd <geos-dir>
+       mkdir build build
+       cmake ..
 
-    If you chose to install Anaconda for all users, you should run the Anaconda
-    2 Prompt as Administrator to be allowed to install basemap.
+   where `<geos-dir>` is the directory where you unpacked GEOS.
+   Open `GEOS.sln` located in the GEOS `build` directory in Visual Studio 2019,
+   set solution configuration to `Release` and perform `Build -> Build solution`.
 
-3. Install ccplot using the supplied Windows installer
-(ccplot-x.y.z.win32-py2.7.exe).
+8. Open `HDFEOS2.sln` located in the HDF-EOS2 `vs2019\HDF-EOS2` directory in
+   Visual Studio 2019, set solution configuration to `Release` and perform
+   `Build -> Build solution`.
 
-You should now be able to run ccplot in the Anaconda Prompt (Anaconda2):
+9. Open the `Anaconda Prompt` from the Windows Start Menu and run:
+
+       cd <basemap-dir>
+       set GEOS_DIR=<geos-dir>
+       python setup.py bdist_wheel
+       pip install dist\basemap-1.2.2+dev-cp38-cp38-win_amd64.whl
+
+       cd <ccplot-dir>
+       set HDF_DIR=<hdf-dir>
+       set HDFEOS_DIR=<hdfeos-dir>
+       python setup.py bdist_wheel
+       pip install dist\ccplot-1.5.6-cp38-cp38-win_amd64.whl
+
+where `<basemap-dir>`, `<geos-dir>`, `<ccplot-dir>`, `<hdf-dir>` and
+`<hdfeos-dir>` are the directories where you unpacked the respective packages.
+
+You should now be able to run ccplot in the Anaconda Prompt:
 
     ccplot -V
 
