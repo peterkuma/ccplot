@@ -38,7 +38,7 @@ if sys.platform == 'darwin':
 
 setup(
     name='ccplot',
-    version='1.5.6',
+    version='1.5.7-dev',
     description='CloudSat and CALIPSO plotting tool',
     long_description="""ccplot is an open source command-line program for
     plotting profile, layer and earth view data sets from CloudSat, CALIPSO
