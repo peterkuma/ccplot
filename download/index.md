@@ -410,7 +410,7 @@ This installation has been tested on macOS Catalania.
 
 4. Install basemap:
 
-       pip3 install git+https://github.com/matplotlib/basemap.git
+       pip3 install git+https://github.com/peterkuma/basemap.git
 
 5. Build and install ccplot:
 
