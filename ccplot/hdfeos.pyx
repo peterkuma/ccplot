@@ -285,7 +285,7 @@ class HDFEOS(DictMixin):
         cdef np.ndarray[char, ndim=1] tmp
 
         with SW(self, swath) as sw:
-            res = SWnentries(sw, 3, &strbufsize)
+            res = SWnentries(sw, 1, &strbufsize)
             if res == FAIL:
                 raise IOError(EIO, 'SWnentries failed', self.filename)
             tmp = np.zeros(strbufsize + 2, dtype=np.byte)
