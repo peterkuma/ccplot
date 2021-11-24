@@ -74,7 +74,7 @@ to be plotted is determined by <type>:
     of cmap files.
 
   * `-d` <dpi>:
-    DPI (Dots Per Inch) of the output image file. 
+    DPI (Dots Per Inch) of the output image file.
 
   * `-m` <band>:
     MODIS band specifier in the format `r`<number> for reflective bands,
@@ -94,8 +94,14 @@ to be plotted is determined by <type>:
     <projopts> are projection-specific options, specified as a comma-seperated
     list of <key>`=`<value> pairs:
 
-      * `boundinglat`=<latitude>:
-        Bounding latitude (polar projections).
+      * `cutoff`=<latitude>:
+        Cut-off latitude (Lambert conformal projection).
+
+      * `h`=<height>:
+        Satellite height (m) (geostationary projection).
+
+      * `k_0`=<scale-factor>:
+        Scale factor.
 
       * `lat_0`=<latitude>:
         Central latitude.
@@ -109,13 +115,14 @@ to be plotted is determined by <type>:
       * `lat_ts`=<latitude>:
         Latitude of true scale.
 
-      * `lon_1`=<longitude>:
-        Longitude of one of the two points on the projection centerline
-        (oblique mercator).
+      * `o_lat_p`=<latitude>:
+        Pole latitude (rotated pole projection).
 
-      * `lon_2`=<longitude>:
-        Longitude of one of the two points on the projection centerline
-        (oblique mercator).
+      * `o_lon_p`=<longitude>:
+        Central rotated longitude (rotated pole projection).
+
+      * `sweep`=<axis>:
+        Sweep axis: "x" or "y" (geostationary projection).
 
     <longitude> is in the format <number>`E`|`W` (East or West).
     <latitude> is in the format <number>`S`|`N` (South or North).
@@ -151,7 +158,7 @@ to be plotted is determined by <type>:
       * <hour1>:<min1>[:<sec1>]..<hour2>:<min2>[:<sec2>]:
         Plot data in time interval (UTC).
 
-      * +|-[<hour>:]<min>:<sec>..+|-[<hour>:]<min>:<sec>:
+      * \+|-[<hour>:]<min>:<sec>..+|-[<hour>:]<min>:<sec>:
         Plot data in time interval relative to the beginning (+) or end (-)
         of the granule.
 
@@ -198,7 +205,7 @@ to be plotted is determined by <type>:
 
       * `elevcolor`:
         Surface elevation line color. Default: *#FF0000*.
-      
+
       * `fontsize`:
         Font size. Default: *10*.
 
@@ -207,7 +214,7 @@ to be plotted is determined by <type>:
 
       * `plotheight`:
         Plot height in inches. Default: *6*.
-      
+
       * `title`:
         Figure title. Default: automatic.
 
@@ -313,22 +320,22 @@ to be plotted is determined by <type>:
 
 ## EXAMPLES
 
-  * Plot the first 1000 rays of CloudSat Reflectivity Factor with
-    colormap *cloudsat-reflec.cmap* into *cloudsat-reflec.png*:
+Plot the first 1000 rays of CloudSat Reflectivity Factor with
+colormap *cloudsat-reflec.cmap* into *cloudsat-reflec.png*:
 
-        ccplot -x 0..1000 -c cloudsat-reflectivity.cmap -o cloudsat-reflec.png cloudsat-reflec 2006224184641_01550_CS_2B-GEOPROF_GRANULE_P_R03_E01.hdf
+    ccplot -x 0..1000 -c cloudsat-reflectivity.cmap -o cloudsat-reflec.png cloudsat-reflec 2006224184641_01550_CS_2B-GEOPROF_GRANULE_P_R03_E01.hdf
 
-  * Plot the first minute of CALIPSO Total Attenuated Backscatter 532nm
-    between altitude 0 and 20 km with colormap *calipso-backscatter.cmap*
-    into *calipso532.png*:
+Plot the first minute of CALIPSO Total Attenuated Backscatter 532nm
+between altitude 0 and 20 km with colormap *calipso-backscatter.cmap*
+into *calipso532.png*:
 
-        ccplot -y 0..20000 -x +0:00..+1:00 -c calipso-backscatter.cmap -o calipso532.png calipso532 CAL_LID_L1-Prov-V2-01.2006-07-06T19-50-51ZN.hdf
+    ccplot -y 0..20000 -x +0:00..+1:00 -c calipso-backscatter.cmap -o calipso532.png calipso532 CAL_LID_L1-Prov-V2-01.2006-07-06T19-50-51ZN.hdf
 
-  * Plot CALIPSO trajectory superimposed on Aqua MODIS
-    band 31 radiance with colormap *modis-temperature.cmap* into
-    *orbit-calipso.png*:
+Plot CALIPSO trajectory superimposed on Aqua MODIS
+band 31 radiance with colormap *modis-temperature.cmap* into
+*orbit-calipso.png*:
 
-        ccplot -m x31 -c modis-temperature.cmap -p tmerc -o orbit-calipso.png orbit-clipped MYD021KM.A2006224.1945.005.2007140113559.hdf CAL_LID_L1-Prov-V2-01.2006-07-06T19-50-51ZN.hdf
+    ccplot -m x31 -c modis-temperature.cmap -p tmerc -o orbit-calipso.png orbit-clipped MYD021KM.A2006224.1945.005.2007140113559.hdf CAL_LID_L1-Prov-V2-01.2006-07-06T19-50-51ZN.hdf
 
 ## ENVIRONMENT
 
@@ -345,13 +352,16 @@ to be plotted is determined by <type>:
 `ccplot` was written by Peter Kuma.
 
 ## REFERENCES
-  
-  * Kuma, P. (2010). Visualising Data from CloudSat and CALIPSO Satellites.
-    Bachelor's thesis, Comenius University.
-  * CloudSat Standard Data Products Handbook
-  * CALIPSO Data Products Catalog Release 2.4
-  * MODIS Level 1B Product User's Guide
+
+Kuma, P. (2010). Visualising Data from CloudSat and CALIPSO Satellites,
+  Bachelor's thesis. Comenius University, Bratisava, Slovakia.
+
+CloudSat Standard Data Products Handbook
+
+CALIPSO Data Products Catalog Release 2.4
+
+MODIS Level 1B Product User's Guide
 
 ## KNOWN ISSUES
 
-  * Plot size is limited to 32767 pixels.
+Plot size is limited to 32767 pixels.

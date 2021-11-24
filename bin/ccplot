@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # ccplot
 # This file is a part of ccplot: CloudSat and CALIPSO plotting tool.
@@ -45,13 +45,16 @@ import getopt
 import datetime as dt
 import re
 import copy
+import inspect
 
 # Other includes.
 import numpy as np
 import matplotlib as mpl
 mpl.use("agg")
 import matplotlib.pyplot as plt
-from mpl_toolkits import basemap
+import cartopy
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
 
 import ccplot.config
 from ccplot.hdf import HDF
@@ -66,7 +69,7 @@ import ccplot.utils
 
 # Early global variables.
 program_name = os.path.basename(sys.argv[0])
-__version__ = "1.5.7-dev"
+__version__ = "2.0.0-dev"
 CCPLOT_CMAP_PATH = os.path.join(ccplot.config.sharepath, 'cmap') \
                  + ":/usr/share/ccplot/cmap:/usr/local/share/ccplot/cmap"
 
@@ -87,8 +90,8 @@ def sdecode(x):
 # Version checking.
 if mpl.__version__ < "0.98.1":
     fail("matplotlib 0.98.1 required, %s present" % mpl.__version__)
-if basemap.__version__ < "0.99.4":
-    fail("basemap 0.99.4 required, %s present" % basemap.__version__)
+if cartopy.__version__ < "0.18.0":
+    fail("cartopy 0.18.0 required, %s present" % cartopy.__version__)
 if np.__version__ < "1.1":
     fail("numpy 1.1 required, %s present" % np.__version__)
 
@@ -109,10 +112,43 @@ PROFILE_BINHEIGHT = 800 # Height of a bin in profile products in meters.
                         # This defines the area of influence of a data point.
 EV_DATAPOINT_SIZE = 2000 # meters.
 
-SUPPORTED_PROJECTIONS = ("aeqd","poly","gnom","moll","tmerc","nplaea","gall",
-"mill","merc","stere","npstere","vandg","laea","mbtfpq","sinu","spstere",
-"lcc","npaeqd","eqdc","cyl","aea","spaeqd","ortho","cass","splaea",
-"robin")
+PROJECTIONS = (
+    ("aea", "AlbersEqualArea", "Albers equal area"),
+    ("aeqd", "AzimuthalEquidistant", "Azimuthal equidistant"),
+    ("cea", "LambertCylindrical", "Lambert cylindrical"),
+    ("cyl", "PlateCarree", "Cylindrical equidistant (Plate Carree)"),
+    ("eck1", "EckertI", "Eckert I"),
+    ("eck2", "EckertII", "Eckert II"),
+    ("eck3", "EckertIII", "Eckert III"),
+    ("eck4", "EckertIV", "Eckert IV"),
+    ("eck5", "EckertV", "Eckert V"),
+    ("eck6", "EckertVI", "Eckert VI"),
+    ("eqdc", "EquidistantConic", "Equidistant conic"),
+    ("eqearth", "EqualEarth", "Equal Earth"),
+    ("europp", "EuroPP", "EuroPP"),
+    ("geos", "Geostationary", "Geostationary"),
+    ("gnom", "Gnomonic", "Gnomonic"),
+    ("igh", "InterruptedGoodeHomolosine", "Interrupted Goode\"s homolosine"),
+    ("laea", "LambertAzimuthalEqualArea", "Lambert azimuthal qqual area"),
+    ("lcc", "LambertConformal", "Lambert conformal"),
+    ("merc", "Mercator", "Mercator"),
+    ("mill", "Miller", "Miller cylindrical"),
+    ("moll",	"Mollweide", "Mollweide"),
+    ("npstere", "NorthPolarStereo", "North-Polar stereographic"),
+    ("nsper", "NearsidePerspective", "Nearside perspective"),
+    ("ob_tran", "RotatedPole", "Rotated pole"),
+    ("ortho", "Orthographic", "Orthographic"),
+    ("osgb", "OSGB", "OSGB"),
+    ("osni", "OSNI", "OSNI"),
+    ("robin", "Robinson", "Robinson"),
+    ("sinu", "Sinusoidal", "Sinusoidal"),
+    ("spstere", "SouthPolarStereo", "South-Polar stereographic"),
+    ("stere", "Stereographic", "Stereographic"),
+    ("tmerc", "TransverseMercator", "Transverse Mercator"),
+    ("utm", "UTM", "Universal Transverse Mercator"),
+)
+
+SUPPORTED_PROJECTIONS = [projection[0] for projection in PROJECTIONS]
 
 MODIS_WAVELENGTHS = np.zeros(36)
 MODIS_WAVELENGTHS[0:36] = (645,858.500,469,555,1240,1640,2130,412.5,443,488,531,551,
@@ -235,7 +271,7 @@ class AutoOpts(object):
         else: raise ValueError("%s must be 1 or 0" % o)
 
     def setlon(self, o, v):
-        if v.endswith("W"): lon -float(v[0:-1])
+        if v.endswith("W"): lon = -float(v[0:-1])
         elif v.endswith("E"): lon = float(v[0:-1])
         else: raise ValueError("%s must end with W or E" % o)
         if lon < -180 or lon > 180: raise ValueError("%s out of range" % o)
@@ -335,24 +371,30 @@ class PlotOpts(AutoOpts):
 
 
 class ProjOpts(AutoOpts):
-    boundinglat = None
     lat_0 = None
     lat_1 = None
     lat_2 = None
     lat_ts = None
     lon_0 = None
-    lon_1 = None
-    lon_2 = None
+    cutoff = None
+    k_0 = None
+    o_lon_p = None
+    o_lat_p = None
+    h = None
+    sweep = None
 
     def setopt(self, o, v):
-        if   o == "boundinglat": q = self.setlat(o, v)
-        elif o == "lon_0": q = self.setlon(o, v)
-        elif o == "lon_1": q = self.setlon(o, v)
-        elif o == "lon_2": q = self.setlon(o, v)
+        if   o == "lon_0": q = self.setlon(o, v)
         elif o == "lat_0": q = self.setlat(o, v)
         elif o == "lat_1": q = self.setlat(o, v)
         elif o == "lat_2": q = self.setlat(o, v)
         elif o == "lat_ts": q = self.setlat(o, v)
+        elif o == "cutoff": q = self.setlat(o, v)
+        elif o == "k_0": q = self.setfloat(o, v, 0)
+        elif o == "o_lon_p": q = self.setlon(o, v)
+        elif o == "o_lat_p": q = self.setlat(o, v)
+        elif o == "h": q = self.setfloat(o, v, 0)
+        elif o == "sweep": q = self.setenum(o, v, ("x", "y"))
 
         else: raise ValueError
         setattr(self, o, q)
@@ -566,14 +608,14 @@ ccplot {version}
 
 Third-party libraries:
 matplotlib {mpl_version}
-basemap {basemap_version}
+cartopy {cartopy_version}
 
-Copyright (c) 2009-2015 Peter Kuma.
+Copyright (c) 2009-2021 Peter Kuma.
 This software is provided under the terms of a 2-clause BSD licence.\
 """.format(
         version=__version__,
         mpl_version=mpl.__version__,
-        basemap_version=basemap.__version__
+        cartopy_version=cartopy.__version__
     ))
     sys.exit(0)
 
@@ -632,8 +674,6 @@ PROJOPTS is a list of option value pairs, where option is one of:\n\
   lat_2\n\
   lat_ts\n\
   lon_0\n\
-  lon_1\n\
-  lon_2\n\
 \n\
 TYPE is one of:\n\
   cloudsat-reflec\n\
@@ -700,33 +740,7 @@ watercolor")
 
 
 def help_projections():
-    print("\
-aeqd 		Azimuthal Equidistant\n\
-poly 		Polyconic\n\
-gnom 		Gnomonic\n\
-moll 		Mollweide\n\
-tmerc 		Transverse Mercator\n\
-nplaea 		North-Polar Lambert Azimuthal\n\
-gall 		Gall Stereographic Cylindrical\n\
-mill 		Miller Cylindrical\n\
-merc 		Mercator\n\
-stere 		Stereographic\n\
-npstere 	North-Polar Stereographic\n\
-vandg 		van der Grinten\n\
-laea 		Lambert Azimuthal Equal Area\n\
-mbtfpq 		McBryde-Thomas Flat-Polar Quartic\n\
-sinu 		Sinusoidal\n\
-spstere 	South-Polar Stereographic\n\
-lcc 		Lambert Conformal\n\
-npaeqd 		North-Polar Azimuthal Equidistant\n\
-eqdc 		Equidistant Conic\n\
-cyl 		Cylindrical Equidistant\n\
-aea 		Albers Equal Area\n\
-spaeqd 		South-Polar Azimuthal Equidistant\n\
-ortho 		Orthographic\n\
-cass 		Cassini-Soldner\n\
-splaea 		South-Polar Lambert Azimuthal\n\
-robin 		Robinson")
+    print("\n".join(["%s\t%s" % (p[0], p[2]) for p in PROJECTIONS]))
     sys.exit(0)
 
 
@@ -1658,7 +1672,7 @@ def plot_profile(what, fname, product, fig, axes, hextent=HorizontalExtent(),
 
 def plot_orbit(fnames, products, fig, axes,
     hextent=HorizontalExtent(),
-    band=1, band_mode=BAND_MODE_RADIANCE, proj='cyl', proj_opts=ProjOpts(),
+    band=1, band_mode=BAND_MODE_RADIANCE, proj="cyl", proj_opts=ProjOpts(),
     clipped=False,
     colormap=None, norm=None,
     ticks=None, radius=None, opts=PlotOpts()):
@@ -1671,7 +1685,7 @@ def plot_orbit(fnames, products, fig, axes,
         hextent     -- an instance of HorizontalExtent
         band        -- band to plot (integer or 13.5 or 14.5 for high bands)
         band_mode   -- any of BAND_MODE_* constants
-        proj        -- Basemap projection name
+        proj        -- projection name
         clipped     -- clip map to MODIS swath
         colormap    -- matplotlib Colormap instance
         norm        -- matplotlib Normalize instance
@@ -1704,17 +1718,77 @@ def plot_orbit(fnames, products, fig, axes,
                                            along_track_ext, across_track_ext)
             break
 
-    if modis_swath != None and clipped:
+    extent = None
+    lon_0 = None
+    lat_0 = None
+
+    if hextent.extent_type == HorizontalExtent.TYPE_LON_LAT:
+        lon_0 = np.average(hextent.lon)
+        lat_0 = np.average(hextent.lat)
+    elif modis_swath is not None and clipped:
+        shape = modis_swath.lon.shape
+        lon_0 = modis_swath.lon[int(shape[0]/2),int(shape[1]/2)]
+        lat_0 = modis_swath.lat[int(shape[0]/2),int(shape[1]/2)]
+
+    if proj_opts.lon_0 != None:
+        lon_0 = proj_opts.lon_0
+
+    if proj_opts.lat_0 != None:
+        lat_0 = proj_opts.lat_0
+
+    proj_name = PROJECTIONS[SUPPORTED_PROJECTIONS.index(proj)][1]
+    proj_cls = getattr(ccrs, proj_name)
+    proj_args = {}
+    if lon_0 is not None:
+        proj_args["central_longitude"] = lon_0
+    if lat_0 is not None:
+        proj_args["central_latitude"] = lat_0
+    if proj_opts.lat_1 is not None and proj_opts.lat_2 is not None:
+        proj_args["standard_parallels"] = (proj_opts.lat_1, proj_opts.lat_2)
+    for key, arg in (
+        ("lat_ts", "latitude_true_scale"),
+        ("lat_ts", "true_scale_latitude"),
+        ("cutoff", "cutoff"),
+        ("k_0", "scale_factor"),
+        ("h", "satellite_height"),
+        ("sweep", "sweep_axis"),
+        ("o_lon_p", "central_rotated_longitude"),
+        ("o_lat_p", "pole_latitude"),
+    ):
+        if getattr(proj_opts, key) is not None:
+            proj_args[arg] = getattr(proj_opts, key)
+    if lon_0 is not None and proj == "ob_tran":
+        proj_args["pole_longitude"] = lon_0 - 180 # See RotatedPole __init__.
+    proj_args_allow = inspect.getfullargspec(proj_cls).args
+    proj_args_deny = ["self", "globe"]
+    proj_args = {k: v for k, v in proj_args.items()
+        if k in proj_args_allow and k not in proj_args_deny}
+
+    info("Initialising Cartopy")
+    for k, v in proj_args.items():
+        info("  %s = %s" % (k, str(v)))
+
+    crs = proj_cls(**proj_args)
+    geoaxes = fig.add_subplot(1, 1, 1, projection=crs)
+    geoaxes.set_position(axes.get_position())
+    fig.delaxes(axes)
+    axes = geoaxes
+
+    extent_xy = None
+    extent_lonlat = None
+
+    if modis_swath is not None and clipped:
         minorticks_base = 10000
         majorticks_base = 60000
         minorparallels = np.arange(-90, 90, 1)
         majorparallels = np.arange(-90, 90, 5)
         minormeridians = np.arange(-180, 180, 1)
         majormeridians = np.arange(-180, 180, 5)
-        lon_0 = np.average(modis_swath.lon) # Central meridian.
-        lat_0 = np.average(modis_swath.lat) # Central latitude.
-        lon_min, lat_min = modis_swath.lon.min(), modis_swath.lat.min()
-        lon_max, lat_max = modis_swath.lon.max(), modis_swath.lat.max()
+        res = axes.projection.transform_points(ccrs.PlateCarree(),
+            modis_swath.lon, modis_swath.lat)
+        X, Y = res[:,:,0], res[:,:,1]
+        extent_lonlat = None
+        extent_xy = [X.min(), X.max(), Y.min(), Y.max()]
 
     else:
         minorticks_base = 60000
@@ -1723,26 +1797,13 @@ def plot_orbit(fnames, products, fig, axes,
         majorparallels = np.arange(-90, 90, 30)
         minormeridians = np.arange(-180, 180, 10)
         majormeridians = np.arange(-180, 180, 30)
-        lon_0 = 0 # Central meridian.
-        lat_0 = 0 # Central latitude.
-
-        if proj == "merc":
-            lon_min, lon_max = -180, 180
-            lat_min, lat_max = -80, 80
-        elif proj == "tmerc":
-            lon_min, lon_max = -80, 80
-            lat_min, lat_max = -90, 90
-            # FIXME: matplotlib is unhappy about these settings,
-            #        but they should be all right
-        elif proj == "npstere":
-            lon_min, lon_max = -180, 180
-            lat_min, lat_max = 60, 90
-        elif proj == "spstere":
-            lon_min, lon_max = -180, 180
-            lat_min, lat_max = -90, -60
-        else:
-            lon_min, lon_max = -180, 180
-            lat_min, lat_max = -90, 90
+        extent_lonlat = {
+            "merc": [-180, 180, -80, 80],
+            "tmerc": [-80, 80, -90, 90],
+            "npstere": [-180, 180, 60, 90],
+            "spstere": [-180, 180, -90, -60],
+        }.get(proj, None)
+        extent_xy = None
 
     if proj == "npstere":
         minorparallels = np.arange(0, 80, 5)
@@ -1773,10 +1834,11 @@ def plot_orbit(fnames, products, fig, axes,
 
     if hextent.extent_type == HorizontalExtent.TYPE_LON_LAT:
         # Determine projection parameters from the horizontal extent given.
-        lon_0 = np.average(hextent.lon)
-        lat_0 = np.average(hextent.lat)
-        lon_min, lat_min = min(hextent.lon), min(hextent.lat)
-        lon_max, lat_max = max(hextent.lon), max(hextent.lat)
+        extent_lonlat = [
+            min(hextent.lon), max(hextent.lon),
+            min(hextent.lat), max(hextent.lat)
+        ]
+        extent_xy = None
 
     if opts.trajticks > 0:
         majorticks_base = opts.trajticks * 1000
@@ -1786,81 +1848,64 @@ def plot_orbit(fnames, products, fig, axes,
     elif opts.trajnminorticks > 0:
         minorticks_base = int(majorticks_base / opts.trajnminorticks)
 
-    if proj.startswith("sp"):
-        boundinglat = min(lat_max, 0.0)
-        lon_0 = 180.0
-        lat_0 = -90.0
-    elif proj.startswith("np"):
-        boundinglat = max(lat_min, 0.0)
-        lon_0 = 0.0
-        lat_0 = 90.0
-    else:
-        boundinglat = 0.0
-
-    if proj_opts.boundinglat != None:
-        boundinglat = proj_opts.boundinglat
-
-    if proj_opts.lon_0 != None:
-        lon_0 = proj_opts.lon_0
-
-    if proj_opts.lat_0 != None:
-        lat_0 = proj_opts.lat_0
-
-    info("Initialising basemap:")
-    info("  lon_0=%.1f, lat_0=%.1f" % (lon_0, lat_0))
-    info("  lon_min=%.1f, lon_max=%.1f, lat_min=%.1f, lat_max=%.1f"
-         % (lon_min, lon_max, lat_min, lat_max))
-    info("  boundinglat=%.1f" % boundinglat)
-
     # Plot map.
-    m = basemap.Basemap(projection=proj, lon_0=lon_0, lat_0=lat_0,
-                        llcrnrlon=lon_min, llcrnrlat=lat_min,
-                        urcrnrlon=lon_max, urcrnrlat=lat_max,
-                        boundinglat=boundinglat,
-                        resolution=opts.mapres, ax=axes,
-                        lon_1=proj_opts.lon_1, lat_1=proj_opts.lat_1,
-                        lon_2=proj_opts.lon_2, lat_2=proj_opts.lat_2,
-                        lat_ts=proj_opts.lat_ts)
+    if extent_xy is not None:
+        axes.set_extent(extent_xy, crs=crs)
+    elif extent_lonlat is not None:
+        axes.set_extent(extent_lonlat, crs=ccrs.PlateCarree())
+    else:
+        axes.set_global()
 
+    extent = axes.get_extent()
+    aspect = (extent[1] - extent[0])/(extent[3] - extent[2])
     x, y, width, height = get_axes_bounds(fig, axes)
-    expand_axes(fig, axes, height/m.aspect, height, padding=opts.padding)
-
-    if proj == "tmerc":
-        def pick(x, center, radius, modulus):
-            dx = x - center
-            return x[np.abs(dx - np.round(dx/modulus)*modulus) < radius]
-        minormeridians = pick(minormeridians, lon_0, 90.0, 360.0)
-        majormeridians = pick(majormeridians, lon_0, 90.0, 360.0)
+    expand_axes(fig, axes, height*aspect, height, \
+        padding=opts.padding)
 
     if opts.drawcoastlines:
-        m.drawcoastlines(linewidth=opts.coastlineslw, color=opts.coastlinescolor)
+        axes.add_feature(cfeature.COASTLINE,
+            linewidth=opts.coastlineslw, color=opts.coastlinescolor)
+
     if opts.drawcountries:
-        m.drawcountries(linewidth=opts.countrieslw, color=opts.countriescolor)
+        axes.add_feature(cfeature.BORDERS,
+            linewidth=opts.countrieslw, color=opts.countriescolor)
     if opts.drawlsmask:
-        m.drawlsmask(opts.landcolor, opts.watercolor, lakes=opts.drawlakes)
+        axes.add_feature(cfeature.LAND, color=opts.landcolor)
+        axes.add_feature(cfeature.OCEAN, color=opts.watercolor)
+        if opts.drawlakes:
+            axes.add_feature(cfeature.LAKES, color=opts.watercolor, zorder=-1)
+
     if opts.drawminorparallels:
-        m.drawparallels(minorparallels, dashes=[],
+         axes.gridlines(xlocs=[], ylocs=minorparallels,
                         linewidth=opts.minorparallelslw,
                         color=opts.minorparallelscolor)
     if opts.drawparallels:
-        m.drawparallels(majorparallels, dashes=[],
+        gl = axes.gridlines(xlocs=[], ylocs=majorparallels,
                         linewidth=opts.majorparallelslw,
                         color=opts.majorparallelscolor,
-                        labels=[1, 0, 0, 0])
+                        draw_labels=True)
+        gl.left_labels = True
+        gl.bottom_labels = True
+        gl.right_labels = False
+        gl.top_labels = False
     if opts.drawminormeridians:
-        m.drawmeridians(minormeridians, dashes=[],
-                         linewidth=opts.minormeridianslw,
-                         color=opts.minormeridianscolor)
+         axes.gridlines(xlocs=minormeridians, ylocs=[],
+                        linewidth=opts.minormeridianslw,
+                        color=opts.minormeridianscolor)
     if opts.drawmeridians:
-        m.drawmeridians(majormeridians, dashes=[],
+        gl = axes.gridlines(xlocs=majormeridians, ylocs=[],
                         linewidth=opts.majormeridianslw,
                         color=opts.majormeridianscolor,
-                        labels=[0, 0, 0, 1])
+                        draw_labels=True)
+        gl.left_labels = True
+        gl.bottom_labels = True
+        gl.right_labels = False
+        gl.top_labels = False
 
     # Plot swath.
     if modis_swath != None:
         info("Plotting swath")
-        plot_swath(modis_swath, m, fig, axes, colormap=colormap, norm=norm,
+        plot_swath(modis_swath, fig, axes, proj, colormap=colormap, norm=norm,
                    ticks=ticks, radius=radius, opts=opts)
         titlea += ["MODIS Swath"]
 
@@ -1894,7 +1939,7 @@ def plot_orbit(fnames, products, fig, axes,
         if hit:
             lw = opts.trajlws[j % len(opts.trajlws)]
             color = opts.trajcolors[j % len(opts.trajcolors)]
-            mask = plot_trajectory(fig, axes, m, lon, lat, time,
+            mask = plot_trajectory(fig, axes, lon, lat, time,
                 time2dt, minorticks_base,
                 majorticks_base, lw=lw, color=color)
             time_min = time_max = None
@@ -1906,7 +1951,8 @@ def plot_orbit(fnames, products, fig, axes,
                 if mask[i]:
                     time_max = time2dt(time[i])
                     break
-            if time_min < time_max:
+            if time_min is not None and time_max is not None and \
+                time_min < time_max:
                 titlea += ["%s Trajectory %s/%s" % \
                            (satellite,
                             time_min.strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -1919,7 +1965,7 @@ def plot_orbit(fnames, products, fig, axes,
     figure_title(fig, opts, title)
 
 
-def plot_trajectory(fig, axes, m, lon, lat, time, time2dt,
+def plot_trajectory(fig, axes, lon, lat, time, time2dt,
     minorticks_base, majorticks_base, lw=1.0, color="#000000"):
 
     #
@@ -1981,19 +2027,10 @@ def plot_trajectory(fig, axes, m, lon, lat, time, time2dt,
     time_delta = d.days*86400000 + d.seconds*1000 + d.microseconds/1000
     del d
 
-    X, Y = m(lon, lat)
-    xmin = min(m.llcrnrx, m.urcrnrx)
-    xmax = max(m.llcrnrx, m.urcrnrx)
-    ymin = min(m.llcrnry, m.urcrnry)
-    ymax = max(m.llcrnry, m.urcrnry)
+    res = axes.projection.transform_points(ccrs.PlateCarree(), lon, lat)
+    X, Y = res[:,0], res[:,1]
+    xmin, xmax, ymin, ymax = axes.get_extent()
     mask = (X > xmin) & (X < xmax) & (Y > ymin) & (Y < ymax)
-
-    # WORKAROUND: This is a pretty nasty workaround. Because basemap
-    # translates points lying on the other hemisphere to our viewport,
-    # we have to check whether they are mapped back to the original point
-    # under inverse transformation.
-    lon_inv, lat_inv = m(X, Y, inverse=True)
-    mask = mask & (abs(lon-lon_inv) + abs(lat-lat_inv) < 0.001)
 
     if not mask.max(): return mask # Nothing to plot.
 
@@ -2139,13 +2176,15 @@ def read_modis_swath(product, band, band_mode,
     return swath
 
 
-def plot_swath(swath, m, fig, axes, colormap=None, norm=None, ticks=None,
+def plot_swath(swath, fig, axes, proj, colormap=None, norm=None, ticks=None,
                radius=None, name=None, opts=PlotOpts()):
 
     global EV_DATAPOINT_SIZE
 
     # lon/lat to X/Y conversion.
-    X, Y = m(swath.lon, swath.lat)
+    res = axes.projection.transform_points(ccrs.PlateCarree(),
+        swath.lon, swath.lat)
+    X, Y = res[:,:,0], res[:,:,1]
     if X.dtype != np.float32: X = np.asarray(X, dtype=np.float32)
     if Y.dtype != np.float32: Y = np.asarray(Y, dtype=np.float32)
 
@@ -2153,28 +2192,32 @@ def plot_swath(swath, m, fig, axes, colormap=None, norm=None, ticks=None,
     x, y, width, height = get_axes_bounds(fig, axes)
     nx = int(width * fig.get_dpi())
     ny = int(height * fig.get_dpi())
+    x0, x1, y0, y1 = axes.get_extent()
     if radius == None:
-        if m.projection == "cyl":
+        if proj in ("cyl", "ob_tran"):
             xfactor = 20037508.34/180.0
             yfactor = 10018754.17/90.0
         else:
             xfactor = yfactor = 1.0
-
-        radius_x = int(EV_DATAPOINT_SIZE/((m.urcrnrx-m.llcrnrx)*xfactor)*nx+0.5)
-        radius_y = int(EV_DATAPOINT_SIZE/((m.urcrnry-m.llcrnry)*yfactor)*ny+0.5)
+        radius_x = int(EV_DATAPOINT_SIZE/((x1 - x0)*xfactor)*nx+0.5)
+        radius_y = int(EV_DATAPOINT_SIZE/((y1 - y0)*yfactor)*ny+0.5)
         info("Interpolation radius: rx=%d, ry=%d" % (radius_x, radius_y))
     else:
         radius_x = radius_y = radius
-    data = cctk.interpolate2d(swath.data, X, Y, (m.llcrnrx, m.urcrnrx, nx),
-                              (m.llcrnry, m.urcrnry, ny), float("nan"),
+
+    data = cctk.interpolate2d(swath.data, X, Y, (x0, x1, nx),
+                              (y0, y1, ny), float("nan"),
                               radius_x, radius_y)
+
+    extent = (X.min(), X.max(), Y.min(), Y.max())
     del X, Y
 
     # Mask invalid values.
     data = np.ma.masked_invalid(data)
 
     # Plotting.
-    im = m.imshow(data.T, cmap=colormap, norm=norm, interpolation="nearest")
+    im = axes.imshow(data.T, cmap=colormap, norm=norm, interpolation="nearest",
+        extent=extent, origin="lower")
 
     cbaxes = fit_colorbar(fig, axes, space=opts.cbspacing, padding=opts.padding)
     cb = fig.colorbar(im, ax=axes, cax=cbaxes, orientation="vertical",
@@ -2243,7 +2286,25 @@ def main(argv):
     # Main switch.
 
     # Profile products.
-    if filetype in ("cloudsat-2b-geoprof", "calipso-profile"):
+    if opts.plot_type in ("orbit", "orbit-clipped"):
+        plot_orbit(
+            opts.fnames,
+            products,
+            fig,
+            axes,
+            band=opts.modis_band,
+            band_mode=opts.modis_band_mode,
+            hextent=opts.hextent,
+            proj=opts.projection,
+            colormap=colormap,
+            norm=norm,
+            ticks=ticks,
+            clipped=True,
+            radius=opts.radius,
+            proj_opts=opts.proj_opts,
+            opts=opts.plot_opts
+        )
+    elif filetype in ("cloudsat-2b-geoprof", "calipso-profile"):
         if len(products) > 1:
             fail("Single file expected")
         plot_profile(
@@ -2278,25 +2339,6 @@ def main(argv):
             norm=norm,
             ticks=ticks,
             radius=opts.radius,
-            opts=opts.plot_opts
-        )
-    # Orbit plot.
-    elif filetype == "modis-swath-l1b":
-        plot_orbit(
-            opts.fnames,
-            products,
-            fig,
-            axes,
-            band=opts.modis_band,
-            band_mode=opts.modis_band_mode,
-            hextent=opts.hextent,
-            proj=opts.projection,
-            colormap=colormap,
-            norm=norm,
-            ticks=ticks,
-            clipped=True,
-            radius=opts.radius,
-            proj_opts=opts.proj_opts,
             opts=opts.plot_opts
         )
     else:
