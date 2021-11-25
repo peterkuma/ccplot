@@ -84,7 +84,8 @@ setup(
     install_requires=[
         'numpy>=1.1',
         'matplotlib>=0.98.1',
-        'cartopy>=0.18.0',
+        'cartopy>=0.17.0',
+        'packaging>=20.03',
     ],
     setup_requires=[
         'cython'

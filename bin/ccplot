@@ -50,6 +50,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # Other includes.
+import packaging.version
 import numpy as np
 import matplotlib as mpl
 mpl.use("agg")
@@ -92,8 +93,8 @@ def sdecode(x):
 # Version checking.
 if mpl.__version__ < "0.98.1":
     fail("matplotlib 0.98.1 required, %s present" % mpl.__version__)
-if cartopy.__version__ < "0.18.0":
-    fail("cartopy 0.18.0 required, %s present" % cartopy.__version__)
+if cartopy.__version__ < "0.17.0":
+    fail("cartopy 0.17.0 required, %s present" % cartopy.__version__)
 if np.__version__ < "1.1":
     fail("numpy 1.1 required, %s present" % np.__version__)
 
@@ -1885,43 +1886,59 @@ def plot_orbit(fnames, products, fig, axes,
 
     if opts.drawcoastlines:
         axes.add_feature(coastline,
-            linewidth=opts.coastlineslw, color=opts.coastlinescolor)
+            linewidth=opts.coastlineslw, edgecolor=opts.coastlinescolor)
 
     if opts.drawcountries:
         axes.add_feature(borders,
-            linewidth=opts.countrieslw, color=opts.countriescolor)
+            linewidth=opts.countrieslw, edgecolor=opts.countriescolor)
     if opts.drawlsmask:
         axes.add_feature(land, color=opts.landcolor)
         axes.add_feature(ocean, color=opts.watercolor)
         if opts.drawlakes:
             axes.add_feature(lakes, color=opts.watercolor, zorder=-1)
 
-    if opts.drawminorparallels:
-         axes.gridlines(xlocs=[], ylocs=minorparallels,
-                        linewidth=opts.minorparallelslw,
-                        color=opts.minorparallelscolor)
-    if opts.drawparallels:
-        gl = axes.gridlines(xlocs=[], ylocs=majorparallels,
-                        linewidth=opts.majorparallelslw,
-                        color=opts.majorparallelscolor,
-                        draw_labels=True)
-        gl.left_labels = True
-        gl.bottom_labels = True
-        gl.right_labels = False
-        gl.top_labels = False
-    if opts.drawminormeridians:
-         axes.gridlines(xlocs=minormeridians, ylocs=[],
-                        linewidth=opts.minormeridianslw,
-                        color=opts.minormeridianscolor)
-    if opts.drawmeridians:
-        gl = axes.gridlines(xlocs=majormeridians, ylocs=[],
-                        linewidth=opts.majormeridianslw,
-                        color=opts.majormeridianscolor,
-                        draw_labels=True)
-        gl.left_labels = True
-        gl.bottom_labels = True
-        gl.right_labels = False
-        gl.top_labels = False
+    if packaging.version.parse(cartopy.__version__) >= \
+       packaging.version.parse('0.18.0'):
+        if opts.drawminorparallels:
+             axes.gridlines(xlocs=[], ylocs=minorparallels,
+                            linewidth=opts.minorparallelslw,
+                            color=opts.minorparallelscolor)
+        if opts.drawparallels:
+            gl = axes.gridlines(xlocs=[], ylocs=majorparallels,
+                            linewidth=opts.majorparallelslw,
+                            color=opts.majorparallelscolor,
+                            draw_labels=True)
+            gl.left_labels = True
+            gl.bottom_labels = True
+            gl.right_labels = False
+            gl.top_labels = False
+        if opts.drawminormeridians:
+             axes.gridlines(xlocs=minormeridians, ylocs=[],
+                            linewidth=opts.minormeridianslw,
+                            color=opts.minormeridianscolor)
+        if opts.drawmeridians:
+            gl = axes.gridlines(xlocs=majormeridians, ylocs=[],
+                            linewidth=opts.majormeridianslw,
+                            color=opts.majormeridianscolor,
+                            draw_labels=True)
+            gl.left_labels = True
+            gl.bottom_labels = True
+            gl.right_labels = False
+            gl.top_labels = False
+    else:
+        if opts.drawminorparallels or opts.drawminormeridians:
+             axes.gridlines(xlocs=minormeridians, ylocs=minorparallels,
+                            linewidth=opts.minorparallelslw,
+                            color=opts.minorparallelscolor)
+        if opts.drawparallels or opts.drawmeridians:
+            gl = axes.gridlines(xlocs=majormeridians, ylocs=majorparallels,
+                            linewidth=opts.majorparallelslw,
+                            color=opts.majorparallelscolor,
+                            draw_labels=(proj in ("cyl", "merc")))
+            gl.left_labels = True
+            gl.bottom_labels = True
+            gl.right_labels = False
+            gl.top_labels = False
 
     # Plot swath.
     if modis_swath != None:
