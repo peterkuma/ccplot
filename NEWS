@@ -1,5 +1,10 @@
 CCPLOT NEWS
 
+New in 2.0.0 (2021-11-25)
+
+    * Migrated map plotting library from Basemap to Cartopy.
+    * Non-backward compatible changes to projections and projection options.
+
 New in 1.5.6 (2021-03-26):
 
     * Fixed an integer division issue in argument parsing on Python 3.
