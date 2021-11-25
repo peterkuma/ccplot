@@ -311,7 +311,7 @@ class PlotOpts(AutoOpts):
     majormeridianslw = 0.3
     majorparallelscolor = "#000000"
     majorparallelslw = 0.3
-    mapres = "i"
+    mapres = None
     meridiansbase = 0
     minormeridianscolor = "#000000"
     minormeridianslw = 0.1
@@ -353,7 +353,7 @@ class PlotOpts(AutoOpts):
         elif o == "majormeridianslw": q = self.setfloat(o, v, 0)
         elif o == "majorparallelscolor": q = self.setcolor(o, v)
         elif o == "majorparallelslw": q = self.setfloat(o, v, 0)
-        elif o == "mapres": q = self.setenum(o, v, ("c","l","i","h","f"))
+        elif o == "mapres": q = self.setenum(o, v, ("auto","10m","50m","110m"))
         elif o == "meridiansbase": q = self.setfloat(o, v, 0)
         elif o == "minormeridianscolor": q = self.setcolor(o, v)
         elif o == "minormeridianslw": q = self.setfloat(o, v, 0)
@@ -1871,18 +1871,30 @@ def plot_orbit(fnames, products, fig, axes,
     expand_axes(fig, axes, height*aspect, height, \
         padding=opts.padding)
 
+    coastline = cfeature.COASTLINE
+    borders = cfeature.BORDERS
+    land = cfeature.LAND
+    ocean = cfeature.OCEAN
+    lakes = cfeature.LAKES
+    if opts.mapres is not None and opts.mapres != "auto":
+        coastline = coastline.with_scale(opts.mapres)
+        borders = borders.with_scale(opts.mapres)
+        land = land.with_scale(opts.mapres)
+        ocean = ocean.with_scale(opts.mapres)
+        lakes = lakes.with_scale(opts.mapres)
+
     if opts.drawcoastlines:
-        axes.add_feature(cfeature.COASTLINE,
+        axes.add_feature(coastline,
             linewidth=opts.coastlineslw, color=opts.coastlinescolor)
 
     if opts.drawcountries:
-        axes.add_feature(cfeature.BORDERS,
+        axes.add_feature(borders,
             linewidth=opts.countrieslw, color=opts.countriescolor)
     if opts.drawlsmask:
-        axes.add_feature(cfeature.LAND, color=opts.landcolor)
-        axes.add_feature(cfeature.OCEAN, color=opts.watercolor)
+        axes.add_feature(land, color=opts.landcolor)
+        axes.add_feature(ocean, color=opts.watercolor)
         if opts.drawlakes:
-            axes.add_feature(cfeature.LAKES, color=opts.watercolor, zorder=-1)
+            axes.add_feature(lakes, color=opts.watercolor, zorder=-1)
 
     if opts.drawminorparallels:
          axes.gridlines(xlocs=[], ylocs=minorparallels,

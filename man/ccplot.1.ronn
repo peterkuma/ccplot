@@ -275,7 +275,8 @@ to be plotted is determined by <type>:
         Major parallels line width. Default: *0.3*.
 
       * `mapres`:
-        Map resolution: c (crude), l (low), i (intermediate), h (high), f (full). Default: *i*.
+        Map resolution: auto (automatic), 10m (1:10m) 50m (1:50m),
+        110m (1:110m). Default: *auto*.
 
       * `meridiansbase`:
          Meridians base, or 0 for automatic. Default: *0*.
