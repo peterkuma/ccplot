@@ -147,7 +147,7 @@ PROJECTIONS = (
     ("spstere", "SouthPolarStereo", "South-Polar stereographic"),
     ("stere", "Stereographic", "Stereographic"),
     ("tmerc", "TransverseMercator", "Transverse Mercator"),
-    ("utm", "UTM", "Universal Transverse Mercator"),
+    ("utm", "UTM", "Universal Transverse Mercator (UTM)"),
 )
 
 SUPPORTED_PROJECTIONS = [projection[0] for projection in PROJECTIONS]
@@ -384,6 +384,7 @@ class ProjOpts(AutoOpts):
     o_lat_p = None
     h = None
     sweep = None
+    zone = None
 
     def setopt(self, o, v):
         if   o == "lon_0": q = self.setlon(o, v)
@@ -397,6 +398,7 @@ class ProjOpts(AutoOpts):
         elif o == "o_lat_p": q = self.setlat(o, v)
         elif o == "h": q = self.setfloat(o, v, 0)
         elif o == "sweep": q = self.setenum(o, v, ("x", "y"))
+        elif o == "zone": q = self.setint(o, v, 1, 60)
 
         else: raise ValueError
         setattr(self, o, q)
@@ -1757,6 +1759,7 @@ def plot_orbit(fnames, products, fig, axes,
         ("sweep", "sweep_axis"),
         ("o_lon_p", "central_rotated_longitude"),
         ("o_lat_p", "pole_latitude"),
+        ("zone", "zone"),
     ):
         if getattr(proj_opts, key) is not None:
             proj_args[arg] = getattr(proj_opts, key)
@@ -1766,6 +1769,9 @@ def plot_orbit(fnames, products, fig, axes,
     proj_args_deny = ["self", "globe"]
     proj_args = {k: v for k, v in proj_args.items()
         if k in proj_args_allow and k not in proj_args_deny}
+
+    if proj == "utm" and "zone" not in proj_args:
+        fail("UTM \"zone\" projection option is required")
 
     info("Initialising Cartopy")
     for k, v in proj_args.items():

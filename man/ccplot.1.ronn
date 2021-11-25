@@ -124,6 +124,9 @@ to be plotted is determined by <type>:
       * `sweep`=<axis>:
         Sweep axis: "x" or "y" (geostationary projection).
 
+      * `zone`=<zone>:
+        UTM zone (1 to 60).
+
     <longitude> is in the format <number>`E`|`W` (East or West).
     <latitude> is in the format <number>`S`|`N` (South or North).
     <number> is a positive decimal number in degrees.
