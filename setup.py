@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import setuptools
 from distutils.core import setup, Extension
 from Cython.Distutils import build_ext
