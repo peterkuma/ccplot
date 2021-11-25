@@ -2207,20 +2207,20 @@ def plot_swath(swath, fig, axes, proj, colormap=None, norm=None, ticks=None,
         info("Interpolation radius: rx=%d, ry=%d" % (radius_x, radius_y))
     else:
         radius_x = radius_y = radius
+    radius_x = max(1, radius_x)
+    radius_y = max(1, radius_y)
 
     data = cctk.interpolate2d(swath.data, X, Y, (x0, x1, nx),
                               (y0, y1, ny), float("nan"),
                               radius_x, radius_y)
-
-    extent = (X.min(), X.max(), Y.min(), Y.max())
     del X, Y
 
     # Mask invalid values.
     data = np.ma.masked_invalid(data)
 
     # Plotting.
-    im = axes.imshow(data.T, cmap=colormap, norm=norm, interpolation="nearest",
-        extent=extent, origin="lower")
+    im = axes.imshow(data.T, cmap=colormap, norm=norm, interpolation="none",
+        extent=(x0, x1, y0, y1), origin="lower", transform=axes.projection)
 
     cbaxes = fit_colorbar(fig, axes, space=opts.cbspacing, padding=opts.padding)
     cb = fig.colorbar(im, ax=axes, cax=cbaxes, orientation="vertical",
@@ -2302,7 +2302,7 @@ def main(argv):
             colormap=colormap,
             norm=norm,
             ticks=ticks,
-            clipped=True,
+            clipped=(opts.plot_type == "orbit-clipped"),
             radius=opts.radius,
             proj_opts=opts.proj_opts,
             opts=opts.plot_opts
