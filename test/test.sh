@@ -37,32 +37,39 @@ check ccplot -V
 testing "list of available projections"
 check ccplot -p help
 expect <<EOF
-aeqd 		Azimuthal Equidistant
-poly 		Polyconic
-gnom 		Gnomonic
-moll 		Mollweide
-tmerc 		Transverse Mercator
-nplaea 		North-Polar Lambert Azimuthal
-gall 		Gall Stereographic Cylindrical
-mill 		Miller Cylindrical
-merc 		Mercator
-stere 		Stereographic
-npstere 	North-Polar Stereographic
-vandg 		van der Grinten
-laea 		Lambert Azimuthal Equal Area
-mbtfpq 		McBryde-Thomas Flat-Polar Quartic
-sinu 		Sinusoidal
-spstere 	South-Polar Stereographic
-lcc 		Lambert Conformal
-npaeqd 		North-Polar Azimuthal Equidistant
-eqdc 		Equidistant Conic
-cyl 		Cylindrical Equidistant
-aea 		Albers Equal Area
-spaeqd 		South-Polar Azimuthal Equidistant
-ortho 		Orthographic
-cass 		Cassini-Soldner
-splaea 		South-Polar Lambert Azimuthal
-robin 		Robinson
+aea	Albers equal area
+aeqd	Azimuthal equidistant
+cea	Lambert cylindrical
+cyl	Cylindrical equidistant (Plate Carree)
+eck1	Eckert I
+eck2	Eckert II
+eck3	Eckert III
+eck4	Eckert IV
+eck5	Eckert V
+eck6	Eckert VI
+eqdc	Equidistant conic
+eqearth	Equal Earth
+europp	EuroPP
+geos	Geostationary
+gnom	Gnomonic
+igh	Interrupted Goode"s homolosine
+laea	Lambert azimuthal qqual area
+lcc	Lambert conformal
+merc	Mercator
+mill	Miller cylindrical
+moll	Mollweide
+npstere	North-Polar stereographic
+nsper	Nearside perspective
+ob_tran	Rotated pole
+ortho	Orthographic
+osgb	OSGB
+osni	OSNI
+robin	Robinson
+sinu	Sinusoidal
+spstere	South-Polar stereographic
+stere	Stereographic
+tmerc	Transverse Mercator
+utm	Universal Transverse Mercator (UTM)
 EOF
 
 testing "list of available options"
@@ -169,7 +176,7 @@ expect ""
 check imgcompare orbit-modis_x31+cloudsat-ccplot.org.png orbit-modis_x31+cloudsat-ccplot.org.ref.png
 
 testing "second MODIS example from ccplot.org"
-check ccplot -o orbit-modis_x31+calipso_spstere-ccplot.org.png -m x31 -c modis-temperature.cmap -p spstere:boundinglat=60S orbit-clipped MYD021KM.A2007163.0415.005.2009290181256.hdf CAL_LID_L1-ValStage1-V3-01.2007-06-12T03-42-18ZN.hdf
+check ccplot -o orbit-modis_x31+calipso_spstere-ccplot.org.png -m x31 -c modis-temperature.cmap -p spstere orbit MYD021KM.A2007163.0415.005.2009290181256.hdf CAL_LID_L1-ValStage1-V3-01.2007-06-12T03-42-18ZN.hdf
 expect ""
 check imgcompare orbit-modis_x31+calipso_spstere-ccplot.org.png orbit-modis_x31+calipso_spstere-ccplot.org.ref.png
 
