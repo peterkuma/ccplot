@@ -46,6 +46,8 @@ import datetime as dt
 import re
 import copy
 import inspect
+import warnings
+warnings.filterwarnings('ignore')
 
 # Other includes.
 import numpy as np
@@ -916,6 +918,7 @@ def parse_options(argv):
             elif o == "-v":
                 global verbose
                 verbose = True
+                warnings.filterwarnings("default")
             elif o == "-y":
                 parts = a.partition("..")
                 if parts[0] != "": opts.vextent[0] = int(parts[0])
