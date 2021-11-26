@@ -1,9 +1,9 @@
 ---
 layout: default
-title: Getting Started
+title: Installation
 ---
-Getting Started
-===============
+Installation
+============
 
 Archive of ccplot releases
 --------------------------
@@ -175,19 +175,18 @@ Linux
 -----
 
 The installation works with either native Python 3 on Linux distributions, or
-with [Anaconda](https://anaconda.org).
+with [Anaconda](https://anaconda.org). The instructions below are for native
+Python 3.
 
-### Step 1: Installation of dependencies
-
-#### On Debian-based distributions (Debian, Ubuntu, Devuan, ...)
+### Dependencies on Debian-based distributions (Debian, Ubuntu, Devuan, ...)
 
 To install dependencies, enter the following command in the terminal:
 
     sudo apt install --no-install-recommends python3 python3-dev python3-pip gcc python3-distutils cython3 libhdf4-dev libhdfeos-dev python3-pil python3-numpy python3-scipy python3-matplotlib python3-cartopy python3-packaging ttf-bitstream-vera proj-bin
 
-#### On Fedora
+### Dependencies on Fedora
 
-On Fedora, download `szip-2.1.1.tar.gz` and `HDF-EOS2.20v1.00.tar.Z` from
+On Fedora, download `szip-2.1.1.tar.gz` and `hdf-eos2-3.0-src.tar.gz` from
 [Earthdata
 Wiki](https://wiki.earthdata.nasa.gov/display/DAS/Toolkit+Downloads), and
 install dependencies with the following commands in the terminal:
@@ -195,18 +194,17 @@ install dependencies with the following commands in the terminal:
     sudo yum install g++ make python3-devel python3-Cython python3-numpy python3-matplotlib python3-cartopy hdf-devel zlib-devel
     tar xf szip-2.1.1.tar.gz
     cd szip-2.1.1
-    configure --prefix=/usr/local
+    ./configure --prefix=/usr/local
     make
     sudo make install
     cd ..
-    tar xf HDF-EOS2.20v1.00.tar.Z
-    cd hdfeos
+    tar xf hdf-eos2-3.0-src.tar.gz
+    cd hdf-eos2-3.0
     ./configure CFLAGS=-I/usr/include/hdf --prefix=/usr/local --enable-install-include --with-pic
     make
     sudo make install
-    cd ..
 
-### Step 2: Installation of ccplot
+### Installation of ccplot
 
 To install ccplot, enter the following command in the terminal:
 
@@ -369,6 +367,12 @@ commercial products without restrictions.
 
 Known Issues
 ------------
+
+### 26 November 2021
+
+Cartopy < 0.18.0 is not able to plot longitude/latitude labels for projections
+other than Plate Carree and Mercator. Ubuntu 20.04 ships with Cartopy 0.17.
+It is possible to use Anaconda instead, which has a newer version of Cartopy.
 
 ### 16 March 2021
 
