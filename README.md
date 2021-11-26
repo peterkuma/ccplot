@@ -5,14 +5,14 @@ ccplot is an open source command-line application for producing two-dimensinal
 plots of profile, layer and earth view data from CloudSat, CALIPSO and Aqua
 satellites.
 
-The project is hosted at [ccplot.org](http://ccplot.org).
+The project is hosted at [ccplot.org](https://ccplot.org).
 
 Installation
 ------------
 
 The installation instructions below are general instructions for Linux
 distributions. For more detailed instructions and other operating systems
-please see [ccplot.org/download](http://ccplot.org/download).
+please see [ccplot.org/download](https://ccplot.org/download).
 
 Requirements:
 
@@ -36,7 +36,7 @@ The Python packages are installed automatically by pip together with ccplot:
 
     # To install from a local directory:
     pip3 install .
-    
+
     # To install from PyPI:
     pip3 install ccplot
 
@@ -44,7 +44,7 @@ More information
 ----------------
 
 See the man page ccplot(1) for information about usage, or visit
-[ccplot.org](http://ccplot.org).
+[ccplot.org](https://ccplot.org).
 
 License
 -------
