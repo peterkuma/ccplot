@@ -182,7 +182,7 @@ Python 3.
 
 To install dependencies, enter the following command in the terminal:
 
-    sudo apt install --no-install-recommends python3 python3-dev python3-pip gcc python3-distutils cython3 libhdf4-dev libhdfeos-dev python3-pil python3-numpy python3-scipy python3-matplotlib python3-cartopy python3-packaging ttf-bitstream-vera proj-bin
+    sudo apt install --no-install-recommends python3 python3-dev python3-pip gcc python3-distutils cython3 libhdf4-dev libhdfeos-dev python3-pil python3-numpy python3-scipy python3-matplotlib python3-cartopy python3-packaging python3-tz ttf-bitstream-vera proj-bin
 
 ### Dependencies on Fedora
 
@@ -191,7 +191,7 @@ On Fedora, download `szip-2.1.1.tar.gz` and `hdf-eos2-3.0-src.tar.gz` from
 Wiki](https://wiki.earthdata.nasa.gov/display/DAS/Toolkit+Downloads), and
 install dependencies with the following commands in the terminal:
 
-    sudo yum install g++ make python3-devel python3-Cython python3-numpy python3-matplotlib python3-cartopy hdf-devel zlib-devel
+    sudo yum install g++ make python3-devel python3-Cython python3-numpy python3-matplotlib python3-cartopy python3-pytz hdf-devel zlib-devel
     tar xf szip-2.1.1.tar.gz
     cd szip-2.1.1
     ./configure --prefix=/usr/local
