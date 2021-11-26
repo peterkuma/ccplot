@@ -250,7 +250,7 @@ On Windows, it is possible to install ccplot under the "Windows Subsystem
 for Linux" (WSL), which is a full-featured Linux distribution running on
 Windows. Unlike the native installation described above, ccplot can only be run
 in the WSL environment, and the ccplot API is only available in Python programs
-run within this environemnt.
+run within this environment.
 
 1. Install the "Windows Subsystem for Linux" (found under Settings → Optional
 features → More Windows features).
@@ -320,7 +320,7 @@ This installation has been tested on macOS Monterey (Intel CPU).
 
 2. Install [MacPorts](https://www.macports.org).
 
-3. Install required MacPorts packages. Enter the followin command in the macOS
+3. Install required MacPorts packages. Enter the following command in the macOS
 Terminal:
 
         sudo port install jpeg hdf4 hdfeos
