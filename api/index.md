@@ -11,7 +11,7 @@ If the command-line program does not fulfill your needs,
 you can use routines
 provided with ccplot to make custom plots in python. These include routines
 for reading HDF and HDF-EOS2 files, parsing time values and performing
-data interpolation. See [API Reference](reference/) for details.
+data interpolation. See [API reference](reference/) for details.
 
 Examples
 --------

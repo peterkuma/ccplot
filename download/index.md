@@ -341,7 +341,7 @@ You should now be able to run ccplot in the macOS Terminal:
 
     ccplot -V
 
-Your Experience
+Your experience
 ---------------
 
 If you have any difficulty with the installation, or if you find a bug,
@@ -365,7 +365,7 @@ ccplot is provided under the terms of a
 allowing you to redistribute, modify and use the software in free and
 commercial products without restrictions.
 
-Known Issues
+Known issues
 ------------
 
 ### 26 November 2021

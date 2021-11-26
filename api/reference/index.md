@@ -1,8 +1,8 @@
 ---
 layout: default
-title: API Reference
+title: API reference
 ---
-API Reference
+API reference
 =============
 
 ccplot.hdf
