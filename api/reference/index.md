@@ -73,7 +73,7 @@ print((b'\n'.join(product.keys())).decode('ascii'))
     metadata
 {% endhighlight %}
 
-The returned keys of type `bytes` in Python 3.
+The returned keys are of type `bytes` in Python 3.
 
 #### Attributes
 
@@ -149,6 +149,29 @@ type(lat)
 type(lat[::])
 --> <type 'numpy.ndarray'>
 {% endhighlight %}
+
+#### Listing swaths and datasets
+
+A list of swaths can retrieved with **HDFEOS.keys()**:
+
+{% highlight python %}
+print((b'\n'.join(product.keys())).decode('ascii'))
+--> 2B-GEOPROF
+{% endhighlight %}
+
+A list of datasets can be retrieved with **Swath.keys()**:
+
+{% highlight python %}
+print((b'\n'.join(sw.keys())).decode('ascii'))
+--> Profile_time
+    UTC_start
+    TAI_start
+    Latitude
+    Longitude
+    ...
+{% endhighlight %}
+
+The returned keys are of type `bytes` in Python 3.
 
 #### Attributes
 
