@@ -17,7 +17,7 @@ of:
 * attributes
 * VData
 
-The constructor accepts the filename (of type `bytes` in Python 3) as its
+The constructor accepts a filename (of type `bytes` in Python 3) as its
 argument:
 
 {% highlight python %}
@@ -25,17 +25,17 @@ from ccplot.hdf import HDF
 product = HDF(b'CAL_LID_L1-ValStage1-V3-02.2013-01-01T11-55-23ZN.hdf')
 {% endhighlight %}
 
-The file can be closed with **HDF.close()**, but the class also provides
-Context Manager interface:
+The file can be closed with **HDF.close()**, or by using the Context Manager
+interface:
 
 {% highlight python %}
 with HDF(b'CAL_LID_L1-ValStage1-V3-02.2013-01-01T11-55-23ZN.hdf') as product:
-    # Work with product.
+    # Work with the file.
 {% endhighlight %}
 
 #### Reading datasets and Vdata
 
-Datasets and Vdata are available as dictionary items of the class instance:
+Datasets and Vdata are accessible as dictionary items of the HDF class instance:
 
 {% highlight python %}
 lat = product[b'Latitude']
@@ -77,7 +77,8 @@ The returned keys are of type `bytes` in Python 3.
 
 #### Attributes
 
-Attributes are available as **HDF.attributes** and **Dataset.attributes**:
+File and dataset attributes are accessible as **HDF.attributes** and
+**Dataset.attributes**, respectively:
 
 {% highlight python %}
 print(dict(lat.attributes))
@@ -106,7 +107,7 @@ of:
 * datasets
 * attributes
 
-The constructor accepts the filename (of type `bytes` in Python 3) as its
+The constructor accepts a filename (of type `bytes` in Python 3) as its
 argument:
 
 {% highlight python %}
@@ -114,12 +115,12 @@ from ccplot.hdfeos import HDFEOS
 product = HDFEOS(b'2013119200420_37263_CS_2B-GEOPROF_GRANULE_P_R04_E06.hdf')
 {% endhighlight %}
 
-The file can be closed with **HDFEOS.close()**, but the class also provides
-Context Manager interface:
+The file can be closed with **HDFEOS.close()**, or by using the Context Manager
+interface:
 
 {% highlight python %}
 with HDFEOS(b'2013119200420_37263_CS_2B-GEOPROF_GRANULE_P_R04_E06.hdf') as product:
-    # Work with product.
+    # Work with the file.
 {% endhighlight %}
 
 #### Reading swath and datasets
@@ -129,6 +130,8 @@ Swaths are available as dictionary items of the HDFEOS instance:
 {% highlight python %}
 sw = product[b'2B-GEOPROF']
 {% endhighlight %}
+
+When accessing swaths, an instance of **Swath** class is returned.
 
 Datasets are available as dictionary items of a swath:
 
@@ -175,8 +178,8 @@ The returned keys are of type `bytes` in Python 3.
 
 #### Attributes
 
-Attributes are available as **HDFEOS.attributes**,
-**Swath.attributes** and **Dataset.attributes**:
+Attributes are accessible as **HDFEOS.attributes**, **Swath.attributes** and
+**Dataset.attributes**:
 
 {% highlight python %}
 print(product.attributes.keys())
