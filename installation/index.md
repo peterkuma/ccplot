@@ -13,13 +13,19 @@ Archive of ccplot releases
         <thead><tr><th>Date</th><th>Release</th></tr></thead>
         <tbody>
             <tr>
+                <td>28 November 2021</td>
+                <td>
+                    <a href="https://github.com/peterkuma/ccplot/archive/refs/tags/v2.1.0.tar.gz">ccplot 2.1.0</a>
+                </td>
+            </tr>
+        </tbody>
+        <tbody id="archive" style="display: none">
+            <tr>
                 <td>25 November 2021</td>
                 <td>
                     <a href="https://github.com/peterkuma/ccplot/archive/refs/tags/v2.0.0.tar.gz">ccplot 2.0.0</a>
                 </td>
             </tr>
-        </tbody>
-        <tbody id="archive" style="display: none">
             <tr>
                 <td>26 March 2021</td>
                 <td>
@@ -302,7 +308,7 @@ but it can theoretically work with future versions of Python.
        set HDF_DIR=<hdf-dir>
        set HDFEOS_DIR=<hdfeos-dir>
        python setup.py bdist_wheel
-       pip install dist\ccplot-2.0.0-cp39-cp39-win_amd64.whl
+       pip install dist\ccplot-2.1.0-cp39-cp39-win_amd64.whl
 
 where `<ccplot-dir>`, `<hdf-dir>` and `<hdfeos-dir>` are the directories where
 you unpacked the respective packages.

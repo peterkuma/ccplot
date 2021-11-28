@@ -8,7 +8,7 @@ API reference
 ccplot.hdf
 ----------
 
-### class HDF
+### class HDF(filename, encoding='utf-8', mode=None)
 
 This is a class for reading HDF files. The class supports reading
 of:
@@ -17,19 +17,21 @@ of:
 * attributes
 * VData
 
-The constructor accepts a filename (of type `bytes` in Python 3) as its
-argument:
+The constructor accepts a filename, text encoding and mode. Mode signifies
+if the file should be opened in a binary or text mode: None (automatic),
+`binary` (binary mode) or `text` (text mode). If mode is None, it is equivalent
+to `binary` if the type of filename is bytes and `text` if filename is str.
 
 {% highlight python %}
 from ccplot.hdf import HDF
-product = HDF(b'CAL_LID_L1-ValStage1-V3-02.2013-01-01T11-55-23ZN.hdf')
+product = HDF('CAL_LID_L1-ValStage1-V3-02.2013-01-01T11-55-23ZN.hdf')
 {% endhighlight %}
 
 The file can be closed with **HDF.close()**, or by using the Context Manager
 interface:
 
 {% highlight python %}
-with HDF(b'CAL_LID_L1-ValStage1-V3-02.2013-01-01T11-55-23ZN.hdf') as product:
+with HDF('CAL_LID_L1-ValStage1-V3-02.2013-01-01T11-55-23ZN.hdf') as product:
     # Work with the file.
 {% endhighlight %}
 
@@ -38,15 +40,13 @@ with HDF(b'CAL_LID_L1-ValStage1-V3-02.2013-01-01T11-55-23ZN.hdf') as product:
 Datasets and Vdata are accessible as dictionary items of the HDF class instance:
 
 {% highlight python %}
-lat = product[b'Latitude']
+lat = product['Latitude']
 print(lat[0])
 --> [ 72.14601898]
-metadata = product[b'metadata']
-print(metadata[b'Product_ID'])
+metadata = product['metadata']
+print(metadata['Product_ID'])
 --> L1_LIDAR_Science
 {% endhighlight %}
-
-The keys are of type `bytes` in Python 3.
 
 When accessing datasets, an instance of **Dataset** class is returned.
 This instance is turned into a numpy array on index subsetting:
@@ -63,7 +63,7 @@ type(lat[::])
 A list of datasets can retrieved with **HDF.keys()**:
 
 {% highlight python %}
-print((b'\n'.join(product.keys())).decode('ascii'))
+print('\n'.join(product.keys()))
 --> Profile_Time
     Profile_UTC_Time
     Profile_ID
@@ -73,8 +73,6 @@ print((b'\n'.join(product.keys())).decode('ascii'))
     metadata
 {% endhighlight %}
 
-The returned keys are of type `bytes` in Python 3.
-
 #### Attributes
 
 File and dataset attributes are accessible as **HDF.attributes** and
@@ -82,10 +80,10 @@ File and dataset attributes are accessible as **HDF.attributes** and
 
 {% highlight python %}
 print(dict(lat.attributes))
---> {b'units': b'degrees', b'valid_range': b'-90.0 ... 90.0', b'fillvalue': -9999.0, b'format': b'Float_32'}
+--> {'units': 'degrees', 'valid_range': '-90.0 ... 90.0', 'fillvalue': -9999.0, 'format': 'Float_32'}
 print(product.attributes.keys())
---> [b'coremetadata', b'archivemetadata']
-print(product.attributes[b'coremetadata'])
+--> ['coremetadata', 'archivemetadata']
+print(product.attributes['coremetadata'])
 --> GROUP                  = INVENTORYMETADATA
     [...]
     END_GROUP              = INVENTORYMETADATA
@@ -93,12 +91,10 @@ print(product.attributes[b'coremetadata'])
     END
 {% endhighlight %}
 
-The keys are of type `bytes` in Python 3.
-
 ccplot.hdfeos
 -------------
 
-### class HDFEOS
+### class HDFEOS(filename, encoding='utf-8', mode=None)
 
 This is a class for reading HDFEOS-2 files. The class supports reading
 of:
@@ -107,19 +103,21 @@ of:
 * datasets
 * attributes
 
-The constructor accepts a filename (of type `bytes` in Python 3) as its
-argument:
+The constructor accepts a filename, text encoding and mode. Mode signifies
+if the file should be opened in a binary or text mode: None (automatic),
+`binary` (binary mode) or `text` (text mode). If mode is None, it is equivalent
+to `binary` if the type of filename is bytes and `text` if filename is str.
 
 {% highlight python %}
 from ccplot.hdfeos import HDFEOS
-product = HDFEOS(b'2013119200420_37263_CS_2B-GEOPROF_GRANULE_P_R04_E06.hdf')
+product = HDFEOS('2013119200420_37263_CS_2B-GEOPROF_GRANULE_P_R04_E06.hdf')
 {% endhighlight %}
 
 The file can be closed with **HDFEOS.close()**, or by using the Context Manager
 interface:
 
 {% highlight python %}
-with HDFEOS(b'2013119200420_37263_CS_2B-GEOPROF_GRANULE_P_R04_E06.hdf') as product:
+with HDFEOS('2013119200420_37263_CS_2B-GEOPROF_GRANULE_P_R04_E06.hdf') as product:
     # Work with the file.
 {% endhighlight %}
 
@@ -128,7 +126,7 @@ with HDFEOS(b'2013119200420_37263_CS_2B-GEOPROF_GRANULE_P_R04_E06.hdf') as produ
 Swaths are available as dictionary items of the HDFEOS instance:
 
 {% highlight python %}
-sw = product[b'2B-GEOPROF']
+sw = product['2B-GEOPROF']
 {% endhighlight %}
 
 When accessing swaths, an instance of **Swath** class is returned.
@@ -136,12 +134,10 @@ When accessing swaths, an instance of **Swath** class is returned.
 Datasets are available as dictionary items of a swath:
 
 {% highlight python %}
-lat = sw[b'Latitude']
+lat = sw['Latitude']
 print(lat[0])
 --> -64.9139
 {% endhighlight %}
-
-The keys are of type `bytes` in Python 3.
 
 When accessing datasets, an instance of **Dataset** class is returned.
 This instance is turned into a numpy array on index subsetting:
@@ -158,14 +154,14 @@ type(lat[::])
 A list of swaths can retrieved with **HDFEOS.keys()**:
 
 {% highlight python %}
-print((b'\n'.join(product.keys())).decode('ascii'))
+print('\n'.join(product.keys()))
 --> 2B-GEOPROF
 {% endhighlight %}
 
 A list of datasets can be retrieved with **Swath.keys()**:
 
 {% highlight python %}
-print((b'\n'.join(sw.keys())).decode('ascii'))
+print('\n'.join(sw.keys()))
 --> Profile_time
     UTC_start
     TAI_start
@@ -174,8 +170,6 @@ print((b'\n'.join(sw.keys())).decode('ascii'))
     ...
 {% endhighlight %}
 
-The returned keys are of type `bytes` in Python 3.
-
 #### Attributes
 
 Attributes are accessible as **HDFEOS.attributes**, **Swath.attributes** and
@@ -183,14 +177,12 @@ Attributes are accessible as **HDFEOS.attributes**, **Swath.attributes** and
 
 {% highlight python %}
 print(product.attributes.keys())
---> [b'HDFEOSVersion', b'StructMetadata.0']
-print(sw.attributes[b'start_time'])
---> b'20130429203541'
-print(sw[b'Radar_Reflectivity'].attributes[b'long_name'])
---> b'Radar Reflectivity Factor'
+--> ['HDFEOSVersion', 'StructMetadata.0']
+print(sw.attributes['start_time'])
+--> '20130429203541'
+print(sw['Radar_Reflectivity'].attributes['long_name'])
+--> 'Radar Reflectivity Factor'
 {% endhighlight %}
-
-The keys are of type `bytes` in Python 3.
 
 ccplot.algorithms
 -----------------

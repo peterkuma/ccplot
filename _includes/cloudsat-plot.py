@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -7,12 +8,13 @@ import datetime as dt
 from ccplot.hdfeos import HDFEOS
 from ccplot.algorithms import interp2d_12
 import ccplot.utils
+import ccplot.config
 
-filename = b'2013119200420_37263_CS_2B-GEOPROF_GRANULE_P_R04_E06.hdf'
-swath = b'2B-GEOPROF'
-name = b'Radar_Reflectivity'
+filename = '2013119200420_37263_CS_2B-GEOPROF_GRANULE_P_R04_E06.hdf'
+swath = '2B-GEOPROF'
+name = 'Radar_Reflectivity'
 label = 'Reflectivity Factor (dBZe)'
-colormap = '/usr/local/share/ccplot/cmap/cloudsat-reflectivity.cmap'
+colormap = os.path.join(ccplot.config.sharepath, 'cmap', 'cloudsat-reflectivity.cmap')
 x1 = 1700
 x2 = 2000
 h1 = 0  # km
@@ -25,10 +27,10 @@ if __name__ == '__main__':
         sw = product[swath]
         ds = sw[name]
         dataset = ds[x1:x2]
-        time = sw[b'Profile_time'][x1:x2]
-        height = sw[b'Height'][:]
+        time = sw['Profile_time'][x1:x2]
+        height = sw['Height'][:]
         start_time = dt.datetime.strptime(
-            sw.attributes[b'start_time'].decode('ascii'),
+            sw.attributes['start_time'],
             '%Y%m%d%H%M%S'
         )
 
@@ -39,12 +41,12 @@ if __name__ == '__main__':
         ])
 
         # Mask missing values.
-        dataset = np.ma.masked_equal(dataset, ds.attributes[b'missing'])
-        dataset = np.ma.masked_equal(dataset, ds.attributes[b'_FillValue'])
+        dataset = np.ma.masked_equal(dataset, ds.attributes['missing'])
+        dataset = np.ma.masked_equal(dataset, ds.attributes['_FillValue'])
 
         # Transform data values to science values.
-        factor = ds.attributes.get(b'factor', 1)
-        offset = ds.attributes.get(b'offset', 0)
+        factor = ds.attributes.get('factor', 1)
+        offset = ds.attributes.get('offset', 0)
         dataset = 1.0/factor*(dataset - offset)
 
         # Interpolate data on a regular grid.
