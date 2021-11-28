@@ -1,5 +1,9 @@
 CCPLOT NEWS
 
+New in 2.1.0 (2021-11-28)
+
+    * Support for text encoding in the API.
+
 New in 2.0.0 (2021-11-25)
 
     * Migrated map plotting library from Basemap to Cartopy.
