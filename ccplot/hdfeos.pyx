@@ -1,8 +1,11 @@
 cimport cython
 cimport numpy as np
 import sys
+import os
 import numpy as np
 from ccplot import hdf
+from .autostr import autostr, Autostr
+
 if sys.version_info[0] == 2:
     from UserDict import DictMixin as DictMixin
 else:
@@ -97,12 +100,14 @@ DTYPE = {
 }
 
 
-class Attributes(DictMixin):
+class Attributes(DictMixin, Autostr):
+    @autostr
     def __init__(self, hdfeos, swath=None, dataset=None):
         self.hdfeos = hdfeos
         self.swath = swath
         self.dataset = dataset
 
+    @autostr
     def __getitem__(self, key):
         if self.swath is None:
             return self.hdfeos.hdf.attributes[key]
@@ -113,9 +118,10 @@ class Attributes(DictMixin):
             if self.dataset is not None:
                 try:
                     return self.hdfeos.hdf[self.dataset].attributes[key]
-                except KeyError: raise KeyError(key)
-            else: raise KeyError(key)
+                except KeyError: raise KeyError(self._autostr(key))
+            else: raise KeyError(self._autostr(key))
 
+    @autostr
     def keys(self):
         if self.swath is None:
             return self.hdfeos.hdf.attributes.keys()
@@ -127,7 +133,8 @@ class Attributes(DictMixin):
         return attrs
 
 
-class Dataset(object):
+class Dataset(Autostr):
+    @autostr
     def __init__(self, hdfeos, swath, name):
         self.hdfeos = hdfeos
         self.swath = swath
@@ -138,6 +145,7 @@ class Dataset(object):
         self.dims = info['dimlist']
         self.attributes = Attributes(self.hdfeos, swath, name)
 
+    @autostr
     def __getitem__(self, key):
         starta = np.zeros(self.rank, dtype=np.int32)
         edgesa = self.shape.copy()
@@ -177,21 +185,25 @@ class Dataset(object):
         else: return data.reshape(shape)
 
 
-class Swath(DictMixin):
+class Swath(DictMixin, Autostr):
+    @autostr
     def __init__(self, hdfeos, name):
         self.hdfeos = hdfeos
         self.name = name
         self.attributes = Attributes(self.hdfeos, self.name)
         self.maps = self.hdfeos._maps(self.name)
 
+    @autostr
     def __getitem__(self, key):
         return Dataset(self.hdfeos, self.name, key)
 
+    @autostr
     def keys(self):
         return self.hdfeos._list_geofields(self.name) + \
             self.hdfeos._list_datafields(self.name)
 
-class SW(object):
+class SW(Autostr):
+    @autostr
     def __init__(self, hdfeos, name):
         self.hdfeos = hdfeos
         self.name = name
@@ -199,23 +211,30 @@ class SW(object):
     def __enter__(self):
         self.sw = SWattach(self.hdfeos.id, self.name)
         if self.sw == FAIL:
-            raise KeyError(self.name)
+            raise KeyError(self._autostr(self.name))
         return self.sw
 
     def __exit__(self, exc_type, exc_value, traceback):
         res = SWdetach(self.sw)
         if res == -1:
             raise IOError(EIO, 'Failed to detach swath %d' %\
-                          self.sw, self.hdfeos.filename)
+                          self.sw, os.fsdecode(self.hdfeos.filename))
 
 
-class HDFEOS(DictMixin):
-    def __init__(self, filename):
+class HDFEOS(DictMixin, Autostr):
+    def __init__(self, filename, encoding='utf-8', mode=None):
+        if mode not in (None, 'binary', 'text'):
+            raise ValueError('mode must be one of: None, "binary", "text"')
+        if mode is None:
+            mode = 'text' if type(filename) is str else 'binary'
+        self._mode = mode
+        self._encoding = encoding
+        filename = os.fsencode(filename)
         self.hdf = hdf.HDF(filename)
         self.filename = filename
         self.id = SWopen(filename, DFACC_RDONLY);
         if self.id == -1:
-            raise IOError(EIO, 'Cannot open file', self.filename)
+            raise IOError(EIO, 'Cannot open file', os.fsdecode(self.filename))
         self.attributes = Attributes(self)
 
     def __enter__(self):
@@ -229,6 +248,7 @@ class HDFEOS(DictMixin):
         SWclose(self.id)
         self.id = None
 
+    @autostr
     def __getitem__(self, key):
         with SW(self, key) as sw: pass
         return Swath(self, key)
@@ -237,12 +257,12 @@ class HDFEOS(DictMixin):
         cdef int32 strbufsize
         res = SWinqswath(self.filename, NULL, &strbufsize)
         if res == FAIL:
-            raise IOError(EIO, 'SWinqswath failed', self.filename)
+            raise IOError(EIO, 'SWinqswath failed', os.fsdecode(self.filename))
         cdef np.ndarray[char, ndim=1] tmp
         tmp = np.zeros(strbufsize + 1, dtype=np.byte)
         res = SWinqswath(self.filename, <char *>tmp.data, &strbufsize)
         if res == FAIL:
-            raise IOError(EIO, 'SWinqswath failed', self.filename)
+            raise IOError(EIO, 'SWinqswath failed', os.fsdecode(self.filename))
         swaths = bytes(bytearray(tmp)).rstrip(b'\0')
         return swaths.split(b',')
 
@@ -252,11 +272,11 @@ class HDFEOS(DictMixin):
         with SW(self, swath) as sw:
             res = SWnentries(sw, 3, &strbufsize)
             if res == FAIL:
-                raise IOError(EIO, 'SWnentries failed', self.filename)
+                raise IOError(EIO, 'SWnentries failed', os.fsdecode(self.filename))
             tmp = np.zeros(strbufsize + 2, dtype=np.byte)
             res = SWinqgeofields(sw, <char *>tmp.data, NULL, NULL)
             if res == FAIL:
-                raise IOError(EIO, 'SWinqgeofields failed', self.filename)
+                raise IOError(EIO, 'SWinqgeofields failed', os.fsdecode(self.filename))
         geofields = bytes(bytearray(tmp)).rstrip(b'\0')
         return geofields.split(b',')
 
@@ -266,11 +286,11 @@ class HDFEOS(DictMixin):
         with SW(self, swath) as sw:
             res = SWnentries(sw, 4, &strbufsize)
             if res == FAIL:
-                raise IOError(EIO, 'SWnentries failed', self.filename)
+                raise IOError(EIO, 'SWnentries failed', os.fsdecode(self.filename))
             tmp = np.zeros(strbufsize + 2, dtype=np.byte)
             res = SWinqdatafields(sw, <char *>tmp.data, NULL, NULL)
             if res == FAIL:
-                raise IOError(EIO, 'SWinqdatafields failed', self.filename)
+                raise IOError(EIO, 'SWinqdatafields failed', os.fsdecode(self.filename))
         datafields = bytes(bytearray(tmp)).rstrip(b'\0')
         return datafields.split(b',')
 
@@ -287,11 +307,11 @@ class HDFEOS(DictMixin):
         with SW(self, swath) as sw:
             res = SWnentries(sw, 1, &strbufsize)
             if res == FAIL:
-                raise IOError(EIO, 'SWnentries failed', self.filename)
+                raise IOError(EIO, 'SWnentries failed', os.fsdecode(self.filename))
             tmp = np.zeros(strbufsize + 2, dtype=np.byte)
             res = SWinqmaps(sw, <char *>tmp.data, <int32 *>offset.data, <int32 *> increment.data)
             if res == FAIL:
-                raise IOError(EIO, 'SWinqmaps failed', self.filename)
+                raise IOError(EIO, 'SWinqmaps failed', os.fsdecode(self.filename))
 
         dimmap = bytes(bytearray(tmp)).rstrip(b'\0')
 
@@ -313,12 +333,12 @@ class HDFEOS(DictMixin):
         with SW(self, swath) as sw:
             res = SWinqattrs(sw, NULL, &strbufsize)
             if res == FAIL:
-                raise IOError(EIO, 'SWinqattrs failed', self.filename)
+                raise IOError(EIO, 'SWinqattrs failed', os.fsdecode(self.filename))
 
             tmp = np.zeros(strbufsize+1, dtype=np.byte)
             res = SWinqattrs(sw, <char *>tmp.data, &strbufsize)
             if res == FAIL:
-                raise IOError(EIO, 'SWinqattrs failed', self.filename)
+                raise IOError(EIO, 'SWinqattrs failed', os.fsdecode(self.filename))
 
         attrlist = bytes(bytearray(tmp)).rstrip(b'\0')
         if attrlist == b'': return []
@@ -343,10 +363,10 @@ class HDFEOS(DictMixin):
 
         with SW(self, swath) as sw:
             res = SWfieldinfo(sw, name, &rank, <int32 *>dims.data, &data_type, <char *>tmp.data)
-        if res == FAIL: raise KeyError(name)
+        if res == FAIL: raise KeyError(self._autostr(name))
         try: dtype = DTYPE[data_type]
-        except KeyError: raise NotImplementedError('%s: %s: Data type %s not implemented'
-                                              % (self.filename, name, data_type))
+        except KeyError: raise NotImplementedError('%s: %s: Data type %d not implemented'
+                                              % (os.fsdecode(self.filename), self._autostr(name), data_type))
 
         dimlist = bytes(bytearray(tmp)).rstrip(b'\0')
         dimlist = dimlist.split(b',') if dimlist != b'' else []
@@ -397,11 +417,11 @@ class HDFEOS(DictMixin):
 
         with SW(self, swath) as sw:
             res = SWattrinfo(sw, attrname, &data_type, &count)
-        if res == FAIL: raise KeyError(name)
+        if res == FAIL: raise KeyError(self._autostr(name))
 
         try: dtype = DTYPE[data_type]
-        except KeyError: raise NotImplementedError('%s: %s: Data type %s not implemented'
-                                              % (self.filename, attrname, data_type))
+        except KeyError: raise NotImplementedError('%s: %s: Data type %d not implemented'
+                                              % (os.fsdecode(self.filename), self._autostr(attrname), data_type))
         count = count/dtype().itemsize
 
         data = np.zeros(count, dtype=dtype)
@@ -409,13 +429,14 @@ class HDFEOS(DictMixin):
         with SW(self, swath) as sw:
             res = SWreadattr(sw, attrname, <void *>buf.data)
         if res == FAIL:
-            raise IOError(EIO, 'Cannot read attribute "%s"' % attrname,
-                          self.filename)
+            raise IOError(EIO, 'Cannot read attribute "%s"' % self._autostr(attrname),
+                          os.fsdecode(self.filename))
 
         if data_type == DFNT_CHAR:
             return bytes(bytearray(data)).rstrip(b'\0')
 
         return data[0] if count == 1 else data
 
+    @autostr
     def keys(self):
         return self._list_swaths()

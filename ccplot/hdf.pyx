@@ -3,6 +3,8 @@ cimport numpy as np
 import sys
 import os
 import numpy as np
+from .autostr import autostr, Autostr
+
 if sys.version_info[0] == 2:
     from UserDict import DictMixin as DictMixin
 else:
@@ -104,19 +106,23 @@ DTYPE = {
 }
 
 
-class Attributes(DictMixin):
+class Attributes(DictMixin, Autostr):
+    @autostr
     def __init__(self, hdf, dataset=None):
         self.hdf = hdf
         self.dataset = dataset
 
+    @autostr
     def __getitem__(self, key):
         return self.hdf._readattr(self.dataset, key)
 
+    @autostr
     def keys(self):
         return self.hdf._attributes(self.dataset)
 
 
-class Dataset(object):
+class Dataset(Autostr):
+    @autostr
     def __init__(self, hdf, name):
         self.hdf = hdf
         self.name = name
@@ -125,6 +131,7 @@ class Dataset(object):
         self.rank = len(self.shape)
         self.attributes = Attributes(self.hdf, name)
 
+    @autostr
     def __getitem__(self, key):
         starta = np.zeros(self.rank, dtype=np.int32)
         edgesa = self.shape.copy()
@@ -164,24 +171,28 @@ class Dataset(object):
         else: return data.reshape(shape)
 
 
-class Vdata(DictMixin):
+class Vdata(DictMixin, Autostr):
+    @autostr
     def __init__(self, hdf, name):
         self.hdf = hdf
         self.name = name
         # Ensure that such Vdata exists.
         self.fields = self.hdf._vdata_fields(name)
 
+    @autostr
     def __getitem__(self, key):
         data = self.hdf._read_vdata(self.name, key)
         if type(data) == np.ndarray and len(data) == 1:
             return data[0]
         return data
 
+    @autostr
     def keys(self):
         return self.fields
 
 
-class SDS(object):
+class SDS(Autostr):
+    @autostr
     def __init__(self, hdf, name):
         self.hdf = hdf
         self.name = name
@@ -189,7 +200,7 @@ class SDS(object):
     def __enter__(self):
         errno = 0
         index = SDnametoindex(self.hdf.sd, self.name)
-        if index == FAIL: raise KeyError(self.name)
+        if index == FAIL: raise KeyError(self._autostr(self.name))
         self.sds = SDselect(self.hdf.sd, index)
         if self.sds == FAIL:
             self.hdf._error('HDF: SDselect of dataset "%s" failed' % self.name)
@@ -199,8 +210,15 @@ class SDS(object):
         SDendaccess(self.sds)
 
 
-class HDF(DictMixin):
-    def __init__(self, filename):
+class HDF(DictMixin, Autostr):
+    def __init__(self, filename, encoding='utf-8', mode=None):
+        if mode not in (None, 'binary', 'text'):
+            raise ValueError('mode must be one of: None, "binary", "text"')
+        if mode is None:
+            mode = 'text' if type(filename) is str else 'binary'
+        self._mode = mode
+        self._encoding = encoding
+        filename = os.fsencode(filename)
         self.filename = filename
 
         self.sd = SDstart(filename, DFACC_READ)
@@ -227,6 +245,7 @@ class HDF(DictMixin):
         Hclose(self.hd)
         self.hd = None
 
+    @autostr
     def __getitem__(self, key):
         # Try SDS.
         try:
@@ -239,8 +258,9 @@ class HDF(DictMixin):
             return Vdata(self, key)
         except KeyError: pass
 
-        raise KeyError(key)
+        raise KeyError(self._autostr(key))
 
+    @autostr
     def keys(self):
         return self._list_datasets() + self._list_vdata()
 
@@ -279,7 +299,7 @@ class HDF(DictMixin):
                 res = VSgetclass(id, tmp)
                 if res == FAIL: self._error('HDF: VSgetclass failed')
                 vdata_class = tmp
-                if len(vdata_class) == 0:
+                if len(vdata_class) == 0 and len(name) > 0:
                     out.append(name)
             finally:
                 res = VSdetach(id)
@@ -290,14 +310,14 @@ class HDF(DictMixin):
     def _error(self, errmsg=None, from_errno=False):
         errcode = HEvalue(1)
         if errcode != 0:
-            msg = '%s: %s' % (errmsg, HEstring(errcode))
-            raise IOError(errcode, msg, self.filename)
+            msg = '%s: %s' % (errmsg, autostr(HEstring(errcode)))
+            raise IOError(errcode, msg, os.fsdecode(self.filename))
         elif errno != 0 and from_errno:
-            raise IOError(errno, strerror(errno), self.filename)
+            raise IOError(errno, autostr(strerror(errno)), os.fsdecode(self.filename))
         elif errmsg is not None:
-            raise IOError(0, errmsg, self.filename)
+            raise IOError(0, errmsg, os.fsdecode(self.filename))
         else:
-            raise IOError(0, 'HDF: Unknown error', self.filename)
+            raise IOError(0, 'HDF: Unknown error', os.fsdecode(self.filename))
 
     def _attributes(self, dataset=None):
         cdef int32 num_datasets, num_global_attrs
@@ -332,8 +352,8 @@ class HDF(DictMixin):
             res = SDgetinfo(sds, NULL, &rank, <int32 *>dims.data, &data_type, &num_attrs)
         if res == FAIL: self._error('HDF: SDgetinfo on dataset "%s" failed' % name)
         try: dtype = DTYPE[data_type]
-        except KeyError: raise NotImplementedError('%s: %s: Data type %s not implemented'
-                                              % (self.filename, name, data_type))
+        except KeyError: raise NotImplementedError('%s: %s: Data type %d not implemented'
+                                              % (os.fsdecode(self.filename), self._autostr(name), data_type))
         return {
             'shape': dims[:rank],
             'dtype': dtype,
@@ -384,7 +404,7 @@ class HDF(DictMixin):
     def _readattr2(self, obj_id, name):
         cdef int32 data_type, count
         index = SDfindattr(obj_id, name)
-        if index == FAIL: raise KeyError(name)
+        if index == FAIL: raise KeyError(self._autostr(name))
         cdef np.ndarray[char, ndim=1] tmp
         tmp = np.zeros(FIELDNAMELENMAX, dtype=np.byte)
         res = SDattrinfo(obj_id, index, <char *>tmp.data, &data_type, &count)
@@ -393,8 +413,8 @@ class HDF(DictMixin):
 
         try: dtype = DTYPE[data_type]
         except KeyError: raise NotImplementedError(
-            '%s: %s: Data type %s not implemented' %\
-            (self.filename, name, data_type))
+            '%s: %s: Data type %d not implemented' %\
+            (os.fsdecode(self.filename), self._autostr(name), data_type))
 
         data = np.zeros(count, dtype=dtype)
         cdef np.ndarray[char, ndim=1] buf = data.view(dtype=np.int8).ravel()
@@ -413,7 +433,7 @@ class HDF(DictMixin):
         cdef int32 index
 
         ref = VSfind(self.hd, vdata)
-        if ref == 0: raise KeyError(vdata)
+        if ref == 0: raise KeyError(self._autostr(vdata))
         id = VSattach(self.hd, ref, 'r')
         if id == FAIL: self._error('HDF: VSattach of "%s" failed' % vdata)
         try:
@@ -421,7 +441,7 @@ class HDF(DictMixin):
             if res == FAIL: self._error('HDF: VSinquire failed')
 
             res = VSsetfields(id, name)
-            if res == FAIL: raise KeyError(name)
+            if res == FAIL: raise KeyError(self._autostr(name))
 
             size = VSsizeof(id, name)
             if size == FAIL: self._error('HDF: VSsizeof failed')
@@ -440,7 +460,7 @@ class HDF(DictMixin):
             except KeyError:
                 raise NotImplementedError(
                     '%s: %s: %s: Data type %d not implemented' %
-                    (self.filename, vdata, name, data_type)
+                    (os.fsdecode(self.filename), self._autostr(vdata), self._autostr(name), data_type)
                 )
 
             if data_type == DFNT_CHAR:
@@ -456,9 +476,9 @@ class HDF(DictMixin):
         cdef char *tmp
         fields = []
         ref = VSfind(self.hd, name)
-        if ref == 0: raise KeyError(name)
+        if ref == 0: raise KeyError(self._autostr(name))
         id = VSattach(self.hd, ref, 'r')
-        if id == FAIL: self._error('HDF: VSattach of "%s" failed' % name)
+        if id == FAIL: self._error('HDF: VSattach of "%s" failed' % self._autostr(name))
         try:
             nfields = VFnfields(id)
             if nfields == FAIL: self._error('HDF: VFnfields failed')
