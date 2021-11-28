@@ -86,6 +86,7 @@ setup(
         'matplotlib>=0.98.1',
         'cartopy>=0.17.0',
         'packaging>=20.03',
+        'pytz',
     ],
     setup_requires=[
         'cython'
