@@ -177,6 +177,12 @@ here:
 * [ccplot >= 1.5, < 2.0.0 (Python 2 & 3)](/download/1.5/)
 * [ccplot < 1.5 (Python 2)](/download/1.0/)
 
+Below, you can find installation instructions for:
+
+* [Linux](#linux)
+* [Windows](#windows)
+* [macOS](#macos)
+
 Linux
 -----
 
