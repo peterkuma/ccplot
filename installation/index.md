@@ -320,7 +320,8 @@ You should now be able to run ccplot in the Anaconda Prompt:
 macOS
 -----
 
-This installation has been tested on macOS Monterey (Intel CPU).
+This installation has been tested on macOS Monterey on Intel, and is also
+reported to work on Apple M1.
 
 1. Install [Anaconda](https://www.anaconda.com/download/).
 
