@@ -20,7 +20,7 @@ of:
 The constructor accepts a filename, text encoding and mode. Mode signifies
 if the file should be opened in a binary or text mode: None (automatic),
 `binary` (binary mode) or `text` (text mode). If mode is None, it is equivalent
-to `binary` if the type of filename is bytes and `text` if filename is str.
+to `binary` if the type of filename is bytes and `text` if the type is str.
 
 {% highlight python %}
 from ccplot.hdf import HDF
@@ -106,7 +106,7 @@ of:
 The constructor accepts a filename, text encoding and mode. Mode signifies
 if the file should be opened in a binary or text mode: None (automatic),
 `binary` (binary mode) or `text` (text mode). If mode is None, it is equivalent
-to `binary` if the type of filename is bytes and `text` if filename is str.
+to `binary` if the type of filename is bytes and `text` if the type is str.
 
 {% highlight python %}
 from ccplot.hdfeos import HDFEOS
