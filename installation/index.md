@@ -254,8 +254,10 @@ To install ccplot on Windows:
 1. Install [Anaconda Python 3.9](https://www.anaconda.com) (later versions are
 currently not supported).
 
-2. Open the `Anaconda Prompt` from the Windows Start Menu. Install ccplot:
+2. Open the `Anaconda Prompt` from the Windows Start Menu. Install cartopy and
+ccplot:
 
+       conda install cartopy
        pip install ccplot
 
 You should now be able to run ccplot in the terminal:
