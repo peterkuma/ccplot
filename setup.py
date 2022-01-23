@@ -29,7 +29,7 @@ if sys.platform == 'win32':
         for x in ['hdf.dll', 'mfhdf.dll', 'xdr.dll']
     ]
     for filename in dlls:
-        shutil.copy(filename, '.')
+        shutil.copy(filename, 'ccplot')
     package_data = {'ccplot': ['hdf.dll', 'mfhdf.dll', 'xdr.dll']}
 else:
     scripts = ['bin/ccplot']
