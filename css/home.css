@@ -1,3 +1,16 @@
+.ccbrowse {
+    background: #f5f5f5;
+    padding: 0.5em;
+    display: block;
+    float: right;
+}
+
+@media (min-width: 950px) {
+    .ccbrowse {
+        margin-top: -1em;
+    }
+}
+
 .abstract {
     font-size: 120%;
     line-height: 160%;

@@ -24,8 +24,13 @@ body {
 }
 
 @media (max-width: 950px) {
+    body {
+        margin: 0;
+        font-size: 14px;
+    }
+
     #main {
-        padding: 25px 20px;
+        padding: 10px;
     }
 }
 

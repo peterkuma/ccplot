@@ -42,3 +42,9 @@ footer {
 footer p {
     margin: 0.7em 0;
 }
+
+@media (max-width: 950px) {
+    footer {
+        margin-top: 1em;
+    }
+}

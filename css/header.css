@@ -1,39 +1,43 @@
 header nav {
     font-size: 120%;
     font-weight: 600;
-    padding-top: 0.6em;
-    padding-bottom: 0.6em;
     margin-top: 0.7em;
     margin-bottom: 0.7em;
     border-bottom: 7px solid #eee;
     line-height: 150%;
-    position: relative;
+    display: flex;
+    flex-wrap: wrap;
 }
 
-header nav > span:before {
-    content: "·";
-    color: #555;
-    font-weight: normal;
-    margin-left: 0.6em;
-    margin-right: 0.6em;
-}
+@media (min-width: 950px) {
+    header nav {
+        padding-top: 0.6em;
+        padding-bottom: 0.6em;
+    }
 
-header nav > span:first-child:before {
-    content: "";
-    margin-left: 0;
-    margin-right: 0;
-}
+    header nav > span:before {
+        content: "·";
+        color: #555;
+        font-weight: normal;
+        margin-left: 0.6em;
+        margin-right: 0.6em;
+    }
 
-header nav .github {
-    position: absolute;
-    right: 0;
-    bottom: 0;
+    header nav > span:first-child:before {
+        content: "";
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    header nav .github {
+        flex-grow: 1;
+        text-align: right;
+    }
 }
 
 @media (max-width: 950px) {
-    header nav .github {
-        position: inherit;
-        margin: 10px 0;
+    header nav {
+        column-gap: 0.6em;
     }
 }
 
