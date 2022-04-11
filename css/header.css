@@ -37,7 +37,12 @@ header nav {
 
 @media (max-width: 950px) {
     header nav {
-        column-gap: 0.6em;
+        margin: 0 -0.3em;
+    }
+
+    header nav > span,
+    header nav > .github {
+        margin: 0 0.3em;
     }
 }
 
