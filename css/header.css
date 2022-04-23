@@ -19,8 +19,8 @@ header nav {
         content: "·";
         color: #555;
         font-weight: normal;
-        margin-left: 0.6em;
-        margin-right: 0.6em;
+        margin-left: 0.5em;
+        margin-right: 0.5em;
     }
 
     header nav > span:first-child:before {
@@ -32,6 +32,11 @@ header nav {
     header nav .github {
         flex-grow: 1;
         text-align: right;
+    }
+
+    header nav .github > a {
+        position: relative;
+        top: 3px;
     }
 }
 
