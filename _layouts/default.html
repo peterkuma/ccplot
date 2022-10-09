@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>{{ page.title }} ‧ ccplot</title>
+        <title>{% if page.title == '' %}ccplot: CloudSat and CALIPSO plotting tool{% else %}{{ page.title }} ‧ ccplot (CloudSat and CALIPSO plotting tool){% endif %}</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="keywords" content="CloudSat,CALIPSO,CPR,CALIOP,MODIS,plot" />
