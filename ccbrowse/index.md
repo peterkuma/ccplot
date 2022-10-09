@@ -4,8 +4,8 @@ title: ccbrowse
 css: home.css
 ---
 
-ccbrowse (beta)
-===============
+ccbrowse
+========
 
 <p class="abstract">
 ccbrowse is an open source web application for browsing data from the CloudSat
@@ -14,7 +14,7 @@ and CALIPSO satellites.
 
 A self-hosted version can be run using code available on
 <a href="https://github.com/peterkuma/ccbrowse">GitHub</a>. A public ccbrowse
-server is available at:
+server is available at (only CALIPSO data are available at the moment):
 
 <div style="text-align: center; font-size: 120%; margin: 1.5em; font-weight: bold">
 <a href="https://browse.ccplot.org">browse.ccplot.org</a>

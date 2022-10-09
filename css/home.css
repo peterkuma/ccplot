@@ -3,6 +3,27 @@
     line-height: 160%;
 }
 
+.ccbrowse {
+    float: right;
+    background: rgb(238, 238, 238);
+    padding: 0.5em;
+    text-align: center;
+}
+
+.ccbrowse p {
+    margin: 0;
+}
+
+.ccbrowse a {
+    font-weight: bold;
+}
+
+.ccbrowse img {
+    display: block;
+    width: 200px;
+    margin-top: 0.5em;
+}
+
 .download {
     padding: 0.2em 0;
     float: right;
