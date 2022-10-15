@@ -20,6 +20,6 @@ server is available at:
 <a href="https://browse.ccplot.org">browse.ccplot.org</a>
 </div>
 
-Only CALIPSO data are available at the moment. Supported browsers: Firefox and Chrome. Safari is not supported.
+Only CALIPSO data are available at the moment.
 
 <video src="https://files.peterkuma.net/media/ey006c2yt7/ccbrowse.webm" poster="ccbrowse.png" style="width: 100%" autoplay="true" loop="true" controls="true"></video>
