@@ -6,8 +6,9 @@
 .ccbrowse {
     float: right;
     background: rgb(238, 238, 238);
-    padding: 0.5em;
+    padding: 0.4em;
     text-align: center;
+    margin-left: 0.2em;
 }
 
 .ccbrowse p {
@@ -22,7 +23,6 @@
     display: block;
     width: 200px;
     margin-top: 0.5em;
-    margin-bottom: 0.5em;
 }
 
 .download {
@@ -44,4 +44,10 @@
 .download .requirements {
     color: #888;
     font-size: 90%;
+}
+
+@media (max-width: 950px) {
+    .ccbrowse img {
+        width: 130px;
+    }
 }
