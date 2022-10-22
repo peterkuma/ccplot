@@ -1,62 +1,8 @@
-header nav {
-    font-size: 120%;
-    font-weight: 600;
-    margin-top: 0.7em;
-    margin-bottom: 0.7em;
-    border-bottom: 7px solid #eee;
-    line-height: 150%;
-    display: flex;
-    flex-wrap: wrap;
-}
-
-@media (min-width: 950px) {
-    header nav {
-        padding-top: 0.6em;
-        padding-bottom: 0.6em;
-    }
-
-    header nav > span:before {
-        content: "·";
-        color: #555;
-        font-weight: normal;
-        margin-left: 0.5em;
-        margin-right: 0.5em;
-    }
-
-    header nav > span:first-child:before {
-        content: "";
-        margin-left: 0;
-        margin-right: 0;
-    }
-
-    header nav .github {
-        flex-grow: 1;
-        text-align: right;
-    }
-
-    header nav .github > a {
-        position: relative;
-        top: 3px;
-    }
-}
-
-@media (max-width: 950px) {
-    header nav {
-        margin: 0 -0.3em;
-    }
-
-    header nav > span,
-    header nav > .github {
-        margin: 0 0.3em;
-    }
-}
-
 header hgroup {
     text-align: center;
     display: block;
     font-weight: bold;
-    margin-top: 1.2em;
-    margin-bottom: 1em;
+    margin-top: 0.4em;
 }
 
 header hgroup a {
@@ -76,4 +22,59 @@ header hgroup h2 {
     font-size: 130%;
     margin-top: 0;
     margin-bottom: 0;
+}
+
+header nav {
+    font-size: 120%;
+    font-weight: 600;
+    border-bottom: 7px solid #eee;
+    line-height: 150%;
+    text-align: center;
+}
+
+header nav > span {
+    white-space: nowrap;
+}
+
+header nav .github img {
+    vertical-align: middle;
+    height: 1.4em;
+}
+
+@media (min-width: 950px) {
+    header hgroup {
+        margin-bottom: 0.6em;
+    }
+
+    header nav {
+        padding-bottom: 0.6em;
+    }
+
+    header nav > span:before {
+        content: "·";
+        color: #555;
+        font-weight: normal;
+        margin-left: 0.2em;
+        margin-right: 0.2em;
+    }
+
+    header nav > span:first-child:before {
+        content: "";
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
+@media (max-width: 950px) {
+    header hgroup {
+        margin-bottom: 0.4em;
+    }
+
+    header nav {
+        padding-bottom: 0.4em;
+    }
+
+    header nav > span {
+        margin: 0 0.2em;
+    }
 }
