@@ -20,17 +20,6 @@ body {
     padding: 25px 50px;
 }
 
-@media (max-width: 950px) {
-    body {
-        margin: 0;
-        font-size: 14px;
-    }
-
-    #main {
-        padding: 10px;
-    }
-}
-
 a {
     color: #1564ca;
     text-decoration: none;
@@ -40,5 +29,13 @@ a img {
     border: none;
 }
 
-h1,h2 {
+@media (max-width: 950px) {
+    body {
+        margin: 0;
+        font-size: 14px;
+    }
+
+    #main {
+        padding: 10px;
+    }
 }
