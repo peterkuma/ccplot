@@ -180,8 +180,8 @@ recommended to install ccplot on Linux.
 Archived installation instructions for past versions of ccplot are available
 here:
 
-* [ccplot >= 1.5, < 2.0.0 (Python 2 & 3)](/download/1.5/)
-* [ccplot < 1.5 (Python 2)](/download/1.0/)
+* [ccplot >= 1.5, < 2.0.0 (Python 2 & 3)](/installation/1.5/)
+* [ccplot < 1.5 (Python 2)](/installation/1.0/)
 
 Below, you can find installation instructions for:
 
@@ -193,7 +193,7 @@ Linux
 -----
 
 The installation works with either native Python 3 on Linux distributions, or
-with [Anaconda](https://anaconda.org). The instructions below are for native
+with [Anaconda](https://anaconda.com). The instructions below are for native
 Python 3.
 
 ### Dependencies on Debian-based distributions (Debian, Ubuntu, Devuan, ...)
