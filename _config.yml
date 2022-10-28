@@ -1,2 +1,4 @@
 name: ccplot
 highlighter: rouge
+plugins:
+  - jekyll-sitemap
