@@ -5,7 +5,7 @@ header hgroup {
     margin-top: 0.4em;
 }
 
-header hgroup a {
+header .heading > a {
     color: inherit;
     display: block;
 }
