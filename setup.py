@@ -94,7 +94,7 @@ setup(
     include_dirs=[numpy.get_include()],
     data_files=[('share/doc/ccplot', ['NEWS']),
                 ('share/ccplot/cmap', glob('cmap/*')),
-                ('man/man1', ['man/ccplot.1'])],
+                ('share/man/man1', ['man/ccplot.1'])],
     include_package_data=True,
     package_data=package_data,
     cmdclass={
