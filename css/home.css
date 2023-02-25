@@ -1,14 +1,25 @@
+.preamble + * {
+    clear: both;
+}
+
 .abstract {
     font-size: 120%;
     line-height: 160%;
 }
 
+.preamble .abstract {
+    width: calc(100% - 260px);
+    float: left;
+}
+
 .ccbrowse {
     float: right;
     background: rgb(238, 238, 238);
-    padding: 0.4em;
+    padding: 5px;
     text-align: center;
-    margin-left: 0.2em;
+    margin-top: 15px;
+    width: 240px;
+    content-size: border-box;
 }
 
 .ccbrowse p {
@@ -21,8 +32,8 @@
 
 .ccbrowse img {
     display: block;
-    width: 200px;
-    margin-top: 0.5em;
+    width: 100%;
+    margin: 0.5em auto 0 auto;
 }
 
 .download {
@@ -46,8 +57,14 @@
     font-size: 90%;
 }
 
-@media (max-width: 950px) {
-    .ccbrowse img {
-        width: 130px;
+@media (max-width: 500px) {
+    .ccbrowse {
+        float: none;
+        margin: auto;
+        width: 220px;
+    }
+    .abstract {
+        float: none;
+        width: auto;
     }
 }
