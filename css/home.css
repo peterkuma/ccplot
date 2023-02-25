@@ -58,13 +58,13 @@
 }
 
 @media (max-width: 500px) {
+    .preamble .abstract {
+        float: none;
+        width: auto;
+    }
     .ccbrowse {
         float: none;
         margin: auto;
         width: 220px;
-    }
-    .abstract {
-        float: none;
-        width: auto;
     }
 }
