@@ -13,13 +13,19 @@ Archive of ccplot releases
         <thead><tr><th>Date</th><th>Release</th></tr></thead>
         <tbody>
             <tr>
+                <td>20 June 2023</td>
+                <td>
+                    <a href="https://github.com/peterkuma/ccplot/archive/refs/tags/v2.1.2.tar.gz">ccplot 2.1.2</a>
+                </td>
+            </tr>
+        </tbody>
+        <tbody id="archive" style="display: none">
+            <tr>
                 <td>23 January 2022</td>
                 <td>
                     <a href="https://github.com/peterkuma/ccplot/archive/refs/tags/v2.1.1.tar.gz">ccplot 2.1.1</a>
                 </td>
             </tr>
-        </tbody>
-        <tbody id="archive" style="display: none">
             <tr>
                 <td>28 November 2021</td>
                 <td>
@@ -249,11 +255,11 @@ It is recommended to run ccplot on [Linux](#linux).
 ### Option 1: Native
 
 ccplot can be installed from a binary distribution (Python wheel) in the
-Python distribution Anaconda 3.9.
+Python distribution Anaconda 3.10.
 
 To install ccplot on Windows:
 
-1. Install [Anaconda Python 3.9](https://www.anaconda.com) (later versions are
+1. Install [Anaconda Python 3.10](https://www.anaconda.com) (later versions are
 currently not supported).
 
 2. Open the `Anaconda Prompt` from the Windows Start Menu. Install cartopy and
