@@ -1,5 +1,9 @@
 CCPLOT NEWS
 
+New in 2.1.2 (2023-06-20)
+
+    * Support for Anaconda Python 3.10 on Windows.
+
 New in 2.1.1 (2021-01-23)
 
     * Fix building of Python wheel on Windows (missing DLLs).
