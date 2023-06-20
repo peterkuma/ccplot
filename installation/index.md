@@ -302,24 +302,30 @@ libraries from source code. This is the most difficult installation method,
 but it can theoretically work with future versions of Python.
 
 1. Install:
-   - [Anaconda](https://www.anaconda.com)
-   - [Visual Studio 2019](https://visualstudio.microsoft.com/downloads/)
-   - [cmake](https://cmake.org)
-   - [HDF4](https://portal.hdfgroup.org/display/HDF4/HDF4) binary distribution
-     for Windows (`hdf-4.2.15-win10_64-vs15.zip` or later)
+   - [Anaconda Python 3.10](https://www.anaconda.com)
+   - [Visual Studio 2022 Community Edition](https://visualstudio.microsoft.com/downloads/)
+   - [HDF 4.2.16](https://portal.hdfgroup.org/display/HDF4/HDF4) binary
+     distribution for Windows (`hdf-4.2.16-win10_64-vs17.zip`)
    - [7-zip](https://www.7-zip.org)
 
-5. Download and unpack:
-   - [HDF-EOS2](https://wiki.earthdata.nasa.gov/display/DAS/Toolkit+Downloads) source code (`hdf-eos2-3.0-src.tar.gz`)
+   When installing Visual Studio, tick "Desktop development with C++".
+
+5. Download and decompress:
+   - [HDF-EOS2 3.0](https://wiki.earthdata.nasa.gov/display/DAS/Toolkit+Downloads)
+     source code (`hdf-eos2-3.0-src.tar.gz`)
    - [ccplot](https://github.com/peterkuma/ccplot/) source code
 
-6. Open `HDFEOS2.sln` located in the HDF-EOS2 `vs2019\HDF-EOS2` directory in
-   Visual Studio 2019, set solution configuration to `Release` and perform
-   `Build -> Build solution`.
+6. Open `HDFEOS2.sln` located in the HDF-EOS2 directory `vs2019\HDF-EOS2` in
+   Visual Studio. When prompted, choose to convert the project to the latest
+   version of Visual Studio. Rename `include\HE2_config.h.in` to
+   `HE2_config.h`. Set solution configuration to "Release". Add paths to the
+   `include` and `lib` directories of HDF4 to "Include Directories" and
+   "Library Directories" under "VC++ Directories" under the project properties.
+   Perform "Build" -> "Build solution".
 
 7. Open the `Anaconda Prompt` from the Windows Start Menu and run:
 
-       conda install cartopy
+       conda install cython cartopy
        cd <ccplot-dir>
        set HDF_DIR=<hdf-dir>
        set HDFEOS_DIR=<hdfeos-dir>
@@ -327,7 +333,7 @@ but it can theoretically work with future versions of Python.
        pip install dist\ccplot-2.1.1-cp39-cp39-win_amd64.whl
 
 where `<ccplot-dir>`, `<hdf-dir>` and `<hdfeos-dir>` are the directories where
-you unpacked the respective packages.
+you decompressed the respective packages.
 
 You should now be able to run ccplot in the Anaconda Prompt:
 
