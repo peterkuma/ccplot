@@ -10,7 +10,7 @@ import os
 import numpy
 
 # Windows build: modify to point to HDF4 and HDF-EOS2 libraries.
-WIN_HDF_DIR=r'C:\Program Files\HDF_Group\HDF\4.2.15'
+WIN_HDF_DIR=r'C:\Program Files\HDF_Group\HDF\4.2.16'
 WIN_HDFEOS_DIR=r'C:\Program Files\hdf-eos2-3.0'
 
 
@@ -18,7 +18,7 @@ if sys.platform == 'win32':
     HDF_DIR = os.environ.get('HDF_DIR', WIN_HDF_DIR)
     HDFEOS_DIR = os.environ.get('HDFEOS_DIR', WIN_HDFEOS_DIR)
     scripts = ['bin/ccplot', 'bin/ccplot.bat']
-    hdf_libraries = ['hdf', 'mfhdf', 'libjpeg', 'libzlib', 'libszip', 'xdr', 'Ws2_32']
+    hdf_libraries = ['hdf', 'mfhdf', 'libjpeg', 'libzlib', 'libszaec', 'xdr', 'Ws2_32']
     hdf_include_dirs = [os.path.join(HDF_DIR, 'include')]
     hdf_library_dirs = [os.path.join(HDF_DIR, 'lib')]
     hdfeos_libraries = ['hdf-eos2']
