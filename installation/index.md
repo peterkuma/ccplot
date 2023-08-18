@@ -221,7 +221,7 @@ On Fedora, download `szip-2.1.1.tar.gz` and `hdf-eos2-3.0-src.tar.gz` from
 Wiki](https://wiki.earthdata.nasa.gov/display/DAS/Toolkit+Downloads), and
 install dependencies with the following commands in the terminal:
 
-    sudo yum install g++ make python3-devel python3-Cython python3-numpy python3-matplotlib python3-cartopy python3-pytz hdf-devel zlib-devel
+    sudo yum install g++ make python3-devel python3-Cython python3-numpy python3-matplotlib python3-cartopy python3-pytz pipx hdf-devel zlib-devel
     tar xf szip-2.1.1.tar.gz
     cd szip-2.1.1
     ./configure --prefix=/usr/local
