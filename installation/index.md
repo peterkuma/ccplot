@@ -13,13 +13,19 @@ Archive of ccplot releases
         <thead><tr><th>Date</th><th>Release</th></tr></thead>
         <tbody>
             <tr>
+                <td>18 August 2023</td>
+                <td>
+                    <a href="https://github.com/peterkuma/ccplot/archive/refs/tags/v2.1.3.tar.gz">ccplot 2.1.3</a>
+                </td>
+            </tr>
+        </tbody>
+        <tbody id="archive" style="display: none">
+            <tr>
                 <td>20 June 2023</td>
                 <td>
                     <a href="https://github.com/peterkuma/ccplot/archive/refs/tags/v2.1.2.tar.gz">ccplot 2.1.2</a>
                 </td>
             </tr>
-        </tbody>
-        <tbody id="archive" style="display: none">
             <tr>
                 <td>23 January 2022</td>
                 <td>
@@ -206,7 +212,7 @@ Python 3.
 
 To install dependencies, enter the following command in the terminal:
 
-    sudo apt install --no-install-recommends python3 python3-dev python3-pip gcc python3-distutils cython3 libhdf4-dev libhdfeos-dev python3-pil python3-numpy python3-scipy python3-matplotlib python3-cartopy python3-packaging python3-tz ttf-bitstream-vera proj-bin
+    sudo apt install --no-install-recommends python3 python3-dev python3-pip gcc python3-distutils pipx cython3 libhdf4-dev libhdfeos-dev python3-pil python3-numpy python3-scipy python3-matplotlib python3-cartopy python3-packaging python3-tz ttf-bitstream-vera proj-bin
 
 ### Dependencies on Fedora
 
@@ -232,16 +238,15 @@ install dependencies with the following commands in the terminal:
 
 To install ccplot, enter the following command in the terminal:
 
-	# To install globally.
-	sudo pip3 install ccplot
+	pipx install ccplot
 
-	# To install in user's home directory. Make sure "$HOME/.local/bin" is
-	# registered the PATH environment variable.
-	pip3 install ccplot --user
+Make sure "$HOME/.local/bin" is registered the PATH environment variable.
 
 Alternatively, to install ccplot from an archive:
 
-    pip3 install ccplot-x.y.z.tar.gz
+    pipx install ./ccplot-x.y.z.tar.gz
+
+**ccplot <= 2.1.2**: Instead of pipx, install with pip3 or pip.
 
 You should now be able to run ccplot in the terminal:
 
