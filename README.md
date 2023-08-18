@@ -35,10 +35,10 @@ Python packages:
 The Python packages are installed automatically by pip together with ccplot:
 
     # To install from a local directory:
-    pip3 install .
+    pipx install .
 
     # To install from PyPI:
-    pip3 install ccplot
+    pipx install ccplot
 
 More information
 ----------------
