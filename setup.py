@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 
-import setuptools
-from distutils.core import setup, Extension
-from Cython.Distutils import build_ext
+from setuptools import setup, Extension
 from glob import glob
 import shutil
 import sys
 import os
-import numpy
 
 # Windows build: modify to point to HDF4 and HDF-EOS2 libraries.
 WIN_HDF_DIR=r'C:\Program Files\HDF_Group\HDF\4.2.16'
@@ -63,19 +60,19 @@ setup(
     url='http://www.ccplot.org/',
     license='BSD',
     classifiers=[
-        "Development Status :: 5 - Production/Stable",
-        "Environment :: Console",
-        "Intended Audience :: Science/Research",
-        "License :: OSI Approved :: BSD License",
-        "Natural Language :: English",
-        "Operating System :: MacOS :: MacOS X",
-        "Operating System :: Microsoft :: Windows",
-        "Operating System :: POSIX",
-        "Programming Language :: C",
-        "Programming Language :: Cython",
-        "Programming Language :: Python :: 3",
-        "Topic :: Scientific/Engineering :: Atmospheric Science",
-        "Topic :: Scientific/Engineering :: Visualization",
+        'Development Status :: 5 - Production/Stable',
+        'Environment :: Console',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: BSD License',
+        'Natural Language :: English',
+        'Operating System :: MacOS :: MacOS X',
+        'Operating System :: Microsoft :: Windows',
+        'Operating System :: POSIX',
+        'Programming Language :: C',
+        'Programming Language :: Cython',
+        'Programming Language :: Python :: 3',
+        'Topic :: Scientific/Engineering :: Atmospheric Science',
+        'Topic :: Scientific/Engineering :: Visualization',
     ],
     scripts=scripts,
     packages=[
@@ -88,18 +85,15 @@ setup(
         'packaging>=20.03',
         'pytz',
     ],
+	python_requires='>=3.0.0',
     setup_requires=[
         'cython'
     ],
-    include_dirs=[numpy.get_include()],
     data_files=[('share/doc/ccplot', ['NEWS']),
                 ('share/ccplot/cmap', glob('cmap/*')),
                 ('share/man/man1', ['man/ccplot.1'])],
     include_package_data=True,
     package_data=package_data,
-    cmdclass={
-        'build_ext': build_ext,
-    },
     ext_modules=[
         Extension(
             'ccplot.cctk',
