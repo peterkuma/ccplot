@@ -236,21 +236,29 @@ install dependencies with the following commands in the terminal:
 
 ### Installation of ccplot
 
-To install ccplot, enter the following command in the terminal:
+To install ccplot, enter the following commands in the terminal:
 
-	pipx install ccplot
+    pipx install ccplot
+    ln -s ~/.local/pipx/venvs/ccplot/share/man/man1/ccplot.1 ~/.local/share/man/man1/
 
-Make sure "$HOME/.local/bin" is registered the PATH environment variable.
+You might have to add "$HOME/.local/bin" the PATH environment variable if not
+already.
 
 Alternatively, to install ccplot from an archive:
 
     pipx install ./ccplot-x.y.z.tar.gz
+    ln -s ~/.local/pipx/venvs/ccplot/share/man/man1/ccplot.1 ~/.local/share/man/man1/
 
-**ccplot <= 2.1.2**: Instead of pipx, install with pip3 or pip.
+**ccplot <= 2.1.2**: Instead of pipx, install with `pip3 install ccplot` or
+`pip install ccplot` if pip3 is not available.
 
 You should now be able to run ccplot in the terminal:
 
     ccplot -V
+
+and view the manual page with:
+
+    man ccplot
 
 Windows
 -------
