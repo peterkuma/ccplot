@@ -2396,10 +2396,14 @@ def main(argv):
     #report_memory()
 
 
-if __name__ == "__main__":
+def main_wrapper():
     try:
         main(sys.argv)
     except MemoryError:
         fail("Insufficient memory")
     except np.linalg.linalg.LinAlgError as err:
         fail("Linear algebra error: %s" % err)
+
+
+if __name__ == "__main__":
+	main()

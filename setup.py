@@ -14,7 +14,6 @@ WIN_HDFEOS_DIR=r'C:\Program Files\hdf-eos2-3.0'
 if sys.platform == 'win32':
     HDF_DIR = os.environ.get('HDF_DIR', WIN_HDF_DIR)
     HDFEOS_DIR = os.environ.get('HDFEOS_DIR', WIN_HDFEOS_DIR)
-    scripts = ['bin/ccplot', 'bin/ccplot.bat']
     hdf_libraries = ['hdf', 'mfhdf', 'libjpeg', 'libzlib', 'libszaec', 'xdr', 'Ws2_32']
     hdf_include_dirs = [os.path.join(HDF_DIR, 'include')]
     hdf_library_dirs = [os.path.join(HDF_DIR, 'lib')]
@@ -29,7 +28,6 @@ if sys.platform == 'win32':
         shutil.copy(filename, 'ccplot')
     package_data = {'ccplot': ['hdf.dll', 'mfhdf.dll', 'xdr.dll']}
 else:
-    scripts = ['bin/ccplot']
     hdf_libraries = ['mfhdf', 'df', 'jpeg', 'z']
     hdf_include_dirs = [
         '/usr/include/hdf',
@@ -74,9 +72,12 @@ setup(
         'Topic :: Scientific/Engineering :: Atmospheric Science',
         'Topic :: Scientific/Engineering :: Visualization',
     ],
-    scripts=scripts,
+    entry_points={
+        'console_scripts': ['ccplot = ccplot.bin.ccplot:main_wrapper'],
+    },
     packages=[
         'ccplot',
+        'ccplot.bin',
     ],
     install_requires=[
         'numpy>=1.1',
