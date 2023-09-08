@@ -372,15 +372,15 @@ Terminal:
 
 3. Install cython:
 
-        pip install cython
+        python3 -m pip install cython
 
 4. To install ccplot, enter the following command in the terminal:
 
-        pip install ccplot
+        python3 -m pip install ccplot
 
    Alternatively, to install ccplot from an archive:
 
-        pip install ccplot-x.y.z.tar.gz
+        python3 -m pip install ccplot-x.y.z.tar.gz
 
 You should now be able to run ccplot in the macOS Terminal:
 
