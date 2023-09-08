@@ -13,13 +13,19 @@ Archive of ccplot releases
         <thead><tr><th>Date</th><th>Release</th></tr></thead>
         <tbody>
             <tr>
+                <td>8 September 2023</td>
+                <td>
+                    <a href="https://github.com/peterkuma/ccplot/archive/refs/tags/v2.1.4.tar.gz">ccplot 2.1.4</a>
+                </td>
+            </tr>
+        </tbody>
+        <tbody id="archive" style="display: none">
+            <tr>
                 <td>18 August 2023</td>
                 <td>
                     <a href="https://github.com/peterkuma/ccplot/archive/refs/tags/v2.1.3.tar.gz">ccplot 2.1.3</a>
                 </td>
             </tr>
-        </tbody>
-        <tbody id="archive" style="display: none">
             <tr>
                 <td>20 June 2023</td>
                 <td>
@@ -268,17 +274,15 @@ Windows
 ### Option 1: Native
 
 ccplot can be installed from a binary distribution (Python wheel) in the
-Python distribution Anaconda 3.10.
+official Python distribution.
 
 To install ccplot on Windows:
 
-1. Install [Anaconda Python 3.10](https://www.anaconda.com) (later versions are
-currently not supported).
+1. Install [Python 3.11](https://www.python.org) (later versions are
+currently not supported). In the installer, tick `Add python.exe to PATH`.
 
-2. Open the `Anaconda Prompt` from the Windows Start Menu. Install cython,
-cartopy and ccplot:
+2. Open the `Command Prompt` from the Windows Start Menu. Install ccplot with:
 
-       conda install cython cartopy
        pip install ccplot
 
 You should now be able to run ccplot in the terminal:
@@ -321,7 +325,7 @@ libraries from source code. This is the most difficult installation method,
 but it can theoretically work with future versions of Python.
 
 1. Install:
-   - [Anaconda Python 3.10](https://www.anaconda.com)
+   - [Python](https://www.python.org)
    - [Visual Studio 2022 Community Edition](https://visualstudio.microsoft.com/downloads/)
    - [HDF 4.2.16](https://portal.hdfgroup.org/display/HDF4/HDF4) binary
      distribution for Windows (`hdf-4.2.16-win10_64-vs17.zip`)
@@ -342,19 +346,19 @@ but it can theoretically work with future versions of Python.
    "Library Directories" under "VC++ Directories" under the project properties.
    Perform "Build" -> "Build solution".
 
-7. Open the `Anaconda Prompt` from the Windows Start Menu and run:
+7. Open the `Command Prompt` from the Windows Start Menu and run:
 
-       conda install cython cartopy
+       pip install wheel cython numpy
        cd <ccplot-dir>
        set HDF_DIR=<hdf-dir>
        set HDFEOS_DIR=<hdfeos-dir>
        python setup.py bdist_wheel
-       pip install dist\ccplot-2.1.2-cp310-cp310-win_amd64.whl
+       pip install dist\ccplot-2.1.4-cp311-cp311-win_amd64.whl
 
 where `<ccplot-dir>`, `<hdf-dir>` and `<hdfeos-dir>` are the directories where
 you decompressed the respective packages.
 
-You should now be able to run ccplot in the Anaconda Prompt:
+You should now be able to run ccplot in the Command Prompt:
 
     ccplot -V
 
