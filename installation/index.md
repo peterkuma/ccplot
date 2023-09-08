@@ -265,8 +265,6 @@ and view the manual page with:
 Windows
 -------
 
-It is recommended to run ccplot on [Linux](#linux).
-
 ### Option 1: Native
 
 ccplot can be installed from a binary distribution (Python wheel) in the
@@ -362,8 +360,6 @@ You should now be able to run ccplot in the Anaconda Prompt:
 
 macOS
 -----
-
-It is recommended to run ccplot on [Linux](#linux).
 
 This installation has been tested on macOS Monterey on Intel, and is also
 reported to work on Apple M1.
