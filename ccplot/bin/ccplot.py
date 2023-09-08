@@ -615,7 +615,7 @@ Third-party libraries:
 matplotlib {mpl_version}
 cartopy {cartopy_version}
 
-Copyright (c) 2009-2021 Peter Kuma.
+Copyright (c) 2009-2023 Peter Kuma.
 This software is provided under the terms of a 2-clause BSD licence.\
 """.format(
         version=__version__,
