@@ -285,7 +285,7 @@ currently not supported). In the installer, tick `Add python.exe to PATH`.
 
        pip install ccplot
 
-You should now be able to run ccplot in the terminal:
+You should now be able to run ccplot in the Command Prompt:
 
     ccplot -V
 
