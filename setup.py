@@ -13,7 +13,7 @@ WIN_HDFEOS_DIR=r'C:\Program Files\hdf-eos2-3.0'
 try:
     import numpy
     numpy_include_dirs = [numpy.get_include()]
-except ModuleNotFound:
+except ModuleNotFoundError:
     numpy_include_dirs = []
 
 if sys.platform == 'win32':
