@@ -361,21 +361,18 @@ You should now be able to run ccplot in the Command Prompt:
 macOS
 -----
 
-This installation has been tested on macOS Monterey on Intel, and is also
-reported to work on Apple M1.
+This installation has been tested on macOS Ventura on Intel.
 
-1. Install [Anaconda](https://www.anaconda.com/download/).
+1. Install [MacPorts](https://www.macports.org).
 
-2. Install [MacPorts](https://www.macports.org).
-
-3. Install required MacPorts packages. Enter the following command in the macOS
+2. Install required MacPorts packages. Enter the following command in the macOS
 Terminal:
 
         sudo port install jpeg hdf4 hdfeos
 
-4. Install cython and cartopy:
+3. Install cython:
 
-        conda install cython cartopy
+        pip install cython
 
 4. To install ccplot, enter the following command in the terminal:
 
