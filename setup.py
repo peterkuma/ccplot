@@ -93,7 +93,8 @@ setup(
     ],
 	python_requires='>=3.0.0',
     setup_requires=[
-        'cython'
+        'cython',
+        'numpy',
     ],
     data_files=[('share/doc/ccplot', ['NEWS']),
                 ('share/ccplot/cmap', glob('cmap/*')),
