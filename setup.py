@@ -10,6 +10,11 @@ import os
 WIN_HDF_DIR=r'C:\Program Files\HDF_Group\HDF\4.2.16'
 WIN_HDFEOS_DIR=r'C:\Program Files\hdf-eos2-3.0'
 
+try:
+    import numpy
+    numpy_include_dirs = [numpy.get_include()]
+except ModuleNotFound:
+    numpy_include_dirs = []
 
 if sys.platform == 'win32':
     HDF_DIR = os.environ.get('HDF_DIR', WIN_HDF_DIR)
@@ -98,25 +103,27 @@ setup(
     ext_modules=[
         Extension(
             'ccplot.cctk',
-            ['ccplot/cctk.c']
+            ['ccplot/cctk.c'],
+            include_dirs=numpy_include_dirs,
         ),
         Extension(
             'ccplot.hdf',
             ['ccplot/hdf.pyx'],
-            include_dirs=hdf_include_dirs,
+            include_dirs=(hdf_include_dirs + numpy_include_dirs),
             library_dirs=hdf_library_dirs,
             libraries=hdf_libraries,
         ),
         Extension(
             'ccplot.hdfeos',
             ['ccplot/hdfeos.pyx'],
-            include_dirs=(hdf_include_dirs + hdfeos_include_dirs),
+            include_dirs=(hdf_include_dirs + hdfeos_include_dirs + numpy_include_dirs),
             library_dirs=(hdf_library_dirs + hdfeos_library_dirs),
             libraries=(hdfeos_libraries + hdf_libraries),
         ),
         Extension(
             'ccplot.algorithms',
             ['ccplot/algorithms.pyx'],
+            include_dirs=numpy_include_dirs,
         ),
     ],
 )
