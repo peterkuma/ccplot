@@ -314,10 +314,6 @@ features → More Windows features).
    user's home directory, where `<user>` is the name of your Windows user
    account, and `ls` to list the content of a directory.
 
-You should now be able to run ccplot in the Anaconda Prompt:
-
-    ccplot -V
-
 ### Option 3: Building from source code
 
 Follow these instructions if you want to build ccplot and the dependent
