@@ -370,11 +370,11 @@ Terminal:
 
         sudo port install jpeg hdf4 hdfeos
 
-3. Install cython:
+3. Install required Python packages:
 
-        python3 -m pip install cython
+        python3 -m pip install cython numpy
 
-4. To install ccplot, enter the following command in the terminal:
+4. Install ccplot:
 
         python3 -m pip install ccplot
 
