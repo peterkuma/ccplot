@@ -278,7 +278,7 @@ official Python distribution.
 
 To install ccplot on Windows:
 
-1. Install [Python 3.11](https://www.python.org) (later versions are
+1. Install [Python 3.13](https://www.python.org) (later versions are
 currently not supported). In the installer, tick `Add python.exe to PATH`.
 
 2. Open the `Command Prompt` from the Windows Start Menu. Install ccplot with:
@@ -344,12 +344,12 @@ but it can theoretically work with future versions of Python.
 
 7. Open the `Command Prompt` from the Windows Start Menu and run:
 
-       pip install wheel cython numpy
+       pip install setuptools wheel cython numpy
        cd <ccplot-dir>
        set HDF_DIR=<hdf-dir>
        set HDFEOS_DIR=<hdfeos-dir>
        python setup.py bdist_wheel
-       pip install dist\ccplot-2.1.4-cp311-cp311-win_amd64.whl
+       pip install dist\ccplot-2.1.4-cp313-cp313-win_amd64.whl
 
 where `<ccplot-dir>`, `<hdf-dir>` and `<hdfeos-dir>` are the directories where
 you decompressed the respective packages.
