@@ -13,13 +13,19 @@ Archive of ccplot releases
         <thead><tr><th>Date</th><th>Release</th></tr></thead>
         <tbody>
             <tr>
+                <td>26 March 2025</td>
+                <td>
+                    <a href="https://github.com/peterkuma/ccplot/archive/refs/tags/v2.1.5.tar.gz">ccplot 2.1.5</a>
+                </td>
+            </tr>
+        </tbody>
+        <tbody id="archive" style="display: none">
+            <tr>
                 <td>8 September 2023</td>
                 <td>
                     <a href="https://github.com/peterkuma/ccplot/archive/refs/tags/v2.1.4.tar.gz">ccplot 2.1.4</a>
                 </td>
             </tr>
-        </tbody>
-        <tbody id="archive" style="display: none">
             <tr>
                 <td>18 August 2023</td>
                 <td>
