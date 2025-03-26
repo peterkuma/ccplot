@@ -355,7 +355,7 @@ but it can theoretically work with future versions of Python.
        set HDF_DIR=<hdf-dir>
        set HDFEOS_DIR=<hdfeos-dir>
        python setup.py bdist_wheel
-       pip install dist\ccplot-2.1.4-cp313-cp313-win_amd64.whl
+       pip install dist\ccplot-2.1.5-cp313-cp313-win_amd64.whl
 
 where `<ccplot-dir>`, `<hdf-dir>` and `<hdfeos-dir>` are the directories where
 you decompressed the respective packages.
