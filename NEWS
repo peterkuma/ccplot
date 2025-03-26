@@ -1,5 +1,9 @@
 CCPLOT NEWS
 
+New in 2.1.5 (2025-03-26)
+
+    * Fixed installation bug due to NumPy 2.
+
 New in 2.1.4 (2023-09-08)
 
     * Support for installation on Windows with Python 3.11.
@@ -14,7 +18,7 @@ New in 2.1.2 (2023-06-20)
 
 New in 2.1.1 (2021-01-23)
 
-    * Fix building of Python wheel on Windows (missing DLLs).
+    * Fixed building of Python wheel on Windows (missing DLLs).
 
 New in 2.1.0 (2021-11-28)
 

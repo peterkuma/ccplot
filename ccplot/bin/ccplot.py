@@ -72,7 +72,7 @@ import ccplot.utils
 
 # Early global variables.
 program_name = os.path.basename(sys.argv[0])
-__version__ = "2.1.4"
+__version__ = "2.1.5"
 CCPLOT_CMAP_PATH = os.path.join(ccplot.config.sharepath, 'cmap') \
                  + ":/usr/share/ccplot/cmap:/usr/local/share/ccplot/cmap"
 
