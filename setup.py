@@ -85,7 +85,7 @@ setup(
         'ccplot.bin',
     ],
     install_requires=[
-        'numpy>=1.1',
+        'numpy>=1.1,<2.0.0',
         'matplotlib>=0.98.1',
         'cartopy>=0.17.0',
         'packaging>=20.03',
