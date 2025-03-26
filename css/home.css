@@ -7,10 +7,12 @@
     line-height: 160%;
 }
 
+/*
 .preamble .abstract {
     width: calc(100% - 260px);
     float: left;
 }
+*/
 
 .ccbrowse {
     float: right;
