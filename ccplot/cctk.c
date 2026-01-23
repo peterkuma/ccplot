@@ -7,14 +7,14 @@
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *  1. Redistributions of source code must retain the above copyright notice,
  *     this list of conditions and the following disclaimer.
  *  2. Redistributions in binary form must reproduce the above copyright
  *     notice, this list of conditions and the following disclaimer
  *     in the documentation and/or other materials provided with
  *     the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE CCPLOT PROJECT ``AS IS'' AND ANY EXPRESS
  * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -24,8 +24,10 @@
  * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
  * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 
 #include <Python.h>
 #include <numpy/arrayobject.h>
@@ -34,8 +36,8 @@
 #define lroundf(x) ((long)((x) >= 0 ? (x)+0.5 : (x)-0.5))
 
 static void
-dimmap2d(PyObject *data, PyObject *out, int off1, int inc1, int off2, int inc2,
-float modulus)
+dimmap2d(PyArrayObject *data, PyArrayObject *out, int off1, int inc1, int off2,
+    int inc2, float modulus)
 {
 	npy_intp i = 0, j = 0;
 	npy_intp k0 = 0, k1 = 0, l0 = 0, l1 = 0;
@@ -79,12 +81,12 @@ float modulus)
 			b2 = PyArray_GETPTR2(data, k0, l1);
 			b3 = PyArray_GETPTR2(data, k1, l0);
 			b4 = PyArray_GETPTR2(data, k1, l1);
-			
+
 			br1 = 0.f;
 			br2 = fmodf(*b2 - *b1, modulus);
 			br3 = fmodf(*b3 - *b1, modulus);
 			br4 = fmodf(*b4 - *b1, modulus);
-			
+
 			*outbin = *b1 + (
 				br1 * (1-dk)*(1-dl) +
 				br2 * (1-dk)* dl +
@@ -98,10 +100,10 @@ static PyObject *
 cctk_dimmap2d(PyObject *self, PyObject *args)
 {
 	PyObject *arg1 = NULL;
-	PyObject *data = NULL;
+	PyArrayObject *data = NULL;
 	int off1, inc1, off2, inc2;
 	float modulus;
-	PyObject *out = NULL;
+	PyArrayObject *out = NULL;
 
 	npy_intp *dims;
 	npy_intp outdims[2] = { 0, 0 };
@@ -111,9 +113,10 @@ cctk_dimmap2d(PyObject *self, PyObject *args)
 		return NULL;
 	}
 
-	data = PyArray_FROM_OTF(arg1, NPY_FLOAT, NPY_IN_ARRAY);
+	data = (PyArrayObject *) \
+	    PyArray_FROM_OTF(arg1, NPY_FLOAT, NPY_ARRAY_IN_ARRAY);
 	if (data == NULL) goto fail;
-	
+
 	if (PyArray_NDIM(data) != 2) {
 		PyErr_SetString(PyExc_ValueError, "Incorrect dimensions");
 		goto fail;
@@ -134,22 +137,24 @@ cctk_dimmap2d(PyObject *self, PyObject *args)
 		goto fail;
 	}
 
-	out = PyArray_ZEROS(2, outdims, NPY_FLOAT, 0);
+	out = (PyArrayObject *) PyArray_ZEROS(2, outdims, NPY_FLOAT, 0);
 	if (out == NULL) goto fail;
-	
+
 	/* Core function call. */
 	dimmap2d(data, out, off1, inc1, off2, inc2, modulus);
 
 	Py_DECREF(data);
-	return out;
+	return (PyObject *) out;
 fail:
 	Py_XDECREF(data);
 	Py_XDECREF(out);
-	return NULL;	
+	return NULL;
 }
 
 static PyObject *
-interpolate2d(PyObject *data, PyObject *xin2d, PyObject *yin2d, PyObject *out,
+interpolate2d(
+    PyArrayObject *data, PyArrayObject *xin2d, PyArrayObject *yin2d,
+    PyArrayObject *out,
 	float xout1, float xout2, float yout1, float yout2,
 	float fill, int radiusx, int radiusy)
 {
@@ -160,17 +165,17 @@ interpolate2d(PyObject *data, PyObject *xin2d, PyObject *yin2d, PyObject *out,
 	float kf, lf;
 	npy_float *bin = NULL;
 	npy_float *outbin = NULL, *coefbin = NULL;
-	PyObject *coefa;
+	PyArrayObject *coefa;
 	float coef;
-	
+
 	xdim = PyArray_DIMS(data)[0];
 	ydim = PyArray_DIMS(data)[1];
 	xoutn = PyArray_DIMS(out)[0];
 	youtn = PyArray_DIMS(out)[1];
 
-	coefa = PyArray_ZEROS(2, PyArray_DIMS(out), NPY_FLOAT, 0);
+	coefa = (PyArrayObject *) PyArray_ZEROS(2, PyArray_DIMS(out), NPY_FLOAT, 0);
 	if (coefa == NULL) return NULL;
-	
+
 	for (i = 0; i < xoutn; i++) {
 		for (j = 0; j < youtn; j++) {
 			bin = PyArray_GETPTR2(coefa, i, j);
@@ -179,14 +184,14 @@ interpolate2d(PyObject *data, PyObject *xin2d, PyObject *yin2d, PyObject *out,
 			*outbin = fill;
 		}
 	}
-	
+
 	for (i = 0; i < xdim; i++) {
 		for (j = 0; j < ydim; j++) {
 			bin = PyArray_GETPTR2(data, i, j);
 			if (npy_isnan(*bin)) continue;
 			x = *((npy_float *) PyArray_GETPTR2(xin2d, i, j));
 			y = *((npy_float *) PyArray_GETPTR2(yin2d, i, j));
-			
+
 			kf = (x - xout1) / (xout2 - xout1) * xoutn;
 			lf = (y - yout1) / (yout2 - yout1) * youtn;
 			k = lroundf(kf);
@@ -229,17 +234,17 @@ interpolate2d(PyObject *data, PyObject *xin2d, PyObject *yin2d, PyObject *out,
 
 	Py_DECREF(coefa);
 
-	return out;
+	return (PyObject *) out;
 }
 
 static PyObject *
 cctk_interpolate2d(PyObject *self, PyObject *args)
 {
 	PyObject *arg1 = NULL, *arg2 = NULL, *arg3 = NULL;
-	PyObject *data = NULL, *xin2d = NULL, *yin2d = NULL;
+	PyArrayObject *data = NULL, *xin2d = NULL, *yin2d = NULL;
 	float xout1, xout2, yout1, yout2;
 	int xoutn, youtn;
-	PyObject *out = NULL;
+	PyArrayObject *out = NULL;
 	float fill;
 	int radiusx, radiusy;
 
@@ -252,13 +257,16 @@ cctk_interpolate2d(PyObject *self, PyObject *args)
 		return NULL;
 	}
 
-	data = PyArray_FROM_OTF(arg1, NPY_FLOAT, NPY_IN_ARRAY);
+	data = (PyArrayObject *) \
+	    PyArray_FROM_OTF(arg1, NPY_FLOAT, NPY_ARRAY_IN_ARRAY);
 	if (data == NULL) goto fail;
 
-	xin2d = PyArray_FROM_OTF(arg2, NPY_FLOAT, NPY_IN_ARRAY);
+	xin2d = (PyArrayObject *) \
+	    PyArray_FROM_OTF(arg2, NPY_FLOAT, NPY_ARRAY_IN_ARRAY);
 	if (xin2d == NULL) goto fail;
 
-	yin2d = PyArray_FROM_OTF(arg3, NPY_FLOAT, NPY_IN_ARRAY);
+	yin2d = (PyArrayObject *) \
+	    PyArray_FROM_OTF(arg3, NPY_FLOAT, NPY_ARRAY_IN_ARRAY);
 	if (yin2d == NULL) goto fail;
 
 	if (PyArray_NDIM(data) != 2 || PyArray_NDIM(xin2d) != 2 ||
@@ -285,17 +293,18 @@ cctk_interpolate2d(PyObject *self, PyObject *args)
 		goto fail;
 	}
 
-	out = PyArray_ZEROS(2, outdims, NPY_FLOAT, 0);
+	out = (PyArrayObject *) PyArray_ZEROS(2, outdims, NPY_FLOAT, 0);
 	if (out == NULL) goto fail;
-	
+
 	/* Core function call. */
-	out = interpolate2d(data, xin2d, yin2d, out, xout1, xout2, yout1, yout2,
-		fill, radiusx, radiusy);
+	out = (PyArrayObject *) \
+	    interpolate2d(data, xin2d, yin2d, out, xout1, xout2, yout1, yout2, fill,
+		radiusx, radiusy);
 
 	Py_DECREF(data);
 	Py_DECREF(xin2d);
 	Py_DECREF(yin2d);
-	return out;
+	return (PyObject *) out;
 fail:
 	Py_XDECREF(data);
 	Py_XDECREF(xin2d);
@@ -324,8 +333,8 @@ fail:
  * 	Returns a 2D numpy array, the same as out.
  */
 static PyObject *
-layermap(PyObject *data, PyObject *nlayer, PyObject *basealt,
-	PyObject *topalt, PyObject *out, float y0, float ym, float fill)
+layermap(PyArrayObject *data, PyArrayObject *nlayer, PyArrayObject *basealt,
+	PyArrayObject *topalt, PyArrayObject *out, float y0, float ym, float fill)
 {
 	npy_intp i, j, k;
 	npy_intp n, m, nlayer_max;
@@ -335,7 +344,7 @@ layermap(PyObject *data, PyObject *nlayer, PyObject *basealt,
 	npy_float alt2y_ratio;
 	npy_float pf, qf;
 	npy_intp p, q;
-	
+
 	n = PyArray_DIMS(out)[0];
 	m = PyArray_DIMS(out)[1];
 	nlayer_max = PyArray_DIMS(data)[1];
@@ -371,16 +380,16 @@ layermap(PyObject *data, PyObject *nlayer, PyObject *basealt,
 			}
 		}
 	}
-	
-	return out;
+
+	return (PyObject *) out;
 }
 
 static PyObject *
 cctk_layermap(PyObject *self, PyObject *args)
 {
 	PyObject *arg1 = NULL, *arg2 = NULL, *arg3 = NULL, *arg4 = NULL;
-	PyObject *data = NULL, *nlayer = NULL, *basealt = NULL, *topalt = NULL;
-	PyObject *out = NULL;
+	PyArrayObject *data = NULL, *nlayer = NULL, *basealt = NULL, *topalt = NULL;
+	PyArrayObject *out = NULL;
 	float yout1, yout2;
 	int youtn;
 	float fill;
@@ -393,16 +402,20 @@ cctk_layermap(PyObject *self, PyObject *args)
 		return NULL;
 	}
 
-	data = PyArray_FROM_OTF(arg1, NPY_FLOAT, NPY_IN_ARRAY);
+	data = (PyArrayObject *) \
+	    PyArray_FROM_OTF(arg1, NPY_FLOAT, NPY_ARRAY_IN_ARRAY);
 	if (data == NULL) goto fail;
 
-	nlayer = PyArray_FROM_OTF(arg2, NPY_UINT8, NPY_IN_ARRAY);
+	nlayer = (PyArrayObject *) \
+	    PyArray_FROM_OTF(arg2, NPY_UINT8, NPY_ARRAY_IN_ARRAY);
 	if (nlayer == NULL) goto fail;
 
-	basealt = PyArray_FROM_OTF(arg3, NPY_FLOAT, NPY_IN_ARRAY);
+	basealt = (PyArrayObject *) \
+	    PyArray_FROM_OTF(arg3, NPY_FLOAT, NPY_ARRAY_IN_ARRAY);
 	if (basealt == NULL) goto fail;
 
-	topalt = PyArray_FROM_OTF(arg4, NPY_FLOAT, NPY_IN_ARRAY);
+	topalt = (PyArrayObject *) \
+	    PyArray_FROM_OTF(arg4, NPY_FLOAT, NPY_ARRAY_IN_ARRAY);
 	if (topalt == NULL) goto fail;
 
 	if (PyArray_NDIM(data) != 2 || PyArray_NDIM(nlayer) != 1 ||
@@ -431,17 +444,18 @@ cctk_layermap(PyObject *self, PyObject *args)
 		goto fail;
 	}
 
-	out = PyArray_ZEROS(2, outdims, NPY_FLOAT, 0);
+	out = (PyArrayObject *) PyArray_ZEROS(2, outdims, NPY_FLOAT, 0);
 	if (out == NULL) goto fail;
 
 	/* Core function call. */
-	out = layermap(data, nlayer, basealt, topalt, out, yout1, yout2, fill);
+	out = (PyArrayObject *) \
+	    layermap(data, nlayer, basealt, topalt, out, yout1, yout2, fill);
 
 	Py_DECREF(data);
 	Py_DECREF(nlayer);
 	Py_DECREF(basealt);
 	Py_DECREF(topalt);
-	return out;
+	return (PyObject *) out;
 fail:
 	Py_XDECREF(data);
 	Py_XDECREF(nlayer);
