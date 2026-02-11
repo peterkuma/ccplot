@@ -19,7 +19,7 @@ except ModuleNotFoundError:
 if sys.platform == 'win32':
     HDF_DIR = os.environ.get('HDF_DIR', WIN_HDF_DIR)
     HDFEOS_DIR = os.environ.get('HDFEOS_DIR', WIN_HDFEOS_DIR)
-    hdf_libraries = ['hdf', 'mfhdf', 'libjpeg', 'libzlib', 'libszaec', 'xdr', 'Ws2_32']
+    hdf_libraries = ['hdf', 'mfhdf', 'libjpeg', 'libszaec', 'Ws2_32']
     hdf_include_dirs = [os.path.join(HDF_DIR, 'include')]
     hdf_library_dirs = [os.path.join(HDF_DIR, 'lib')]
     hdfeos_libraries = ['hdf-eos2']
@@ -27,11 +27,11 @@ if sys.platform == 'win32':
     hdfeos_library_dirs = [os.path.join(HDFEOS_DIR, r'vs2019\HDF-EOS2\x64\Release')]
     dlls = [
         os.path.join(HDF_DIR, 'bin', x)
-        for x in ['hdf.dll', 'mfhdf.dll', 'xdr.dll']
+        for x in ['hdf.dll', 'mfhdf.dll']
     ]
     for filename in dlls:
         shutil.copy(filename, 'ccplot')
-    sys_package_data = ['hdf.dll', 'mfhdf.dll', 'xdr.dll']
+    sys_package_data = ['hdf.dll', 'mfhdf.dll']
 else:
     hdf_libraries = ['mfhdf', 'df', 'jpeg', 'z', 'gctp']
     hdf_include_dirs = [
