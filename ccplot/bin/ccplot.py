@@ -2201,6 +2201,7 @@ def read_modis_swath(product, band, band_mode,
     # Radiance to temperature conversion.
     if band_mode == BAND_MODE_RADIANCE:
         data = radiance2temp(data, modis_band_wavelength(band) * 1E-9)
+        data = data.astype(np.float32)
         name = "Band %2.1f Black Body Temperature (K)" % band
     elif band_mode == BAND_MODE_REFLECTANCE:
         data *= 100 # In per cent.
