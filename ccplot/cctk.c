@@ -1,7 +1,7 @@
 /* cctkmodule.c
  * This file is a part of ccplot: a CloudSat and CALIPSO plotting tool.
  *
- * Copyright (c) 2009-2020 Peter Kuma
+ * Copyright (c) 2009-2026 Peter Kuma
  *
  * This software is provided under the terms of a 2-clause BSD licence:
  *
