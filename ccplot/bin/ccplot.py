@@ -2401,7 +2401,7 @@ def main_wrapper():
         main(sys.argv)
     except MemoryError:
         fail("Insufficient memory")
-    except np.linalg.linalg.LinAlgError as err:
+    except np.linalg.LinAlgError as err:
         fail("Linear algebra error: %s" % err)
 
 
