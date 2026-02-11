@@ -3,7 +3,7 @@
 # ccplot
 # This file is a part of ccplot: CloudSat and CALIPSO plotting tool.
 #
-# Copyright (c) 2009-2025 Peter Kuma
+# Copyright (c) 2009-2026 Peter Kuma
 #
 # This software is provided under the terms of a 2-clause BSD licence:
 #
