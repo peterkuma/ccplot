@@ -33,7 +33,7 @@ if sys.platform == 'win32':
         shutil.copy(filename, 'ccplot')
     package_data = {'ccplot': ['hdf.dll', 'mfhdf.dll', 'xdr.dll']}
 else:
-    hdf_libraries = ['mfhdf', 'df', 'jpeg', 'z']
+    hdf_libraries = ['mfhdf', 'df', 'jpeg', 'z', 'gctp']
     hdf_include_dirs = [
         '/usr/include/hdf',
         '/usr/local/include/hdf',
