@@ -31,7 +31,7 @@ if sys.platform == 'win32':
     ]
     for filename in dlls:
         shutil.copy(filename, 'ccplot')
-    package_data = {'ccplot': ['hdf.dll', 'mfhdf.dll', 'xdr.dll']}
+    sys_package_data = ['hdf.dll', 'mfhdf.dll', 'xdr.dll']
 else:
     hdf_libraries = ['mfhdf', 'df', 'jpeg', 'z', 'gctp']
     hdf_include_dirs = [
@@ -44,7 +44,7 @@ else:
     hdfeos_libraries = ['hdfeos']
     hdfeos_include_dirs = []
     hdfeos_library_dirs = []
-    package_data = {}
+    sys_package_data = []
 
 if sys.platform == 'darwin':
     hdfeos_libraries += ['Gctp']
@@ -96,11 +96,10 @@ setup(
         'cython',
         'numpy',
     ],
-    data_files=[('share/doc/ccplot', ['NEWS']),
-                ('share/ccplot/cmap', glob('cmap/*')),
+    data_files=[('share/doc/ccplot', ['NEWS', 'LICENSE']),
                 ('share/man/man1', ['man/ccplot.1'])],
     include_package_data=True,
-    package_data=package_data,
+    package_data={'ccplot': ['cmap/*'] + sys_package_data},
     ext_modules=[
         Extension(
             'ccplot.cctk',

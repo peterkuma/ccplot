@@ -46,6 +46,7 @@ import datetime as dt
 import re
 import copy
 import inspect
+import importlib
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -59,7 +60,6 @@ import cartopy
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 
-import ccplot.config
 from ccplot.hdf import HDF
 from ccplot.hdfeos import HDFEOS
 
@@ -73,8 +73,7 @@ import ccplot.utils
 # Early global variables.
 program_name = os.path.basename(sys.argv[0])
 __version__ = "2.1.5"
-CCPLOT_CMAP_PATH = os.path.join(ccplot.config.sharepath, 'cmap') \
-                 + ":/usr/share/ccplot/cmap:/usr/local/share/ccplot/cmap"
+CCPLOT_CMAP_PATH = ""
 
 # Early functions.
 def fail(s):
@@ -1006,6 +1005,10 @@ def loadcolormap(filename, name):
                 fp = open(os.path.join(path, filename), "r")
             except IOError as err: continue
             break
+        try:
+            path = importlib.resources.files("ccplot.cmap")
+            fp = open(path.joinpath(filename), "r")
+        except IOError as err: pass
     if fp == None: fail("%s: File not found" % filename)
 
     try:
