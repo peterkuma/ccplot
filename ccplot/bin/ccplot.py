@@ -1199,8 +1199,8 @@ def setup_lonlat_axes(fig, axes, lon, lat):
     def lonlat_formatter(x, pos=None):
         i = int(x)
         if x < 0 or x >= len(lon): return ""
-        return "%s\n%s" % (lon2str(lon[i], "$\degree$"), \
-                           lat2str(lat[i], "$\degree$"))
+        return "%s\n%s" % (lon2str(lon[i], "$\\degree$"), \
+                           lat2str(lat[i], "$\\degree$"))
 
     llaxes = axes.twiny()
     llaxes.set_xlim(axes.get_xlim())
