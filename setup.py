@@ -83,6 +83,7 @@ setup(
     packages=[
         'ccplot',
         'ccplot.bin',
+        'ccplot.cmap',
     ],
     install_requires=[
         'numpy>=1.1',
