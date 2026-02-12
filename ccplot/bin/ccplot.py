@@ -72,7 +72,7 @@ import ccplot.utils
 
 # Early global variables.
 program_name = os.path.basename(sys.argv[0])
-__version__ = "2.1.5"
+__version__ = "2.1.6"
 CCPLOT_CMAP_PATH = ""
 
 # Early functions.
