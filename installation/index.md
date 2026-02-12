@@ -13,13 +13,19 @@ Archive of ccplot releases
         <thead><tr><th>Date</th><th>Release</th></tr></thead>
         <tbody>
             <tr>
+                <td>12 February 2026</td>
+                <td>
+                    <a href="https://github.com/peterkuma/ccplot/archive/refs/tags/v2.1.6.tar.gz">ccplot 2.1.6</a>
+                </td>
+            </tr>
+        </tbody>
+        <tbody id="archive" style="display: none">
+            <tr>
                 <td>26 March 2025</td>
                 <td>
                     <a href="https://github.com/peterkuma/ccplot/archive/refs/tags/v2.1.5.tar.gz">ccplot 2.1.5</a>
                 </td>
             </tr>
-        </tbody>
-        <tbody id="archive" style="display: none">
             <tr>
                 <td>8 September 2023</td>
                 <td>
@@ -251,8 +257,6 @@ install dependencies with the following commands in the terminal:
 To install ccplot, enter the following commands in the terminal:
 
     pipx install ccplot
-    mkdir -p ~/.local/share/man/man1
-    ln -s ~/.local/pipx/venvs/ccplot/share/man/man1/ccplot.1 ~/.local/share/man/man1/
 
 You might have to add "$HOME/.local/bin" the PATH environment variable if not
 already.
@@ -260,8 +264,6 @@ already.
 Alternatively, to install ccplot from an archive:
 
     pipx install ./ccplot-x.y.z.tar.gz
-    mkdir -p ~/.local/share/man/man1
-    ln -s ~/.local/pipx/venvs/ccplot/share/man/man1/ccplot.1 ~/.local/share/man/man1/
 
 **ccplot <= 2.1.2**: Instead of pipx, install with `pip3 install ccplot` or
 `pip install ccplot` if pip3 is not available.
@@ -328,9 +330,9 @@ but it can theoretically work with future versions of Python.
 
 1. Install:
    - [Python](https://www.python.org)
-   - [Visual Studio 2022 Community Edition](https://visualstudio.microsoft.com/downloads/)
-   - [HDF 4.2.16](https://portal.hdfgroup.org/display/HDF4/HDF4) binary
-     distribution for Windows (`hdf-4.2.16-win10_64-vs17.zip`)
+   - [Visual Studio 2022 Community Edition](https://aka.ms/vs/17/release/vs_community.exe)
+   - [HDF4](https://support.hdfgroup.org/downloads/index.html) binary
+     distribution for Windows.
    - [7-zip](https://www.7-zip.org)
 
    When installing Visual Studio, tick "Desktop development with C++".
@@ -346,7 +348,10 @@ but it can theoretically work with future versions of Python.
    `HE2_config.h`. Set solution configuration to "Release". Add paths to the
    `include` and `lib` directories of HDF4 to "Include Directories" and
    "Library Directories" under "VC++ Directories" under the project properties.
-   Perform "Build" -> "Build solution".
+   Remove "FORTRAN_API" from "Preprocessor Definitions". Add
+   `#include <stdlib.h>` and `#include <string.h>` under other include
+   directives in the files `GDapi.c`, `Hapi.c`, `PTapi.c`, and `SWapi.c` in the
+   `src` directory. Build the solution with "Build" -> "Build solution".
 
 7. Open the `Command Prompt` from the Windows Start Menu and run:
 
@@ -354,8 +359,9 @@ but it can theoretically work with future versions of Python.
        cd <ccplot-dir>
        set HDF_DIR=<hdf-dir>
        set HDFEOS_DIR=<hdfeos-dir>
+       pip install setuptools numpy
        python setup.py bdist_wheel
-       pip install dist\ccplot-2.1.5-cp313-cp313-win_amd64.whl
+       pip install dist\ccplot-2.1.6-cp314-cp314-win_amd64.whl
 
 where `<ccplot-dir>`, `<hdf-dir>` and `<hdfeos-dir>` are the directories where
 you decompressed the respective packages.
