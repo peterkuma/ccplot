@@ -7,7 +7,7 @@ import sys
 import os
 
 # Windows build: modify to point to HDF4 and HDF-EOS2 libraries.
-WIN_HDF_DIR=r'C:\Program Files\HDF_Group\HDF\4.2.16'
+WIN_HDF_DIR=r'C:\Program Files\HDF_Group\HDF\4.3.1'
 WIN_HDFEOS_DIR=r'C:\Program Files\hdf-eos2-3.0'
 
 try:
