@@ -286,7 +286,7 @@ official Python distribution.
 
 To install ccplot on Windows:
 
-1. Install [Python 3.13](https://www.python.org) (later versions are
+1. Install [Python 3.14](https://www.python.org) (later versions are
 currently not supported). In the installer, tick `Add python.exe to PATH`.
 
 2. Open the `Command Prompt` from the Windows Start Menu. Install ccplot with:
